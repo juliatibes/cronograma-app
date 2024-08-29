@@ -1,0 +1,15 @@
+.menu-header ul {
+  list-style-type: none;
+  margin: 0;
+  overflow: hidden;
+}
+
+.logo {
+  width: 75px;
+  /* display: flex; */
+}
+
+header {
+  /* padding-bottom: 1%; */
+  background-color: #004A8D;
+}
