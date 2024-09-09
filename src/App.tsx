@@ -1,5 +1,6 @@
 import './App.css';
 import MenuBar from "./components/MenuBar";
+import Router from './Router';
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
           <MenuBar />
         </header>
       </div>
+      <div><Router/></div>
     </div>
   );
 }

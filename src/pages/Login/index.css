@@ -1,0 +1,47 @@
+:root{
+    --dark-blue-senac:#004A8D;
+    --light-blue-senac:#558ABA;
+    --dark-orange-senac: #F7941D;
+    --light-orange-senac: #FDC180;
+    --light: #ffffff;
+    --dark: #000000;
+}
+main{
+    display: flex;
+    width: 100vw;
+    overflow: hidden;
+}
+.login-blue-side{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 45vw;
+    height: 100vh;
+    gap: 24px;
+    background-color: var(--dark-blue-senac);
+}
+.login-blue-side h2{
+    font-size: 28px;
+    margin: 0;
+    color: var(--light);
+}
+.login-email-label, .login-senha-label{
+    width: 60%;
+}
+.login-email-label input-padrao, .login-senha-label input-padrao{
+    background-color: var(--light);
+}
+.icon-clickable {
+    cursor: pointer;
+}
+.login-white-side{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 55vw;
+    height: 100vh;
+}
+.login-white-side .img-login{
+    width: 50%;
+}

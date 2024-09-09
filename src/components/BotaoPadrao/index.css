@@ -1,0 +1,19 @@
+:root{
+    --dark-blue-senac:#004A8D;
+    --light-blue-senac:#558ABA;
+    --dark-orange-senac: #F7941D;
+    --light-orange-senac: #FDC180;
+    --light: #ffffff;
+    --dark: #000000;
+}
+.standard-button{
+    background-color: var(--dark-orange-senac) !important;
+    color: var(--dark-blue-senac) !important;
+    font-weight: bold !important;
+    padding: 10px !important;
+    width: 90px !important;
+}
+
+.standard-button:hover{
+    background-color: var(--light) !important;
+}
