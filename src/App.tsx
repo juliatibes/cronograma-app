@@ -1,5 +1,5 @@
 import './App.css';
-import MenuBar from "./components/MenuBar";
+import Header from './components/Header';
 import Router from './Router';
 
 function App() {
@@ -7,7 +7,7 @@ function App() {
     <div className="body">
       <div className="container">
         <header>
-          <MenuBar />
+          <Header />
         </header>
       </div>
       <div><Router/></div>

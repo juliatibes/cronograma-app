@@ -1,0 +1,39 @@
+:root{
+    --dark-blue-senac:#004A8D;
+    --light-blue-senac:#558ABA;
+    --dark-orange-senac: #F7941D;
+    --light-orange-senac: #FDC180;
+    --light: #ffffff;
+    --dark: #000000;
+}
+
+main{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    overflow: hidden;
+}
+
+.cadastro-professor{
+ width: 100vw;
+ height: 100vh;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 20px;
+ flex-direction: column;
+}
+
+.cadastro-professor-nome-email{
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.cadastro-professor-celular-cpf{
+display: flex;
+gap: 20px;
+}
