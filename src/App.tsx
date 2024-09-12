@@ -7,7 +7,7 @@ function App() {
     <div className="body">
       <div className="container">
         <header>
-          <Header />
+          {/* <Header /> */}
         </header>
       </div>
       <div><Router/></div>
