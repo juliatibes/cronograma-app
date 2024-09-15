@@ -12,13 +12,25 @@
  height: 100vh;
 }
 .side-menu-lista{
+    list-style-type: none;
     display: flex;
     flex-direction: column;
+    padding: 20px;
     gap: 18px;
     height: 100vh;
+    width: 12vw;
     background-color: var(--gray);
 }
-.side-menu-lista > il {
+.side-menu-lista li {
     display: flex;
-    justify-items: center; 
+    justify-items: center;
+    gap: 10px;
 }
+.side-menu-lista li a{
+  color: var(--dark);
+  text-decoration: none;
+}
+
+.side-menu-lista li a:hover{
+    color: var(--dark-orange-senac);
+  }
