@@ -17,7 +17,7 @@ main{
     overflow: hidden;
 }
 
-.cadastro-professor{
+.cadastro-curso{
  width: 88vw;
  height: 100vh;
  margin: 40px;
@@ -28,20 +28,9 @@ main{
  flex-direction: column;
 }
 
-.cadastro-professor-nome-email{
+.cadastro-curso-nome{
     width: 80%;
     display: flex;
     flex-direction: column;
     gap: 20px;
-}
-
-.cadastro-professor-celular-cpf{
-width: 80%;
-display: flex;
-gap: 20px;
-}
-
-.cadastro-professor-dias-semana{
-    width: 80%;
-    display: flex;
 }

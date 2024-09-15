@@ -3,6 +3,7 @@ import "./index.css";
 import InputPadrao from "../../components/InputPadrao";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import BotaoPadrao from "../../components/BotaoPadrao";
+import imagem_login from "../../assets/imagem_login.svg"
 
 
 
@@ -41,7 +42,7 @@ const Login: FC = () => {
             <BotaoPadrao label={"Entrar"} />
             </div>
             <div className="login-white-side">
-            <img src="/imagem_login.png" alt="Imagem de login" className="img-login" />
+            <img src={imagem_login} alt="Imagem de login" className="img-login" />
             </div>
         </main>
     );
