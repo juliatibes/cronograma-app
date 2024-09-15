@@ -2,6 +2,7 @@ import { FC } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import CadastroProfessor from "./pages/CadastroProfessor";
+import CadastroPeriodo from "./pages/CadastroPeriodo";
 import CadastroCoordenador from "./pages/CadastroCoordenador";
 import CadastroCurso from "./pages/CadastroCurso";
 import Professor from "./pages/Professor";
@@ -15,6 +16,7 @@ const Router: FC = () => {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/cadastroprofessor" element={<CadastroProfessor />} />
+        <Route path="/cadastroperiodo" element={<CadastroPeriodo/>} />
         <Route path="/cadastrocoordenador" element={<CadastroCoordenador />} />
         <Route path="/cadastrocurso" element={<CadastroCurso />} />
         <Route path="/professor" element={<Professor />} />
