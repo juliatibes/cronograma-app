@@ -1,0 +1,46 @@
+:root {
+  --dark-blue-senac: #004a8d;
+  --light-blue-senac: #558aba;
+  --dark-orange-senac: #f7941d;
+  --light-orange-senac: #fdc180;
+  --light: #ffffff;
+  --dark: #000000;
+}
+
+main {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  overflow: hidden;
+}
+
+.titulo {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.cadastro-periodo {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-direction: column;
+}
+
+.cadastro-periodo-nome {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cadastro-periodo-data {
+  display: flex;
+  gap: 20px;
+  width: 80%;
+}
