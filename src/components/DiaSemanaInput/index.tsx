@@ -13,7 +13,7 @@ const DiaSemanaInput: FC = () => {
         defaultValue={[top100Films[0]]}
         filterSelectedOptions
         renderInput={(params) => (
-          <TextField {...params} label="Dia da semana" placeholder="" />
+          <TextField {...params} label="Dia da semana" placeholder="" size="small" />
         )}
       />
     </Stack>

@@ -8,7 +8,8 @@ import DiaSemanaInput from "../../components/DiaSemanaInput";
 
 const CadastroProfessor: FC = () => {
  return (
-    <main>
+    <main style={{width: "100%"}}>
+        
         < SideMenu />
        
         <div className="cadastro-professor">
