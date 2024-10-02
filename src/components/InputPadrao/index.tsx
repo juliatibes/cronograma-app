@@ -18,6 +18,7 @@ const InputPadrao: FC<InputPadraoProperty> = ({ label, type, icon, variant }) =>
       label={label}
       variant={variant}
       type={type}
+      size="small"
       slotProps={{
         input: {
           endAdornment: icon ? (
