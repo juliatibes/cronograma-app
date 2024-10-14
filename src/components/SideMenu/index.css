@@ -1,19 +1,23 @@
+.side-menu{
+    width: 100%;
+    padding: 10px 0;
+    background-color: var(--gray);
+}
+
 .side-menu-lista {
     list-style-type: none;
     display: flex;
     flex-direction: column;
     margin: 0;
-    padding: 20px;
-    gap: 18px;
+    padding: 0;
     height: 100vh;
-    width: 12vw;
-    background-color: var(--gray);
 }
 
 .side-menu-lista li {
+    padding: 12px 46px 12px 22px;
     display: flex;
     justify-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .side-menu-lista li a {
