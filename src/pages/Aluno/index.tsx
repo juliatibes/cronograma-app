@@ -11,7 +11,7 @@ const Aluno: FC = () => {
     navigate("/cadastroaluno");
   };
   return(
-<main>
+<main >
       <SideMenu />
       <div className="cadastro-aluno">
           <h2>Aluno</h2>

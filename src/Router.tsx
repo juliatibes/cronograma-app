@@ -12,6 +12,7 @@ import Periodo from "./pages/Periodo";
 import Fase from "./pages/Fase";
 import CadastroFase from "./pages/CadastroFase";
 import Aluno from "./pages/Aluno";
+import Cronograma from "./pages/Cronograma";
 import CadastroDisciplina from "./pages/CadastroDisciplina";
 
 const Router: FC = () => {
@@ -32,6 +33,7 @@ const Router: FC = () => {
         <Route path="/curso" element={<Curso />} />
         <Route path="/fase" element={<Fase />} />
         <Route path="/aluno" element={<Aluno />} />
+        <Route path="/cronograma" element={<Cronograma />} />
       </Routes>
     </BrowserRouter>
   );
