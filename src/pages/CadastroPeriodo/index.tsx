@@ -9,7 +9,6 @@ import { DatePicker } from "@mui/x-date-pickers";
 import "dayjs/locale/pt-br";
 import dayjs, { Dayjs } from "dayjs";
 import { TextField } from "@mui/material";
-import { apiPost, STATUS_CODE } from "../../api/RestClient";
 import { IPeriodoCadastro } from "./types";
 
 interface PeriodoProperties {}
@@ -28,11 +27,7 @@ const CadastroPeriodo: FC<PeriodoProperties> = ({}) => {
         dataFinal : new Date(dataFinal.format('YYYY-MM-DD'))   // Formatar a data final
       }
 
-    const response = await apiPost('/periodo/criar', periodo)
-
-    if(response.status === STATUS_CODE.CREATED) {
-      console.log("ate que enfim deu certo!!!!", periodo)
-      }
+ 
     }
 
   useEffect(() => {
