@@ -1,36 +1,30 @@
-:root{
-    --dark-blue-senac:#004A8D;
-    --light-blue-senac:#558ABA;
-    --dark-orange-senac: #F7941D;
-    --light-orange-senac: #FDC180;
-    --light: #ffffff;
-    --dark: #000000;
-    --gray: #EBEBEB;
+.side-menu{
+    width: 100%;
+    padding: 10px 0;
+    background-color: var(--gray);
 }
 
-.side-menu{
- height: 100vh;
-}
-.side-menu-lista{
+.side-menu-lista {
     list-style-type: none;
     display: flex;
     flex-direction: column;
-    padding: 20px;
-    gap: 18px;
+    margin: 0;
+    padding: 0;
     height: 100vh;
-    width: 12vw;
-    background-color: var(--gray);
-}
-.side-menu-lista li {
-    display: flex;
-    justify-items: center;
-    gap: 10px;
-}
-.side-menu-lista li a{
-  color: var(--dark);
-  text-decoration: none;
 }
 
-.side-menu-lista li a:hover{
+.side-menu-lista li {
+    padding: 12px 46px 12px 22px;
+    display: flex;
+    justify-items: center;
+    gap: 12px;
+}
+
+.side-menu-lista li a {
+    color: var(--dark);
+    text-decoration: none;
+}
+
+.side-menu-lista li a:hover {
     color: var(--dark-orange-senac);
-  }
+}

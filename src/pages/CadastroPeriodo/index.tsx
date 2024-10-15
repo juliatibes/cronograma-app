@@ -3,9 +3,9 @@ import InputPadrao from "../../components/InputPadrao";
 import "./index.css";
 import SideMenu from "../../components/SideMenu";
 import BotaoPadrao from "../../components/BotaoPadrao";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers";
+// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { DatePicker } from "@mui/x-date-pickers";
 import "dayjs/locale/pt-br";
 import dayjs, { Dayjs } from "dayjs";
 import { TextField } from "@mui/material";
@@ -35,7 +35,7 @@ const CadastroPeriodo: FC<PeriodoProperties> = ({}) => {
   }, []);
   return (
     <>
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
+      {/* <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
         <main style={{ width: "100%" }}>
           <SideMenu />
           <div className="cadastro-periodo">
@@ -83,7 +83,7 @@ const CadastroPeriodo: FC<PeriodoProperties> = ({}) => {
             <BotaoPadrao label={"Salvar"} onClick={salvarPeriodo} />
           </div>
         </main>
-      </LocalizationProvider>
+      </LocalizationProvider> */}
     </>
   );
 };

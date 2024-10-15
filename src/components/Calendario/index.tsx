@@ -1,8 +1,8 @@
 import React from 'react';
-import FullCalendar from '@fullcalendar/react'; // Importa o componente principal do calendário
-import dayGridPlugin from '@fullcalendar/daygrid'; // Exibe o calendário no formato de grade
-import timeGridPlugin from '@fullcalendar/timegrid'; // Exibe um calendário com as horas do dia
-import interactionPlugin from '@fullcalendar/interaction'; // Permite interações, como arrastar e soltar
+// import FullCalendar from '@fullcalendar/react'; // Importa o componente principal do calendário
+// import dayGridPlugin from '@fullcalendar/daygrid'; // Exibe o calendário no formato de grade
+// import timeGridPlugin from '@fullcalendar/timegrid'; // Exibe um calendário com as horas do dia
+// import interactionPlugin from '@fullcalendar/interaction'; // Permite interações, como arrastar e soltar
 import './index.css'; // Importa um CSS personalizado, se necessário
 
 const Calendario: React.FC = () => {
@@ -12,7 +12,7 @@ const Calendario: React.FC = () => {
 
   return (
     <div className="calendar-container">
-      <FullCalendar
+      {/* <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]} // Adiciona plugins necessários
         initialView="dayGridMonth" // Define a visualização inicial como grade mensal
         headerToolbar={{          // Define a barra de ferramentas do cabeçalho
@@ -31,7 +31,7 @@ const Calendario: React.FC = () => {
           { title: 'Evento 3', start: '2023-10-09T10:30:00', end: '2023-10-09T12:30:00' }
         ]}
         dateClick={handleDateClick} // Chama a função ao clicar em uma data
-      />
+      /> */}
     </div>
   );
 };
