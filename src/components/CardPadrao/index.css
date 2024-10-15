@@ -1,0 +1,23 @@
+#card-padrao-body p{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+#card-padrao-title,
+#card-padrao-body span {
+    max-width: 100%;   
+    overflow: hidden;     
+    white-space: nowrap;       
+    text-overflow: ellipsis; 
+}
+
+#card-padrao-actions svg {
+    width: 2rem;
+    height: 2rem;
+}
+
+
+#card-padrao-actions span {
+    cursor: pointer;
+}
