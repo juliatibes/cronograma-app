@@ -1,0 +1,10 @@
+/* Estilo básico para o contêiner do calendário */
+.calendar-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
