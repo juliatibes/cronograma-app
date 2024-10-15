@@ -1,7 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import SideMenu from "../../components/SideMenu";
-import "./index.css";
 import {
   Autocomplete,
   FormControlLabel,
