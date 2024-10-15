@@ -6,7 +6,7 @@ import BotaoPadrao from "../../components/BotaoPadrao";
 
 const CadastroCoordenador: FC = () => {
     return (
-        <main>
+        <main style={{width: "100%"}}>
             < SideMenu />
            
             <div className="cadastro-coordenador">
@@ -16,8 +16,8 @@ const CadastroCoordenador: FC = () => {
                 < InputPadrao label={"E-mail"} type={"email"} />
             </div>
             <div className="cadastro-coordenador-celular-cpf">
-                < InputPadrao label={"Celular"} type={"number"} />
-                < InputPadrao label={"CPF"} type={"number"} />
+                < InputPadrao label={"Celular"} type={"text"} />
+                < InputPadrao label={"CPF"} type={"text"} />
             </div>
             <div className="botao-salvar">
             <BotaoPadrao label={"Salvar"} />
