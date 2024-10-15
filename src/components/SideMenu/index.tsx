@@ -15,7 +15,7 @@ return(
 <div>
     <div className="side-menu">
     <ul className="side-menu-lista">
-        <li> <CalendarMonthIcon /> <a href="#">Cronograma</a></li>
+        <li> <CalendarMonthIcon /> <a href="/cronograma">Cronograma</a></li>
         <li> <SchoolIcon /> <a href="/professor">Professores</a></li>
         <li> <HistoryEduIcon /> <a href="#">Disciplinas</a></li>
         <li> <AutoStoriesIcon /> <a href="/fase">Fases</a></li>

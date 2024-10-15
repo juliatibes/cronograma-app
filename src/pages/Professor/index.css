@@ -1,0 +1,43 @@
+.cadastro-professor {
+    padding: 20px;
+  }
+  
+  .botao-adicionar {
+    margin-bottom: 20px;
+  }
+  
+  .professores-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 30%);
+    gap: 5px;
+    margin-top: 20px;
+  }
+  
+  .professor-card {
+    border-radius: 8px;
+    padding: 16px;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Configuração para corte de texto e reticências no título */
+  .professor-card h3 {
+    margin-top: 0;
+    font-size: 1.5em;
+    max-width: 100%;           /* Defina um limite de largura */
+    overflow: hidden;           /* Esconde o texto que exceder */
+    white-space: nowrap;        /* Evita a quebra de linha */
+    text-overflow: ellipsis;    /* Adiciona '...' ao final */
+  }
+  
+  /* Configuração para corte de texto e reticências nos parágrafos */
+  .professor-card p {
+    margin: 8px 0;
+    max-width: 90%;            /* Defina um limite de largura */
+    overflow: hidden;           /* Esconde o texto que exceder */
+    white-space: nowrap;        /* Evita a quebra de linha */
+    text-overflow: ellipsis;    /* Adiciona '...' ao final */
+  }
+  

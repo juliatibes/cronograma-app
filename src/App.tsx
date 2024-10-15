@@ -1,4 +1,4 @@
-import "./App.css";
+import "./index.css";
 import Header from "./components/Header";
 import Router from "./Router";
 
@@ -18,7 +18,7 @@ function App() {
           ""
         )}
       </div>
-      <div style={{marginRight: "5%"}}>
+      <div>
         <Router />
       </div>
     </div>
