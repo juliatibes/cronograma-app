@@ -12,6 +12,7 @@ import Periodo from "./pages/Periodo";
 import Fase from "./pages/Fase";
 import CadastroFase from "./pages/CadastroFase";
 import Aluno from "./pages/Aluno";
+import CadastroDisciplina from "./pages/CadastroDisciplina";
 
 const Router: FC = () => {
   return (
@@ -24,6 +25,7 @@ const Router: FC = () => {
         <Route path="/cadastrocoordenador" element={<CadastroCoordenador />} />
         <Route path="/cadastrocurso" element={<CadastroCurso />} />
         <Route path="/cadastrofase" element={<CadastroFase />} />
+        <Route path="/cadastrodisciplina" element={<CadastroDisciplina />} />
         <Route path="/professor" element={<Professor />} />
         <Route path="/periodo" element={<Periodo />} />
         <Route path="/coordenador" element={<Coordenador />} />
