@@ -1,5 +1,12 @@
+
 .cadastro-professor {
     padding: 20px;
+  }
+
+  .header-professor{
+    display: flex;
+    justify-content: space-between;
+
   }
   
   .botao-adicionar {

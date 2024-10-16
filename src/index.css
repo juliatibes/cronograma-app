@@ -22,3 +22,7 @@ main {
   justify-items: center;
   overflow: hidden;
 }
+
+html{
+  background-color: #e2f0fd;
+}
