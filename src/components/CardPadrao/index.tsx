@@ -17,7 +17,7 @@ const CardPadrao: FC<CardPadraoProperties> = ({
 
   return <>
     <Card className="card-padrao">
-      <CardHeader sx={{padding:'0px'}} title={<h3 title={titulo} className="card-padrao-title">{titulo}</h3>}/>
+      <CardHeader className="card-padrao-title" title={<h3 title={titulo}>{titulo}</h3>}/>
       <CardContent sx={{padding:'0px'}}>
         <Typography className="card-padrao-body" component="div" sx={{ color: 'text.secondary' }}>
           {body.map((bodyItem, index) => (
