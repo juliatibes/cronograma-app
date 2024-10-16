@@ -8,17 +8,9 @@ function App() {
   const isLogado = buscaUsuarioSessao().token ? true : false;
 
   return (
-    <div className="body">
-      <div className="container">
-        {isLogado && (
-          <>
-            <header>
-              <Header />
-            </header>
-          </>
-        )}
-      </div>
-      <div>
+    <div className="container">
+      {isLogado && (<><Header /></>)}
+      <div className="content">
         <Router />
       </div>
     </div>
