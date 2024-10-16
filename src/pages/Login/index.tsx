@@ -60,6 +60,7 @@ const Login: FC = () => {
         <h2>Entre na sua conta</h2>
         <div className="login-email-label">
           <InputPadrao
+            backgroundColor="#fff"
             label="CPF"
             type={"text"}
             variant={"filled"}
@@ -74,6 +75,7 @@ const Login: FC = () => {
         <div className="login-senha-label">
           <InputPadrao
             label={"Senha"}
+            backgroundColor="#fff"
             type={showPassword ? "text" : "password"}
             icon={
               showPassword ? (

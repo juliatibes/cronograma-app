@@ -10,8 +10,9 @@ interface InputPadraoProperty {
   type: React.InputHTMLAttributes<unknown>["type"];
   icon?: ReactNode;
   variant?: 'outlined' | 'filled' | 'standard';
+  backgroundColor?:string
 }
-const InputPadrao: FC<InputPadraoProperty> = ({ label, value, onChange, type, icon, variant }) => {
+const InputPadrao: FC<InputPadraoProperty> = ({ label, value, onChange, type, icon, variant, backgroundColor }) => {
   return (
     <TextField
     className="login-imput"
@@ -23,6 +24,7 @@ const InputPadrao: FC<InputPadraoProperty> = ({ label, value, onChange, type, ic
       variant={variant}
       type={type}
       size="small"
+      sx={{backgroundColor:backgroundColor}}
       slotProps={{
         input: {
           endAdornment: icon ? (

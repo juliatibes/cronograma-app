@@ -1,3 +1,7 @@
+.menu-header {
+  box-shadow: 0px 2px 2px 0px #013263;
+}
+
 .menu-header ul {
   list-style-type: none;
   margin: 0;
@@ -6,10 +10,8 @@
 
 .logo {
   width: 75px;
-  /* display: flex; */
 }
 
 header {
-  /* padding-bottom: 1%; */
   background-color: #004A8D;
 }
