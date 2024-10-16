@@ -1,7 +1,25 @@
 .titulo {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.modal-box {
   display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: flex-start;
+  flex-direction: column;
+  width: 400px;
+  background-color: var(--light);
+  border: 2px solid var(--dark-blue-senac);
+  box-shadow: 24px;
+  padding: 16px;
+}
+
+#modal-modal-title {
+  display: flex;
+  justify-content: center;
+  padding: 15px;
 }
 
 .cadastro-periodo {
@@ -15,7 +33,7 @@
 }
 
 .cadastro-periodo-nome {
-  width: 80%;
+
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -24,5 +42,5 @@
 .cadastro-periodo-data {
   display: flex;
   gap: 20px;
-  width: 80%;
+
 }
