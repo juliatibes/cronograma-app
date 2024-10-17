@@ -11,7 +11,7 @@ import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { AlternateEmail, CalendarMonth, Phone } from "@mui/icons-material";
+import { AlternateEmail, CalendarMonth, AccountBalance, People } from "@mui/icons-material";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import CursoFaseLista from "../../components/CursoFaseLista";
@@ -94,17 +94,21 @@ const Curso: FC = () => {
           {cursos.map((curso) => (
             <CardPadrao
               key={curso.id}
-              titulo={curso.nome}
+              titulo={curso.sigla}
               body={[
-                <CardPadraoBodyItem icon={<Phone />} label={curso.sigla} />,
+                <CardPadraoBodyItem icon={<AccountBalance />} label={curso.nome} />,
+                <CardPadraoBodyItem icon={<People />} label={curso.coordenador.nome} />,
                 <CardPadraoBodyItem icon={<AutoStoriesIcon />} label={curso.fases.map((fase) => (fase.numero + "ª Fase")).join(', ')} />,
               ]}
               actions={[
-                <CardPadraoActionItem icon={<EditNoteIcon />} onClick={() => { }} />,
+                (
+                  verificarToggleStatusEnum(curso.id) && 
+                  <CardPadraoActionItem icon={<EditNoteIcon />} onClick={() => { }} />
+                ),
                 (
                   verificarToggleStatusEnum(curso.id) ?
                   (<CardPadraoActionItem icon={<ToggleOffOutlinedIcon />} onClick={() => { handleToggle(curso.id) }} />) :
-                  (<CardPadraoActionItem icon={<ToggleOnOutlinedIcon />} onClick={() => { handleToggle(curso.id); }} />)
+                  (<CardPadraoActionItem icon={<ToggleOnOutlinedIcon color="error" />} onClick={() => { handleToggle(curso.id); }} />)
                 ),
               ]}
             />
