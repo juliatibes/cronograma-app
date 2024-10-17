@@ -83,14 +83,7 @@ const Curso: FC = () => {
           <h2>Curso</h2>
           <BotaoPadrao label={"Adicionar"} onClick={handleAddClick} />
         </div>
-        <div>
-          <CursoFaseLista curso={"ADS"} fases={""} editavel={true} onClickListItemText={function (faseId: number, cursoId: number): void {
-            throw new Error("Function not implemented.");
-          }} onClickRemoveCircleOutlineIcon={function (): void {
-            throw new Error("Function not implemented.");
-          }} />
-        </div>
-        <div id="teste">
+        <div className="curso-content">
           {cursos.map((curso) => (
             <CardPadrao
               key={curso.id}
@@ -102,8 +95,9 @@ const Curso: FC = () => {
               ]}
               actions={[
                 (
-                  verificarToggleStatusEnum(curso.id) && 
-                  <CardPadraoActionItem icon={<EditNoteIcon />} onClick={() => { }} />
+                  verificarToggleStatusEnum(curso.id) ?
+                  (<CardPadraoActionItem icon={<EditNoteIcon />} onClick={() => {}} />) :
+                  <></>
                 ),
                 (
                   verificarToggleStatusEnum(curso.id) ?

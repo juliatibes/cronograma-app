@@ -1,7 +1,8 @@
+import { SvgIconProps } from "@mui/material";
 import { FC } from "react";
 
-interface CardPadraoActionItemProperties {
-    icon: React.ReactNode,
+export interface CardPadraoActionItemProperties {
+    icon: React.ReactElement<SvgIconProps>,
     onClick: () => void,
 }
 

@@ -2,11 +2,13 @@ import {Card, CardActions, CardContent, CardHeader, Typography } from "@mui/mate
 import { FC } from "react";
 import "./index.css";
 import React from "react";
+import { CardPadraoBodyItemProperties } from "../CardPadraoBodyItem";
+import { CardPadraoActionItemProperties } from "../CardPadraoActionItem";
 
 interface CardPadraoProperties {
   titulo: string,
-  body: React.ReactNode[],
-  actions: React.ReactNode[]
+  body: React.ReactElement<CardPadraoBodyItemProperties>[],
+  actions: React.ReactElement<CardPadraoActionItemProperties>[]
 }
 
 const CardPadrao: FC<CardPadraoProperties> = ({

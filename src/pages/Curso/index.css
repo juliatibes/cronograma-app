@@ -1,8 +1,11 @@
-#teste {
+.curso-content {
     width: 100%;
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
     gap: 20px;
+
+    /* alterar para grid responsivo com keyframe*/
 }
 
 .cadastro-fase {
