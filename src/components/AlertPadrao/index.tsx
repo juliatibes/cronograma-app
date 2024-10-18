@@ -3,22 +3,22 @@ import CheckIcon from '@mui/icons-material/Check';
 import { FC } from "react";
 
 interface AlertPadraoProperties {
-    estadoInicial:boolean,
-    cor: AlertColor,
-    mensagem:string[],
+    state:boolean,
+    color: AlertColor,
+    messages:string[],
     onClose: () => void,
 
 }
 
 const AlertPadrao: FC<AlertPadraoProperties> = ({
-    estadoInicial,
-    cor,
-    mensagem,
+    state,
+    color,
+    messages,
     onClose,
 }) => {
     return <>
         <Snackbar
-            open={estadoInicial}
+            open={state}
             style={{
                 position: 'fixed',
                 top: '13vh',
@@ -32,11 +32,11 @@ const AlertPadrao: FC<AlertPadraoProperties> = ({
                 iconMapping={{
                     success: <CheckIcon fontSize="inherit" />,
                 }} 
-                severity={cor} 
+                severity={color} 
                 onClose={onClose}>
-                {mensagem.map((mensagem:string) => {
+                {messages.map((message:string) => {
                     return <>
-                        {mensagem}.<br />
+                        {message}.<br />
                     </>
                 })}
             </Alert>

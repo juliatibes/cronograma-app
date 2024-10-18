@@ -20,7 +20,7 @@ const Curso: FC = () => {
   const navigate = useNavigate();
   const [estadoModal, setEstadoModal] = useState<boolean>(false);
   const [mensagemModal, setMensagemModal] = useState<string[]>([]);
-  const [corModal, setCorModal] = useState<AlertColor>("success");
+  const [corAlert, setCorAlert] = useState<AlertColor>("success");
 
   const [cursos, setCursos] = useState<ICurso[]>([]);
 
@@ -47,7 +47,7 @@ const Curso: FC = () => {
 
       setEstadoModal(true);
       setMensagemModal([`${nome} ${ativar ? "ativado" : "inativado"} com sucesso!`]);
-      setCorModal("success");
+      setCorAlert("success");
       carregarCurso();
     }
   }
@@ -61,14 +61,6 @@ const Curso: FC = () => {
   }, []);
 
   return <>
-    <AlertPadrao
-      estadoInicial={estadoModal}
-      cor={corModal}
-      mensagem={mensagemModal}
-      onClose={() => {
-        setEstadoModal(false);
-      }}
-    />
     <main className="cadastro-curso">
       <div style={{ display: 'flex' }}>
         <h2>Curso</h2>
