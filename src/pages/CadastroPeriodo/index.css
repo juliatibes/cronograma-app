@@ -4,27 +4,8 @@
     justify-content: flex-start;
 }
 
-.modal-box {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  width: 400px;
-  background-color: var(--light);
-  border: 2px solid var(--dark-blue-senac);
-  box-shadow: 24px;
-  padding: 16px;
-}
-
-#modal-modal-title {
-  display: flex;
-  justify-content: center;
-  padding: 15px;
-}
-
 .cadastro-periodo {
-  width: 100vw;
-  padding: 40px;
+  padding: 20px;
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
@@ -33,14 +14,15 @@
 }
 
 .cadastro-periodo-nome {
-
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  width: 100%;
 }
 
 .cadastro-periodo-data {
   display: flex;
   gap: 20px;
+  width: 100%;
+}
 
+.date-picker {
+  width: 100%;
 }

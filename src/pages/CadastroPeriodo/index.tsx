@@ -1,11 +1,12 @@
 import { FC, useEffect, useState } from "react";
 import InputPadrao from "../../components/InputPadrao";
 import "./index.css";
+import "../../styles/modal.css";
 import SideMenu from "../../components/SideMenu";
 import BotaoPadrao from "../../components/BotaoPadrao";
-// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-// import { DatePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers";
 import "dayjs/locale/pt-br";
 import dayjs, { Dayjs } from "dayjs";
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
@@ -17,6 +18,25 @@ const CadastroPeriodo: FC<PeriodoProperties> = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  
+  // const [open, setOpen] = useState(false);
+  // const [viewButton, setViewButton] = useState(false);
+
+  // const editar = (id) => {
+  //     setOpen(true)
+  //     viewButton(true)
+  // }
+
+  // const visu = (id) => {
+  //   setOpen(true)
+  //   viewButton(false)
+  // }
+
+  // const criar = () => {
+  //   setOpen(true)
+  //   viewButton(true)
+  // }
 
   const [nome, setNome] = useState<string>("");
   const [dataInicial, setDataInicial] = useState<Dayjs>(
@@ -38,20 +58,26 @@ const CadastroPeriodo: FC<PeriodoProperties> = () => {
   return (
     <>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
-        <SideMenu/>
         <main style={{ width: "100%" }}>
-          <Button variant="contained" color="success" onClick={handleOpen}>Abrir modal</Button>
+        <SideMenu/>
+        <div>
+        <Button variant="contained" color="success" onClick={handleOpen}>Abrir modal</Button>
           <Modal open={open} onClose={handleClose} className="modal">
             <Box className='modal-box'>
-              <div className="modal-content">
+
               <Typography id="modal-modal-title" variant="h6" component="h2">
                 Período
               </Typography>
-              <Typography id="modal-modal-description">
+              <Typography 
+              id="modal-modal-description" 
+              component="div"
+              >
+                
                 <div className="cadastro-periodo">
                   <div className="cadastro-periodo-nome">
                     <TextField
                       label={"Nome do período"}
+                      fullWidth
                       type={"text"}
                       value={nome}
                       onChange={(event) => {
@@ -86,14 +112,22 @@ const CadastroPeriodo: FC<PeriodoProperties> = () => {
                       }}
                     />
                   </div>
-                  <BotaoPadrao label={"Salvar"} onClick={salvarPeriodo} />
+                  <div className="modal-footer">
+                  <BotaoPadrao 
+                  label={"Salvar"} 
+                  onClick={salvarPeriodo}
+                  />
+
+                  </div>
                 </div>
               </Typography>
-              </div>
+
             </Box>
           </Modal>
+        </div>
+         
         </main>
-      </LocalizationProvider> */}
+      </LocalizationProvider>
     </>
   );
 };
