@@ -52,10 +52,10 @@ const Login: FC = () => {
 
   useEffect(() => {
     removerUsuario();
-  }, [])
+  }, []);
 
   return (
-    <main>
+    <main className="login-content">
       <div className="login-blue-side">
         <h2>Entre na sua conta</h2>
         <div className="login-email-label">

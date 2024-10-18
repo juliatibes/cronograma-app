@@ -2,15 +2,21 @@ import "./index.css";
 import Header from "./components/Header";
 import Router from "./Router";
 import { buscaUsuarioSessao } from "./store/UsuarioStore/usuarioStore";
+import SideBar from "./components/SideMenu";
+import { useEffect, useState } from "react";
 
-function App() {
+function App(){
+   const [isLogado,setIsLogado] = useState<boolean>();
 
-  const isLogado = buscaUsuarioSessao().token ? true : false;
+  useEffect(() => {
+    setIsLogado(buscaUsuarioSessao().token ? true : false);
+  },[])
 
   return (
     <div className="container">
       {isLogado && (<><Header /></>)}
       <div className="content">
+      {isLogado && (<><SideBar/></>)}
         <Router />
       </div>
     </div>

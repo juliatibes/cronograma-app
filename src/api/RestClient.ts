@@ -156,12 +156,12 @@ export const apiPost = async (url: string, data: any): Promise<IDataResponse> =>
     }
 }
 
-export const apiPut = async (url: string, data: any): Promise<IDataResponse> => {
+export const apiPut = async (url: string, data?: any): Promise<IDataResponse> => {
 
     const usuarioSessao = buscaUsuarioSessao();
 
     try {
-        const response: AxiosResponse = await api.put(url, JSON.stringify(data), {
+        const response: AxiosResponse = await api.put(url,(data && JSON.stringify(data)), {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${usuarioSessao?.token ?? ""}`
@@ -228,8 +228,6 @@ export const apiDelete = async (url: string): Promise<IDataResponse> => {
                 "Authorization": `Bearer ${usuarioSessao?.token ?? ""}`
             }
         });
-
-        console.log(response);
 
         if (response === undefined) {
             return {

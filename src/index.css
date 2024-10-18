@@ -18,10 +18,14 @@ body {
   --gray: #EBEBEB;
 }
 
-main {
+.content {
   min-width: 100%;
   width: 100%;
   height: auto;
   display: flex;
   justify-items: center;
+}
+
+main {
+  max-width: 100%;
 }
