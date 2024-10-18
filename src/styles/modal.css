@@ -1,0 +1,32 @@
+.modal-box {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 50%;
+  background-color: var(--light);
+  border: 2px solid var(--dark-blue-senac);
+  box-shadow: 24px;
+  padding: 16px;
+  border-radius: 10px;
+}
+
+#modal-modal-title {
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+}
+
+#modal-modal-description {
+  width: 100%;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
