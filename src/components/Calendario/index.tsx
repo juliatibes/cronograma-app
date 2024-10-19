@@ -6,9 +6,7 @@ import React from 'react';
 import './index.css'; // Importa um CSS personalizado, se necessário
 
 const Calendario: React.FC = () => {
-  const handleDateClick = (arg: any) => {
-    alert('Data clicada: ' + arg.dateStr); // Exibe a data clicada no alerta
-  };
+  
 
   return (
     <div className="calendar-container">
