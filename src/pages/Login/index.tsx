@@ -8,54 +8,66 @@ import { ILogin } from "../../types/login";
 import { apiPost, STATUS_CODE } from "../../api/RestClient";
 import { INivelAcesso, IUsuarioStore } from "../../store/UsuarioStore/types";
 import { adicionaUsuarioSessao, removerUsuario } from "../../store/UsuarioStore/usuarioStore";
-import { AlertColor } from "@mui/material";
-import { IValidField } from "../../types/validField";
-import AlertPadrao from "../../components/AlertPadrao";
+import { AlertColor, Button } from "@mui/material";
+import AlertPadrao from "../../components/AlertaPadrao";
+import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
+import { aplicarMascaraCpf } from "../../util/mascaras";
 
 const Login: FC = () => {
-  const initialValidField: IValidField = { hasError: false, message: "" };
+  const [exibirSenha, setExibirSenha] = useState(false);
 
-  const [showPassword, setShowPassword] = useState(false);
-
-  const [stateAlert, setStateAlert] = useState<boolean>(false);
-  const [messagesAlert, setMessagesAlert] = useState<string[]>([]);
-  const [colorAlert, setColorAlert] = useState<AlertColor>("error");
+  const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
+  const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
+  const [corAlerta, setCorAlerta] = useState<AlertColor>("error");
 
   const [cpf, setCpf] = useState<string>('');
   const [senha, setSenha] = useState<string>('');
 
-  const [validFieldCpf, setValidFieldCpf] = useState<IValidField>(initialValidField);
-  const [validFieldSenha, setValidFieldSenha] = useState<IValidField>(initialValidField);
+  const [validarCampoCpf, setValidarCampoCpf] = useState<IValidarCampos>(valorInicialValidarCampos);
+  const [validarCampoSenha, setValidarCampoSenha] = useState<IValidarCampos>(valorInicialValidarCampos);
 
 
   const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
+    setExibirSenha(!exibirSenha);
   };
 
-  const clearErrors = () => {
-    setValidFieldCpf(initialValidField);
-    setValidFieldSenha(initialValidField);
+  const limparErros = () => {
+    setValidarCampoCpf(valorInicialValidarCampos);
+    setValidarCampoSenha(valorInicialValidarCampos);
   }
 
-  const validFieldsLogin = (): boolean => {
-    let hasError = false;
-    const isRequiredField: IValidField = { hasError: true, message: "Campo obrigatório" }
+  const validarCamposObrigatorios = (): boolean => {
+    let existeErro = false;
 
     if (!cpf) {
-      setValidFieldCpf(isRequiredField);
-      hasError = true;
+      setValidarCampoCpf(campoObrigatorio);
+      existeErro = true;
     }
     if (!senha) {
-      setValidFieldSenha(isRequiredField);
-      hasError = true;
+      setValidarCampoSenha(campoObrigatorio);
+      existeErro = true;
     }
 
-    return hasError;
+    return existeErro;
+  }
+
+  const exibirErros = (mensagens: string[]) => {
+
+    for (const mensagem of mensagens) {
+      if (mensagem.includes("Cpf")) {
+        setValidarCampoCpf({ existeErro: true, mensagem: mensagem });
+        continue;
+      }
+      if (mensagem.includes("Senha")) {
+        setValidarCampoCpf({ existeErro: true, mensagem: mensagem });
+      }
+    }
+
   }
 
   const entrar = async () => {
-    clearErrors();
-    if (validFieldsLogin()) return;
+    limparErros();
+    if (validarCamposObrigatorios()) return;
 
     const usuario: ILogin = {
       cpf: cpf,
@@ -86,22 +98,13 @@ const Login: FC = () => {
     }
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
-      const messages = response.messages;
-
-      for (const message of messages) {
-        if (message.includes("Cpf")) {
-          setValidFieldCpf({ hasError: true, message: message });
-          continue;
-        }
-        if (message.includes("Senha")) {
-          setValidFieldCpf({ hasError: true, message: message });
-        }
-      }
+      const mensagens = response.messages;
+      exibirErros(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      setStateAlert(true);
-      setMessagesAlert(["Login erro inesperado!"]);
+      setEstadoAlerta(true);
+      setMensagensAlerta(["Erro inesperado!"]);
     }
 
   }
@@ -112,11 +115,11 @@ const Login: FC = () => {
 
   return <>
     <AlertPadrao
-      state={stateAlert}
-      color={colorAlert}
-      messages={messagesAlert}
+      estado={estadoAlerta}
+      cor={corAlerta}
+      mesnsagens={mensagensAlerta}
       onClose={() => {
-        setStateAlert(false);
+        setEstadoAlerta(false);
       }}
     />
     <main className="login-content">
@@ -125,15 +128,15 @@ const Login: FC = () => {
         <div className="login-email-label">
           <InputPadrao
             backgroundColor="#fff"
-            error={validFieldCpf.hasError}
-            helperText={validFieldCpf.message}
+            error={validarCampoCpf.existeErro}
+            helperText={validarCampoCpf.mensagem}
             label="CPF"
             type={"text"}
             variant={"filled"}
-            value={cpf}
+            value={aplicarMascaraCpf(cpf)}
             onChange={(e) => {
               if (e) {
-                setCpf(e.target.value)
+                setCpf(aplicarMascaraCpf(e.target.value))
               }
             }}
           />
@@ -142,9 +145,9 @@ const Login: FC = () => {
           <InputPadrao
             label={"Senha"}
             backgroundColor="#fff"
-            type={showPassword ? "text" : "password"}
+            type={exibirSenha ? "text" : "password"}
             icon={
-              showPassword ? (
+              exibirSenha ? (
                 <VisibilityOff
                   onClick={handleClickShowPassword}
                   className="icon-clickable"
@@ -158,8 +161,8 @@ const Login: FC = () => {
             }
             variant={"filled"}
             value={senha}
-            error={validFieldSenha.hasError}
-            helperText={validFieldSenha.message}
+            error={validarCampoSenha.existeErro}
+            helperText={validarCampoSenha.mensagem}
             onChange={(e) => {
               if (e) {
                 setSenha(e.target.value)
@@ -167,10 +170,21 @@ const Login: FC = () => {
             }}
           />
         </div>
-        <BotaoPadrao
-          label={"Entrar"}
+        <Button
+          sx={{
+            backgroundColor: 'var(--dark-orange-senac)',
+            color: 'var(--dark-blue-senac)',
+            fontWeight: 'bold',
+            padding: '10px',
+            width: '90px',
+            '&:hover': {
+              backgroundColor: 'var(--light)',
+            },
+          }}
           onClick={entrar}
-        />
+        >
+          Entrar
+        </Button>
       </div>
       <div className="login-white-side">
         <img src={imagem_login} alt="Imagem de login" className="img-login" />

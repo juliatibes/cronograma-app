@@ -14,13 +14,13 @@ import { apiGet, apiPut, STATUS_CODE } from "../../api/RestClient";
 import { ICurso } from "../../types/curso";
 import { STATUS_ENUM } from "../../types/statusEnum";
 import { AlertColor } from "@mui/material";
-import AlertPadrao from "../../components/AlertPadrao";
+import AlertPadrao from "../../components/AlertaPadrao";
 
 const Curso: FC = () => {
   const navigate = useNavigate();
-  const [estadoModal, setEstadoModal] = useState<boolean>(false);
-  const [mensagemModal, setMensagemModal] = useState<string[]>([]);
-  const [corAlert, setCorAlert] = useState<AlertColor>("success");
+  const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
+  const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
+  const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
 
   const [cursos, setCursos] = useState<ICurso[]>([]);
 
@@ -45,9 +45,9 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.NO_CONTENT) {
 
-      setEstadoModal(true);
-      setMensagemModal([`${nome} ${ativar ? "ativado" : "inativado"} com sucesso!`]);
-      setCorAlert("success");
+      setEstadoAlerta(true);
+      setMensagensAlerta([`${nome} ${ativar ? "ativado" : "inativado"} com sucesso!`]);
+      setCorAlerta("success");
       carregarCurso();
     }
   }
@@ -61,6 +61,14 @@ const Curso: FC = () => {
   }, []);
 
   return <>
+    <AlertPadrao
+      estado={estadoAlerta}
+      cor={corAlerta}
+      mesnsagens={mensagensAlerta}
+      onClose={() => {
+        setEstadoAlerta(false);
+      }}
+    />
     <main className="cadastro-curso">
       <div style={{ display: 'flex' }}>
         <h2>Curso</h2>

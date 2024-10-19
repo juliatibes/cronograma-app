@@ -1,42 +1,37 @@
 import { Alert, AlertColor, Snackbar } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 import { FC } from "react";
+import "./index.css";
 
-interface AlertPadraoProperties {
-    state:boolean,
-    color: AlertColor,
-    messages:string[],
+interface AlertaPadraoProperties {
+    estado:boolean,
+    cor: AlertColor,
+    mesnsagens:string[],
     onClose: () => void,
 
 }
 
-const AlertPadrao: FC<AlertPadraoProperties> = ({
-    state,
-    color,
-    messages,
+const AlertaPadrao: FC<AlertaPadraoProperties> = ({
+    estado,
+    cor,
+    mesnsagens,
     onClose,
 }) => {
     return <>
         <Snackbar
-            open={state}
-            style={{
-                position: 'fixed',
-                top: '13vh',
-                right: '20px',
-                left: 'auto',
-                bottom: 'auto',
-            }}
+            open={estado}
+            className="alerta-padrao"
             onClose={onClose}
         >
             <Alert 
                 iconMapping={{
                     success: <CheckIcon fontSize="inherit" />,
                 }} 
-                severity={color} 
+                severity={cor} 
                 onClose={onClose}>
-                {messages.map((message:string) => {
+                {mesnsagens.map((mensagem:string) => {
                     return <>
-                        {message}.<br />
+                        {mensagem}.<br />
                     </>
                 })}
             </Alert>
@@ -44,4 +39,4 @@ const AlertPadrao: FC<AlertPadraoProperties> = ({
     </>
 }
 
-export default AlertPadrao;
+export default AlertaPadrao;
