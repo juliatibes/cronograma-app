@@ -1,8 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import "./index.css";
 import InputPadrao from "../../components/InputPadrao";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import BotaoPadrao from "../../components/BotaoPadrao";
+import { Save, Visibility, VisibilityOff } from "@mui/icons-material";
 import imagem_login from "../../assets/imagem_login.svg";
 import { ILogin } from "../../types/login";
 import { apiPost, STATUS_CODE } from "../../api/RestClient";
@@ -12,9 +11,11 @@ import { AlertColor, Button } from "@mui/material";
 import AlertPadrao from "../../components/AlertaPadrao";
 import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
 import { aplicarMascaraCpf } from "../../util/mascaras";
+import { LoadingButton } from "@mui/lab";
 
 const Login: FC = () => {
-  const [exibirSenha, setExibirSenha] = useState(false);
+  const [exibirSenha, setExibirSenha] = useState<boolean>(false);
+  const [carregando,setCarregando] = useState<boolean>(false);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
   const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
@@ -36,13 +37,17 @@ const Login: FC = () => {
     setValidarCampoSenha(valorInicialValidarCampos);
   }
 
-  const validarCamposObrigatorios = (): boolean => {
+  const validarCampos = (): boolean => {
     let existeErro = false;
 
     if (!cpf) {
       setValidarCampoCpf(campoObrigatorio);
       existeErro = true;
+    } else if (cpf.length < 14) {
+      setValidarCampoCpf({existeErro:true,mensagem:"CPF inválido"});
+      existeErro = true;
     }
+
     if (!senha) {
       setValidarCampoSenha(campoObrigatorio);
       existeErro = true;
@@ -67,13 +72,15 @@ const Login: FC = () => {
 
   const entrar = async () => {
     limparErros();
-    if (validarCamposObrigatorios()) return;
+    if (validarCampos()) return;
+    setCarregando(true);
 
     const usuario: ILogin = {
       cpf: cpf,
       senha: senha,
     }
 
+    
     const response = await apiPost('/usuario/login', usuario);
 
     if (response.status === STATUS_CODE.OK) {
@@ -107,6 +114,7 @@ const Login: FC = () => {
       setMensagensAlerta(["Erro inesperado!"]);
     }
 
+    setCarregando(false);
   }
 
   useEffect(() => {
@@ -170,7 +178,7 @@ const Login: FC = () => {
             }}
           />
         </div>
-        <Button
+        <LoadingButton
           sx={{
             backgroundColor: 'var(--dark-orange-senac)',
             color: 'var(--dark-blue-senac)',
@@ -181,10 +189,13 @@ const Login: FC = () => {
               backgroundColor: 'var(--light)',
             },
           }}
+          loading={carregando}
+          loadingPosition="center"
+          variant="outlined"
           onClick={entrar}
         >
           Entrar
-        </Button>
+        </LoadingButton>
       </div>
       <div className="login-white-side">
         <img src={imagem_login} alt="Imagem de login" className="img-login" />

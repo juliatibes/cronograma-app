@@ -1,21 +1,25 @@
-import { Button } from "@mui/material";
 import { FC } from "react";
-import "./index.css"; 
+import "./index.css";
+import { LoadingButton } from "@mui/lab";
 
 interface ButtonPadraoProperty {
     label: string;
     variant?: 'text' | 'contained' | 'outlined';
     onClick?: () => void;
+    carregando?:boolean
 }
 
-const BotaoPadrao: FC<ButtonPadraoProperty> = ({label, variant, onClick}) => {
-    return(
-        <Button 
-        className="standard-button" 
-         onClick={onClick}
-        variant={variant}>
-        {label}
-        </Button>
+const BotaoPadrao: FC<ButtonPadraoProperty> = ({ label, variant, onClick,carregando }) => {
+    return (
+        <LoadingButton
+        className="standard-button"
+        loading={carregando}
+        loadingPosition="center"
+        variant={variant}
+        onClick={onClick}
+      >
+         {label}
+      </LoadingButton>
     );
 }
 
