@@ -4,7 +4,7 @@
     right: 16px !important;
     left: auto !important;
     bottom: 16px !important;
-    animation: slide-up 0.5s ease-out;
+    animation: slide-up 1s ease-out;
 }
 
 .alerta-padrao > div {
@@ -13,12 +13,10 @@
 
 @keyframes slide-up {
     0% {
-        transform: translateY(100%);
-        opacity: 0;
+        transform: translateY(100px);
     }
 
     100% {
         transform: translateY(0);
-        opacity: 1;
     }
 }

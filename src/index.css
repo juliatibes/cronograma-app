@@ -26,6 +26,12 @@ body {
   justify-items: center;
 }
 
-main {
+.page-main {
   max-width: 100%;
+  padding: 40px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 20px;
+  flex-direction: column;
 }

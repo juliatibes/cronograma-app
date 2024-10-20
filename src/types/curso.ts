@@ -10,3 +10,11 @@ export interface ICurso {
     coordenador:ICoordenador
     fases:IFase[]
 }
+
+export interface ICursoRequest {
+    id?:number,
+    nome:string,
+    sigla:string,
+    coordenadorId?:number
+    faseIds:number[]
+}

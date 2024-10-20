@@ -160,7 +160,7 @@ export const apiPost = async (url: string, data: any): Promise<IDataResponse> =>
         return {
             status: response.status,
             messages: [SUCCESS_MESSAGE],
-            data: JSON.parse(response.data),
+            data: response.data && JSON.parse(response.data),
         }
 
     } catch (e) {

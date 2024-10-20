@@ -6,19 +6,19 @@ import "./index.css";
 interface AlertaPadraoProperties {
     estado:boolean,
     cor: AlertColor,
-    mesnsagens:string[],
+    mensagens:string[],
     onClose: () => void,
-
 }
 
 const AlertaPadrao: FC<AlertaPadraoProperties> = ({
     estado,
     cor,
-    mesnsagens,
+    mensagens,
     onClose,
 }) => {
     return <>
         <Snackbar
+            key={estado ? "ativo": "inativo"}
             open={estado}
             className="alerta-padrao"
             onClose={onClose}
@@ -27,11 +27,12 @@ const AlertaPadrao: FC<AlertaPadraoProperties> = ({
                 iconMapping={{
                     success: <CheckIcon fontSize="inherit" />,
                 }} 
+                key={estado ? "ativo": "inativo"}
                 severity={cor} 
                 onClose={onClose}>
-                {mesnsagens.map((mensagem:string) => {
+                {mensagens.map((mensagem:string) => {
                     return <>
-                        {mensagem}.<br />
+                        {mensagem}<br />
                     </>
                 })}
             </Alert>

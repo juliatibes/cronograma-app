@@ -10,7 +10,7 @@ import { adicionaUsuarioSessao, removerUsuario } from "../../store/UsuarioStore/
 import { AlertColor, Button } from "@mui/material";
 import AlertPadrao from "../../components/AlertaPadrao";
 import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
-import { aplicarMascaraCpf } from "../../util/mascaras";
+import { aplicarMascaraCpf, removerMascaraNumeros } from "../../util/mascaras";
 import { LoadingButton } from "@mui/lab";
 
 const Login: FC = () => {
@@ -64,7 +64,7 @@ const Login: FC = () => {
         continue;
       }
       if (mensagem.includes("Senha")) {
-        setValidarCampoCpf({ existeErro: true, mensagem: mensagem });
+        setValidarCampoSenha({ existeErro: true, mensagem: mensagem });
       }
     }
 
@@ -76,7 +76,7 @@ const Login: FC = () => {
     setCarregando(true);
 
     const usuario: ILogin = {
-      cpf: cpf,
+      cpf: removerMascaraNumeros(cpf),
       senha: senha,
     }
 
@@ -125,7 +125,7 @@ const Login: FC = () => {
     <AlertPadrao
       estado={estadoAlerta}
       cor={corAlerta}
-      mesnsagens={mensagensAlerta}
+      mensagens={mensagensAlerta}
       onClose={() => {
         setEstadoAlerta(false);
       }}

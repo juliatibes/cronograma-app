@@ -3,7 +3,7 @@ import BotaoPadrao from "../../components/BotaoPadrao";
 import InputPadrao from "../../components/InputPadrao";
 import SideMenu from "../../components/SideMenu";
 import "./index.css"; 
-import CoordenadorInput from "../../components/CoordenadorInput";
+import CoordenadorInput from "../../components/MultiSelect";
 
 
 const CadastroFase: FC = () => {

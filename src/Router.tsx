@@ -4,7 +4,6 @@ import Login from "./pages/Login";
 import CadastroProfessor from "./pages/CadastroProfessor";
 import CadastroPeriodo from "./pages/CadastroPeriodo";
 import CadastroCoordenador from "./pages/CadastroCoordenador";
-import CadastroCurso from "./pages/CadastroCurso";
 import Professor from "./pages/Professor";
 import Coordenador from "./pages/Coordenador";
 import Curso from "./pages/Curso";
@@ -24,7 +23,6 @@ const Router: FC = () => {
         <Route path="/cadastroprofessor" element={<CadastroProfessor />} />
         <Route path="/cadastroperiodo" element={<CadastroPeriodo/>} />
         <Route path="/cadastrocoordenador" element={<CadastroCoordenador />} />
-        <Route path="/cadastrocurso" element={<CadastroCurso />} />
         <Route path="/cadastrofase" element={<CadastroFase />} />
         <Route path="/cadastrodisciplina" element={<CadastroDisciplina />} />
         <Route path="/professor" element={<Professor />} />

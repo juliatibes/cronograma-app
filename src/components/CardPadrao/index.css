@@ -48,4 +48,9 @@
 
 .card-padrao-actions span {
     cursor: pointer;
+    opacity: 1 !important;
+}
+
+.inativo {
+    opacity: 0.5;
 }
