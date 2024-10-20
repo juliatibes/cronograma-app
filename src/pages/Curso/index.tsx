@@ -4,17 +4,13 @@ import { useNavigate } from "react-router-dom";
 import "../../styles/modal.css";
 import "../../styles/gridContent.css";
 import CardPadrao from "../../components/CardPadrao";
-import EditNoteIcon from '@mui/icons-material/EditNote';
-import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
-import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
-import { AccountBalance, People } from "@mui/icons-material";
+import { AccountBalance, People, EditNote, ToggleOffOutlined, ToggleOnOutlined, AutoStories, VisibilityOutlined } from "@mui/icons-material";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import { apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
 import { ICurso, ICursoRequest } from "../../types/curso";
 import { STATUS_ENUM } from "../../types/statusEnum";
-import { AlertColor, Autocomplete, Box, FormControl, Modal,TextField, Typography } from "@mui/material";
+import { AlertColor, Autocomplete, Box, Dialog, DialogContent, DialogTitle, Divider, FormControl, Modal, Stack, TextField, Typography } from "@mui/material";
 import AlertPadrao from "../../components/AlertaPadrao";
 import InputPadrao from "../../components/InputPadrao";
 import { IFase } from "../../types/fase";
@@ -31,6 +27,7 @@ const Curso: FC = () => {
   const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
 
   const [estadoModal, setEstadoModal] = useState(false);
+  const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false);//exemplo visualizar
 
   const [cursos, setCursos] = useState<ICurso[]>([]);
   const [fases, setFases] = useState<IFase[]>([]);
@@ -121,6 +118,10 @@ const Curso: FC = () => {
 
     return existeErro;
   }
+
+  const fecharModalVisualizar = () => setEstadoModalVisualizar(false);//exemplo visualizar
+
+  const fecharModal = () => setEstadoModal(false);
 
   const carregarCurso = async () => {
     const response = await apiGet('/curso/carregar');
@@ -307,13 +308,62 @@ const Curso: FC = () => {
     setEstadoModal(true);
   }
 
-  const fecharModal = () => setEstadoModal(false);
+  const visualizar = async (id: number) => {//exemplo visualizar
+    limparModal();
+    carregarCursoPorId(id);
+    setEstadoModalVisualizar(true);
+  }
 
   useEffect(() => {
     carregarCurso();
   }, []);
 
   return <>
+    {/*//exemplo visualizar */}
+    <Dialog
+      open={estadoModalVisualizar}
+      onClose={fecharModalVisualizar}
+      fullWidth
+      maxWidth="sm"
+      sx={{ borderRadius: 4, padding: 2}}
+      PaperProps={{
+        sx: {
+          outline: '2px solid var(--dark-blue-senac)',
+        }
+      }}
+    >
+      <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+        {sigla}
+      </DialogTitle>
+      <Divider />
+      <DialogContent>
+        <Stack spacing={2} sx={{ mt: 2 , margin:"0px 0px 8px 0px"}}>
+          <Box>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              Nome:
+            </Typography>
+            <Typography variant="body1">{nome}</Typography>
+          </Box>
+
+          <Box>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              Coordenador:
+            </Typography>
+            <Typography variant="body1">{coordenadorSelecionado?.nome ? coordenadorSelecionado.nome : "Contratando..."}</Typography>
+          </Box>
+
+          <Box>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              Fases:
+            </Typography>
+            <Typography variant="body1">
+              {fasesSelecionadas.map((fase) => (fase.numero + "ª Fase")).join(', ')}
+            </Typography>
+          </Box>
+        </Stack>
+      </DialogContent>
+    </Dialog>
+
     <Modal open={estadoModal} onClose={fecharModal} className="modal">
       <Box className='modal-box'>
         <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -409,18 +459,22 @@ const Curso: FC = () => {
             body={[
               <CardPadraoBodyItem icon={<AccountBalance titleAccess="Curso" />} label={curso.nome} />,
               <CardPadraoBodyItem icon={<People titleAccess="Coordenador" />} label={curso.coordenador ? curso.coordenador.nome : "Contratando..."} />,
-              <CardPadraoBodyItem icon={<AutoStoriesIcon titleAccess="Fases" />} label={curso.fases.map((fase) => (fase.numero + "ª Fase")).join(', ')} />,
+              <CardPadraoBodyItem icon={<AutoStories titleAccess="Fases" />} label={curso.fases.map((fase) => (fase.numero + "ª Fase")).join(', ')} />,
             ]}
             actions={[
+              <CardPadraoActionItem //exemplo visualizar
+                icon={<VisibilityOutlined titleAccess="Visualizar" />} 
+                onClick={() => visualizar(curso.id)} 
+              />,
               (
                 curso.statusEnum === STATUS_ENUM.ATIVO ?
-                  (<CardPadraoActionItem icon={<EditNoteIcon titleAccess="Editar" />} onClick={() => abrirModal(curso.id)} />) :
-                  <></>
+                (<CardPadraoActionItem icon={<EditNote titleAccess="Editar" />} onClick={() => abrirModal(curso.id)} />) :
+                <></>
               ),
               (
                 curso.statusEnum === STATUS_ENUM.INATIVO ?
-                  (<CardPadraoActionItem icon={<ToggleOffOutlinedIcon titleAccess="Inativado" color="error" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, true)} />) :
-                  (<CardPadraoActionItem icon={<ToggleOnOutlinedIcon titleAccess="Ativado" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, false)} />)
+                (<CardPadraoActionItem icon={<ToggleOffOutlined titleAccess="Inativado" color="error" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, true)} />) :
+                (<CardPadraoActionItem icon={<ToggleOnOutlined titleAccess="Ativado" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, false)} />)
               ),
             ]}
           />
