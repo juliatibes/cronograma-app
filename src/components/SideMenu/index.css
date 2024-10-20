@@ -1,7 +1,7 @@
 .side-menu{
-    width: 100%;
     padding: 10px 0;
-    background-color: var(--gray);
+    background-color: #004A8D;
+    box-shadow: inset 0px 2px 2px 0px #0132639c;
 }
 
 .side-menu-lista {
@@ -17,14 +17,19 @@
     padding: 12px 46px 12px 22px;
     display: flex;
     justify-items: center;
+    align-items: center;
     gap: 12px;
 }
 
 .side-menu-lista li a {
-    color: var(--dark);
+    color: #f1f1f1;
     text-decoration: none;
 }
 
-.side-menu-lista li a:hover {
+.side-menu-lista li path {
+    color: #f1f1f1;
+}
+
+.side-menu-lista li:hover {
     color: var(--dark-orange-senac);
 }

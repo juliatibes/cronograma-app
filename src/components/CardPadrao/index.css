@@ -1,23 +1,56 @@
-#card-padrao-body p{
+.card-padrao{
+    height: 200px;
+    padding: 16px 24px 10px 24px;
     display: flex;
-    align-items: center;
-    gap: 14px;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0px 4px 8px 0px #00000013, 0px 0px 4px 0px #00000036!important;
+    border-radius: 10px !important;
+    gap: 6px;
 }
 
-#card-padrao-title,
-#card-padrao-body span {
+.card-padrao-title {
+    padding: 0 !important;
+}
+
+.card-padrao-title div {
+    max-width: 100%;
+}
+
+.card-padrao-title div span h3{
+    margin: 0 0 5px 0;
+    font-size: 1.64rem;
     max-width: 100%;   
     overflow: hidden;     
     white-space: nowrap;       
     text-overflow: ellipsis; 
 }
 
-#card-padrao-actions svg {
+.card-padrao-body p{
+    margin: 5px 0px 10px 0px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.card-padrao-body span {
+    max-width: 100%;   
+    overflow: hidden;     
+    white-space: nowrap;       
+    text-overflow: ellipsis; 
+}
+
+.card-padrao-actions svg {
     width: 2rem;
     height: 2rem;
 }
 
 
-#card-padrao-actions span {
+.card-padrao-actions span {
     cursor: pointer;
+    opacity: 1 !important;
+}
+
+.inativo {
+    opacity: 0.5;
 }

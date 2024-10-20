@@ -1,28 +1,86 @@
 import { FC, useEffect, useState } from "react";
 import "./index.css";
 import InputPadrao from "../../components/InputPadrao";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import BotaoPadrao from "../../components/BotaoPadrao";
+import { Save, Visibility, VisibilityOff } from "@mui/icons-material";
 import imagem_login from "../../assets/imagem_login.svg";
 import { ILogin } from "../../types/login";
 import { apiPost, STATUS_CODE } from "../../api/RestClient";
 import { INivelAcesso, IUsuarioStore } from "../../store/UsuarioStore/types";
 import { adicionaUsuarioSessao, removerUsuario } from "../../store/UsuarioStore/usuarioStore";
+import { AlertColor, Button } from "@mui/material";
+import AlertPadrao from "../../components/AlertaPadrao";
+import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
+import { aplicarMascaraCpf, removerMascaraNumeros } from "../../util/mascaras";
+import { LoadingButton } from "@mui/lab";
 
 const Login: FC = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [exibirSenha, setExibirSenha] = useState<boolean>(false);
+  const [carregando,setCarregando] = useState<boolean>(false);
+
+  const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
+  const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
+  const [corAlerta, setCorAlerta] = useState<AlertColor>("error");
+
   const [cpf, setCpf] = useState<string>('');
   const [senha, setSenha] = useState<string>('');
 
+  const [validarCampoCpf, setValidarCampoCpf] = useState<IValidarCampos>(valorInicialValidarCampos);
+  const [validarCampoSenha, setValidarCampoSenha] = useState<IValidarCampos>(valorInicialValidarCampos);
+
+
   const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
+    setExibirSenha(!exibirSenha);
   };
 
+  const limparErros = () => {
+    setValidarCampoCpf(valorInicialValidarCampos);
+    setValidarCampoSenha(valorInicialValidarCampos);
+  }
+
+  const validarCampos = (): boolean => {
+    let existeErro = false;
+
+    if (!cpf) {
+      setValidarCampoCpf(campoObrigatorio);
+      existeErro = true;
+    } else if (cpf.length < 14) {
+      setValidarCampoCpf({existeErro:true,mensagem:"CPF inválido"});
+      existeErro = true;
+    }
+
+    if (!senha) {
+      setValidarCampoSenha(campoObrigatorio);
+      existeErro = true;
+    }
+
+    return existeErro;
+  }
+
+  const exibirErros = (mensagens: string[]) => {
+
+    for (const mensagem of mensagens) {
+      if (mensagem.includes("Cpf")) {
+        setValidarCampoCpf({ existeErro: true, mensagem: mensagem });
+        continue;
+      }
+      if (mensagem.includes("Senha")) {
+        setValidarCampoSenha({ existeErro: true, mensagem: mensagem });
+      }
+    }
+
+  }
+
   const entrar = async () => {
+    limparErros();
+    if (validarCampos()) return;
+    setCarregando(true);
+
     const usuario: ILogin = {
-      cpf: cpf,
+      cpf: removerMascaraNumeros(cpf),
       senha: senha,
     }
+
+    
     const response = await apiPost('/usuario/login', usuario);
 
     if (response.status === STATUS_CODE.OK) {
@@ -41,32 +99,52 @@ const Login: FC = () => {
         niveisAcesso: niveisAcesso,
       }
 
-
-
       adicionaUsuarioSessao(usuario);
 
       window.location.href = "/cadastroprofessor";
-
     }
+
+    if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
+      const mensagens = response.messages;
+      exibirErros(mensagens);
+    }
+
+    if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
+      setEstadoAlerta(true);
+      setMensagensAlerta(["Erro inesperado!"]);
+    }
+
+    setCarregando(false);
   }
 
   useEffect(() => {
     removerUsuario();
-  }, [])
+  }, []);
 
-  return (
-    <main>
+  return <>
+    <AlertPadrao
+      estado={estadoAlerta}
+      cor={corAlerta}
+      mensagens={mensagensAlerta}
+      onClose={() => {
+        setEstadoAlerta(false);
+      }}
+    />
+    <main className="login-content">
       <div className="login-blue-side">
         <h2>Entre na sua conta</h2>
         <div className="login-email-label">
           <InputPadrao
+            backgroundColor="#fff"
+            error={validarCampoCpf.existeErro}
+            helperText={validarCampoCpf.mensagem}
             label="CPF"
             type={"text"}
             variant={"filled"}
-            value={cpf}
+            value={aplicarMascaraCpf(cpf)}
             onChange={(e) => {
               if (e) {
-                setCpf(e.target.value)
+                setCpf(aplicarMascaraCpf(e.target.value))
               }
             }}
           />
@@ -74,9 +152,10 @@ const Login: FC = () => {
         <div className="login-senha-label">
           <InputPadrao
             label={"Senha"}
-            type={showPassword ? "text" : "password"}
+            backgroundColor="#fff"
+            type={exibirSenha ? "text" : "password"}
             icon={
-              showPassword ? (
+              exibirSenha ? (
                 <VisibilityOff
                   onClick={handleClickShowPassword}
                   className="icon-clickable"
@@ -90,6 +169,8 @@ const Login: FC = () => {
             }
             variant={"filled"}
             value={senha}
+            error={validarCampoSenha.existeErro}
+            helperText={validarCampoSenha.mensagem}
             onChange={(e) => {
               if (e) {
                 setSenha(e.target.value)
@@ -97,16 +178,30 @@ const Login: FC = () => {
             }}
           />
         </div>
-        <BotaoPadrao
-          label={"Entrar"}
+        <LoadingButton
+          sx={{
+            backgroundColor: 'var(--dark-orange-senac)',
+            color: 'var(--dark-blue-senac)',
+            fontWeight: 'bold',
+            padding: '10px',
+            width: '90px',
+            '&:hover': {
+              backgroundColor: 'var(--light)',
+            },
+          }}
+          loading={carregando}
+          loadingPosition="center"
+          variant="outlined"
           onClick={entrar}
-        />
+        >
+          Entrar
+        </LoadingButton>
       </div>
       <div className="login-white-side">
         <img src={imagem_login} alt="Imagem de login" className="img-login" />
       </div>
     </main>
-  );
+  </>
 };
 
 export default Login;

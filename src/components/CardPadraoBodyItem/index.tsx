@@ -1,7 +1,8 @@
+import { SvgIconProps } from "@mui/material";
 import { FC } from "react";
 
-interface CardPadraoBodyItemProperties {
-    icon: React.ReactNode,
+export interface CardPadraoBodyItemProperties {
+    icon: React.ReactElement<SvgIconProps>,
     label: string,
 }
 
@@ -10,7 +11,7 @@ const CardPadraoBodyItem: FC<CardPadraoBodyItemProperties> = ({
     label
 }) => {
     return <>
-        <p>{icon}<span>{label}</span></p>
+        <p title={label}>{icon}<span>{label}</span></p>
     </>
 }
 
