@@ -1,43 +1,58 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { FC } from "react";
+import { ICronogramaMes } from "../../types/cronograma";
+import { DIA_SEMANA_ENUM } from "../../types/diaSemanaEnum";
 
-const Calendario: FC = () => {
+interface CalendarioProperties {
+  meses: ICronogramaMes[]
+}
+
+const Calendario: FC<CalendarioProperties> = ({ meses }) => {
 
   return <>
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>S</TableCell>
-          <TableCell>T</TableCell>
-          <TableCell>Q</TableCell>
-          <TableCell>Q</TableCell>
-          <TableCell>S</TableCell>
-          <TableCell>S</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-            <TableRow>
-              <TableCell>
-                1
-              </TableCell>
-              <TableCell>
-                1
-              </TableCell>
-              <TableCell>
-                1
-              </TableCell>
-              <TableCell>
-                1
-              </TableCell>
-              <TableCell>
-                1
-              </TableCell>
-              <TableCell>
-                1
-              </TableCell>
-            </TableRow>
-      </TableBody>
-    </Table>
+    {meses.map((mes: ICronogramaMes) => (
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>S</TableCell>
+            <TableCell>T</TableCell>
+            <TableCell>Q</TableCell>
+            <TableCell>Q</TableCell>
+            <TableCell>S</TableCell>
+            <TableCell>S</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          
+          <TableRow>
+          {
+          mes.diasSemana.some(diaSemana => diaSemana.diaSemanaEnum === DIA_SEMANA_ENUM.SEGUNDA_FEIRA) ?  
+          <TableCell>1</TableCell>:
+          <TableCell>VAZIO</TableCell>
+          }
+            <TableCell>
+              1
+            </TableCell>
+            <TableCell>
+              1
+            </TableCell>
+            <TableCell>
+              1
+            </TableCell>
+            <TableCell>
+              1
+            </TableCell>
+            <TableCell>
+              1
+            </TableCell>
+            <TableCell>
+              1
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    ))}
+
   </>
 }
 

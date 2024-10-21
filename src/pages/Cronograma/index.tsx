@@ -248,7 +248,7 @@ const Cronograma: FC = () => {
                 </div>
                 <div className="cronograma-content">
                             
-                    <Calendario/>
+                    {cronogramaPorPeriodoCursoFase && <Calendario meses={cronogramaPorPeriodoCursoFase.meses}/>}
                 </div>
             </div>
 

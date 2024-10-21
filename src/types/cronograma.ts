@@ -7,7 +7,7 @@ export interface ICronograma {
     faseNumero:number,
     ano:number,
     disciplinas:ICronogramaDisciplina[],
-    meses:ICronogramaMes
+    meses:ICronogramaMes[]
 }
 
 export interface ICronogramaDisciplina {
