@@ -38,7 +38,7 @@ const CursoFaseLista: FC<CursoFaseListaProperties> = ({
       component="nav"
       aria-labelledby="nested-list-subheader"
     >
-      <ListItemButton sx={{ display: 'flex', gap: '4px' }} >
+      <ListItemButton sx={{ display: 'flex', gap: '10px' }} >
         <RemoveCircleOutlineIcon
           color="error"
           className={`curso-fase-icon ${!editavel && "curso-fase-hide"}`}

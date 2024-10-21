@@ -5,22 +5,20 @@ import { IPeriodo } from "../../types/periodo";
 import { useNavigate } from "react-router-dom";
 import { apiGet, STATUS_CODE } from "../../api/RestClient";
 import CursoFaseLista from "../../components/CursoFaseLista";
-import { ICurso, ICursoPorPeriodo } from "../../types/curso";
+import { ICursoPorPeriodo } from "../../types/curso";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules'; // Módulo de navegação
 import 'swiper/css'; // CSS básico do Swiper
 import 'swiper/css/navigation'; // CSS para botões de navegação
-import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import BotaoPadrao from "../../components/BotaoPadrao";
+import { ICronograma, ICronogramaDisciplina } from "../../types/cronograma";
 import Calendario from "../../components/Calendario";
-import GerarCronograma from "../../components/Calendario";
 const Cronograma: FC = () => {
     const navigate = useNavigate();
     const [periodoSelecionado, setPeriodoSelecionado] = useState<IPeriodo>();
     const [periodos, setPeriodos] = useState<IPeriodo[]>([]);
     const [cursosPorPeriodo, setCursosPorPeriodo] = useState<ICursoPorPeriodo[]>([]);
-    const [cronogramaPorPeriodoCursoFase, setCronogramaPorPeriodoCursoFase] = useState<ICursoPorPeriodo[]>([]);
-    const [dados, setDados] = useState<any>();
+    const [cronogramaPorPeriodoCursoFase, setCronogramaPorPeriodoCursoFase] = useState<ICronograma>();
 
     const carregarPeriodo = async () => {
         const response = await apiGet('/periodo/carregar/usuario');
@@ -80,7 +78,7 @@ const Cronograma: FC = () => {
 
         if (response.status === STATUS_CODE.OK) {
             console.log(response.data)
-            setDados(response.data);
+            setCronogramaPorPeriodoCursoFase(response.data);
         }
 
         if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
@@ -100,18 +98,10 @@ const Cronograma: FC = () => {
         return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
 
-    const courses = [
-        { instructor: "Dayana Ricken", hours: 40, title: "Fundamentos da Pesquisa" },
-        { instructor: "Fernando Gabriel", hours: 36, title: "Introdução a Computação" },
-        { instructor: "Marcelo Mazon", hours: 76, title: "Modelagem de Dados" },
-        { instructor: "Christine Vieira", hours: 152, title: "Introdução a Programação de Computadores" },
-        { instructor: "Jossuan Diniz", hours: 76, title: "Engenharia de Requisitos" },
-        { instructor: "Dayana Ricken", hours: 45, title: "Extensão em Análise e Desenvolvimento de Sistemas I" },
-    ];
-
     useEffect(() => {
         carregarPeriodo();
     }, []);
+
 
     return <>
 
@@ -196,7 +186,8 @@ const Cronograma: FC = () => {
             <Divider className="divider" />
             <div className="cronograma-container">
                 <div className="cronograma-header">
-                    <h2 className="cronograma-titulo">3ª Fase - Analise e Desenvolvimento de Sistemas</h2>
+                {cronogramaPorPeriodoCursoFase && <>
+                    <h2 className="cronograma-titulo">{`${cronogramaPorPeriodoCursoFase.faseNumero}ª Fase - ${cronogramaPorPeriodoCursoFase.cursoNome}`}</h2>
                     <div className="cronograma-legenda">
                         <div className="cronograma-legenda-default" >
                             <div id="cronograma-legenda-feriado">
@@ -210,35 +201,36 @@ const Cronograma: FC = () => {
                         </div>
                         <Table className="cronograma-legenda-table">
                             <TableBody>
-                                {courses.map((course, index) => (
+                                   {cronogramaPorPeriodoCursoFase.disciplinas.map((disciplina:ICronogramaDisciplina,index) => (
                                     <>
                                         <TableRow
                                             className="cronograma-legenda-row"
-                                            sx={{ backgroundColor: hexToRgba("#000000", 0.2) }}
+                                            sx={{ backgroundColor: hexToRgba(disciplina.corHexadecimal, 0.3) }}
                                             key={index}
                                         >
                                             <TableCell
                                                 className="cronograma-legenda-box-cor cronograma-legenda-row-cell"
+                                                sx={{backgroundColor:disciplina.corHexadecimal}}
                                             >
                                             </TableCell>
                                             <TableCell
                                                 className="cronograma-legenda-row-cell"
                                                 align="center"
                                             >
-                                                {course.instructor}
+                                                {disciplina.professorNome}
                                             </TableCell>
                                             <TableCell
                                                 className="cronograma-legenda-row-cell"
                                                 align="center"
                                             >
-                                                {course.hours}h
+                                                {disciplina.cargaHoraria}h
                                             </TableCell>
                                             <TableCell
                                                 sx={{ borderRadius: '0px 5px 5px 0px' }}
 
                                                 className="cronograma-legenda-row-cell"
                                             >
-                                                {course.title}
+                                                {disciplina.nome}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow key={`spacer-${index}`}>
@@ -252,9 +244,11 @@ const Cronograma: FC = () => {
                             </TableBody>
                         </Table>
                     </div>
+                  </>  }
                 </div>
                 <div className="cronograma-content">
-                    {dados && <Calendario {...dados} />}
+                            
+                    <Calendario/>
                 </div>
             </div>
 
