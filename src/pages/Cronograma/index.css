@@ -1,0 +1,160 @@
+
+.cronograma-periodo {
+    margin-inline: 20px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap-reverse;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 100%;
+}
+
+.cronograma-botao {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.cronograma-carousel {
+    display: flex;
+    max-width: 55vw;
+}
+
+.cronograma-periodo-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    line-height: normal !important;
+    background-color:  var(--dark-blue-senac) !important;
+    color: var(--dark-orange-senac) !important;
+    border-radius: 10px !important;
+    text-transform: none !important;
+    font-size: 1rem !important;
+    padding-block: 10px !important;
+    opacity: 0.8;
+    transition: 0.2s !important;
+}
+
+
+.cronograma-periodo-btn:hover {
+   opacity: 0.9;
+}
+
+.selecionado {
+    opacity: 1;
+}
+
+.divider {
+    width: 100%;
+}
+
+.cronogram-cursos {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cronograma-container {
+    width: 100%;
+}
+
+.cronograma-titulo {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 500;
+    margin: 5px 0;
+}
+
+.cronograma-header {
+    width: 100%;
+}
+
+.cronograma-legenda {
+    margin: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.cronograma-legenda-default {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.cronograma-legenda-default > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    box-shadow: 0px 0px 2px 0px #000;
+}
+
+.cronograma-legenda-default div span {
+    display: inline-block;
+    width: 25px;
+    height: 24px;
+    border-radius: 5px;
+    background-color: pink;
+    box-shadow: 0px 0px 2px 0px #000;
+}
+
+.cronograma-legenda-default div p {
+    margin: 0 30px;
+}
+
+#cronograma-legenda-feriado {
+    background-color: rgba(255, 255, 0, 0.2);
+}
+
+#cronograma-legenda-feriado span {
+    background-color: yellow;
+}
+
+
+#cronograma-legenda-sem-aula {
+    background-color: #fff;
+}
+
+#cronograma-legenda-sem-aula span {
+    background-color: #fff;
+}
+
+.cronograma-legenda-table {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.cronograma-legenda-row-cell {
+    font-size: 1.1rem !important;
+    margin: 5px !important;
+    padding: 0 !important;
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+    border-bottom: none !important;
+}
+
+.cronograma-legenda-box-cor {
+    display: inline-block;
+    width: 15px;
+    height: 100%;
+    border-radius: 5px;
+    background-color: pink;
+    box-shadow: 0px 0px 2px 0px #000;
+    padding-left: 0px !important;
+}
+
+.cronograma-legenda-row-cell-fake {
+    height: 16px;
+}
+

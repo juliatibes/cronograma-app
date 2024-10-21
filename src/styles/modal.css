@@ -34,7 +34,6 @@
   width: 100%;
 }
 
-
 .modal-two-form-group {
   display: flex;
   gap: 20px;
@@ -44,14 +43,6 @@
 .modal-one-form-group {
   width: 100%;
 }
-
-.modal-teste-form-group {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 80% 20%;
-  gap: 20px;
-}
-
 
 .modal-footer {
   border-top: 1px solid #CECECE;

@@ -5,18 +5,20 @@ import { buscaUsuarioSessao } from "./store/UsuarioStore/usuarioStore";
 import SideBar from "./components/SideMenu";
 import { useEffect, useState } from "react";
 
-function App(){
-   const [isLogado,setIsLogado] = useState<boolean>();
+function App() {
+  const [isLogado, setIsLogado] = useState<boolean>(true);
 
   useEffect(() => {
-    setIsLogado(buscaUsuarioSessao().token ? true : false);
+    setTimeout(() => {
+      setIsLogado(buscaUsuarioSessao().token ? true : false);
+    }, 50);
   },[])
 
   return (
     <div className="container">
       {isLogado && (<><Header /></>)}
       <div className="content">
-      {isLogado && (<><SideBar/></>)}
+        {isLogado && (<><SideBar /></>)}
         <Router />
       </div>
     </div>

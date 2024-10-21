@@ -23,6 +23,7 @@ const MultiSelect: FC<MultiSelectProperties> = ({
       <Autocomplete
         multiple
         fullWidth
+        size="small"
         id="tags-outlined"
         options={options}
         getOptionLabel={(option) => option.nome ? option.nome : `${option.numero}ª Fase`}

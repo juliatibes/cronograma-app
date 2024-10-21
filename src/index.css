@@ -28,7 +28,8 @@ body {
 
 .page-main {
   max-width: 100%;
-  padding: 40px;
+  width: 100%;
+  padding: 30px 40px;
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
