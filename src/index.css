@@ -36,3 +36,15 @@ body {
   gap: 20px;
   flex-direction: column;
 }
+
+.dia-cronograma {
+  transition: background-color 0.3s ease;
+}
+
+.bloqueada {
+  background-color: yellow !important; /* Força o fundo amarelo para dias bloqueados */
+}
+
+.calendar-day {
+  font-weight: bold;
+}

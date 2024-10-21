@@ -1,8 +1,5 @@
-import { FC, useEffect, useRef, useState } from "react";
-import { Box, Button, Card, CardContent, Divider, IconButton, Popover, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
-import dayGridPlugin from '@fullcalendar/daygrid'; // Exibe o calendário no formato de grade
-import interactionPlugin from '@fullcalendar/interaction'; // Permite interações, como arrastar e soltar
-import ptBrLocale from '@fullcalendar/core/locales/pt-br';
+import { FC, useEffect, useState } from "react";
+import { Box, Button, Divider, IconButton, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import "./index.css";
 import { IPeriodo } from "../../types/periodo";
 import { useNavigate } from "react-router-dom";
@@ -15,15 +12,15 @@ import 'swiper/css'; // CSS básico do Swiper
 import 'swiper/css/navigation'; // CSS para botões de navegação
 import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import BotaoPadrao from "../../components/BotaoPadrao";
-import FullCalendar from "@fullcalendar/react";
-import { DateClickArg } from "@fullcalendar/interaction";
-import { EventClickArg } from "@fullcalendar/core";
+import Calendario from "../../components/Calendario";
+import GerarCronograma from "../../components/Calendario";
 const Cronograma: FC = () => {
     const navigate = useNavigate();
     const [periodoSelecionado, setPeriodoSelecionado] = useState<IPeriodo>();
     const [periodos, setPeriodos] = useState<IPeriodo[]>([]);
     const [cursosPorPeriodo, setCursosPorPeriodo] = useState<ICursoPorPeriodo[]>([]);
     const [cronogramaPorPeriodoCursoFase, setCronogramaPorPeriodoCursoFase] = useState<ICursoPorPeriodo[]>([]);
+    const [dados, setDados] = useState<any>();
 
     const carregarPeriodo = async () => {
         const response = await apiGet('/periodo/carregar/usuario');
@@ -83,6 +80,7 @@ const Cronograma: FC = () => {
 
         if (response.status === STATUS_CODE.OK) {
             console.log(response.data)
+            setDados(response.data);
         }
 
         if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
@@ -110,56 +108,6 @@ const Cronograma: FC = () => {
         { instructor: "Jossuan Diniz", hours: 76, title: "Engenharia de Requisitos" },
         { instructor: "Dayana Ricken", hours: 45, title: "Extensão em Análise e Desenvolvimento de Sistemas I" },
     ];
-
-    const backgroundEvents = [
-        {
-            start: '2024-10-22',
-            end: '2024-10-24',
-            display: 'background',
-            color: '#ff9f89',
-            extendedProps: {
-                info: { name: 'Evento A', description: 'Descrição do Evento A' },
-            }
-        },
-        {
-            start: '2024-12-25',
-            display: 'background',
-            color: '#c5cae9',
-            extendedProps: {
-                info: { name: 'Natal', description: 'Feriado de Natal' },
-            }
-        }
-    ];
-    interface EventInfo {
-        name: string;
-        description: string;
-      }
-
-    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-    const [selectedEvent, setSelectedEvent] = useState<EventInfo | null>(null);
-  
-    // Função para abrir o Popover na data clicada
-    const handleDateClick = (info: DateClickArg) => {
-      const clickedDate = info.dateStr;
-  
-      // Encontra o evento correspondente à data clicada
-      const event = backgroundEvents.find(
-        (e) => clickedDate >= (e.start as string) && clickedDate < (e.end || e.start)
-      );
-  
-      if (event && event.extendedProps) {
-        setSelectedEvent(event.extendedProps.info as EventInfo);
-        setAnchorEl(info.jsEvent.target as HTMLButtonElement); // Define o elemento âncora para o Popover
-      }
-    };
-  
-    // Função para fechar o Popover
-    const handleClose = () => {
-      setAnchorEl(null);
-      setSelectedEvent(null);
-    };
-  
-    const open = Boolean(anchorEl);
 
     useEffect(() => {
         carregarPeriodo();
@@ -306,55 +254,12 @@ const Cronograma: FC = () => {
                     </div>
                 </div>
                 <div className="cronograma-content">
-                    <FullCalendar
-
-                        plugins={[dayGridPlugin, interactionPlugin]} // Adiciona plugins necessários
-                        initialView="dayGridMonth" // Define a visualização inicial como grade mensal
-                        headerToolbar={{          // Define a barra de ferramentas do cabeçalho
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: ''
-                        }}
-                        editable={false}            // Permite edição de eventos (arrastar e redimensionar)
-                        selectable={false}          // Permite selecionar datas e intervalos
-                        selectMirror={false}        // Visualização do seletor ao arrastar
-                        dayMaxEvents={true}        // Limita o número de eventos a serem exibidos por dia
-                        weekends={true}
-                        locale={ptBrLocale}
-                        validRange={{
-                            start: '2024-01-01',
-                            end: '2024-12-31'
-                        }}
-                        dateClick={handleDateClick}
-                        events={backgroundEvents}
-                    />
-                    <Popover
-                        open={open}
-                        anchorEl={anchorEl}
-                        onClose={handleClose}
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'center',
-                        }}
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'center',
-                        }}
-                    >
-                        <Box p={2}>
-                            {selectedEvent ? (
-                                <>
-                                    <Typography variant="h6">{selectedEvent.name}</Typography>
-                                    <Typography variant="body1">{selectedEvent.description}</Typography>
-                                </>
-                            ) : (
-                                <Typography>Nenhum evento encontrado</Typography>
-                            )}
-                        </Box>
-                    </Popover>
+                    {dados && <Calendario {...dados} />}
+                </div>
             </div>
-        </div>
-    </main >
+
+
+        </main >
     </>
 }
 
