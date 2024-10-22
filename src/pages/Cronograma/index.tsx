@@ -13,6 +13,7 @@ import 'swiper/css/navigation'; // CSS para botões de navegação
 import BotaoPadrao from "../../components/BotaoPadrao";
 import { ICronograma, ICronogramaDisciplina } from "../../types/cronograma";
 import Calendario from "../../components/Calendario";
+import React from "react";
 const Cronograma: FC = () => {
     const navigate = useNavigate();
     const [periodoSelecionado, setPeriodoSelecionado] = useState<IPeriodo>();
@@ -97,6 +98,8 @@ const Cronograma: FC = () => {
         const b = parseInt(hex.slice(5, 7), 16);
         return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
+
+    console.log(cronogramaPorPeriodoCursoFase?.meses);
 
     useEffect(() => {
         carregarPeriodo();
@@ -186,68 +189,70 @@ const Cronograma: FC = () => {
             <Divider className="divider" />
             <div className="cronograma-container">
                 <div className="cronograma-header">
-                {cronogramaPorPeriodoCursoFase && <>
-                    <h2 className="cronograma-titulo">{`${cronogramaPorPeriodoCursoFase.faseNumero}ª Fase - ${cronogramaPorPeriodoCursoFase.cursoNome}`}</h2>
-                    <div className="cronograma-legenda">
-                        <div className="cronograma-legenda-default" >
-                            <div id="cronograma-legenda-feriado">
-                                <span></span>
-                                <p>Feriado</p>
+                    {cronogramaPorPeriodoCursoFase && <>
+                        <h2 className="cronograma-titulo">{`${cronogramaPorPeriodoCursoFase.faseNumero}ª Fase - ${cronogramaPorPeriodoCursoFase.cursoNome}`}</h2>
+                        <div className="cronograma-legenda">
+                            <div className="cronograma-legenda-default" >
+                                <div id="cronograma-legenda-feriado">
+                                    <span></span>
+                                    <p>Feriado</p>
+                                </div>
+                                <div id="cronograma-legenda-sem-aula">
+                                    <span></span>
+                                    <p>Sem Aula</p>
+                                </div>
                             </div>
-                            <div id="cronograma-legenda-sem-aula">
-                                <span></span>
-                                <p>Sem Aula</p>
-                            </div>
+                            <Table className="cronograma-legenda-table">
+                                <TableBody>
+                                    {cronogramaPorPeriodoCursoFase.disciplinas.map((disciplina: ICronogramaDisciplina, index) => (
+                                        <React.Fragment key={`${disciplina.nome}-${disciplina.professorNome}-${disciplina.cargaHoraria}-${index}`}>
+                                            <TableRow
+                                                className="cronograma-legenda-row"
+                                                sx={{ backgroundColor: hexToRgba(disciplina.corHexadecimal, 0.3) }}
+                                                key={`${disciplina.nome}1${disciplina.corHexadecimal}`}
+                                            >
+                                                <TableCell
+                                                    className="cronograma-legenda-box-cor cronograma-legenda-row-cell"
+                                                    sx={{ backgroundColor: disciplina.corHexadecimal }}
+                                                    key={disciplina.corHexadecimal}
+                                                >
+                                                </TableCell>
+                                                <TableCell
+                                                    className="cronograma-legenda-row-cell"
+                                                    align="center"
+                                                    key={disciplina.professorNome}
+                                                >
+                                                    {disciplina.professorNome}
+                                                </TableCell>
+                                                <TableCell
+                                                    className="cronograma-legenda-row-cell"
+                                                    align="center"
+                                                    key={disciplina.cargaHoraria}
+                                                >
+                                                    {disciplina.cargaHoraria}h
+                                                </TableCell>
+                                                <TableCell
+                                                    sx={{ borderRadius: '0px 5px 5px 0px' }}
+                                                    key={disciplina.nome}
+                                                    className="cronograma-legenda-row-cell"
+                                                >
+                                                    {disciplina.nome}
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow key={`spacer-${disciplina.nome}`}>
+                                                <TableCell key={`fake-${disciplina.nome}`}
+                                                    className="cronograma-legenda-row-cell cronograma-legenda-row-cell-fake">
+                                                </TableCell>
+                                            </TableRow>
+                                        </React.Fragment>
+                                    ))}
+                                </TableBody>
+                            </Table>
                         </div>
-                        <Table className="cronograma-legenda-table">
-                            <TableBody>
-                                   {cronogramaPorPeriodoCursoFase.disciplinas.map((disciplina:ICronogramaDisciplina,index) => (
-                                    <>
-                                        <TableRow
-                                            className="cronograma-legenda-row"
-                                            sx={{ backgroundColor: hexToRgba(disciplina.corHexadecimal, 0.3) }}
-                                            key={index}
-                                        >
-                                            <TableCell
-                                                className="cronograma-legenda-box-cor cronograma-legenda-row-cell"
-                                                sx={{backgroundColor:disciplina.corHexadecimal}}
-                                            >
-                                            </TableCell>
-                                            <TableCell
-                                                className="cronograma-legenda-row-cell"
-                                                align="center"
-                                            >
-                                                {disciplina.professorNome}
-                                            </TableCell>
-                                            <TableCell
-                                                className="cronograma-legenda-row-cell"
-                                                align="center"
-                                            >
-                                                {disciplina.cargaHoraria}h
-                                            </TableCell>
-                                            <TableCell
-                                                sx={{ borderRadius: '0px 5px 5px 0px' }}
-
-                                                className="cronograma-legenda-row-cell"
-                                            >
-                                                {disciplina.nome}
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow key={`spacer-${index}`}>
-                                            <TableCell
-                                                className="cronograma-legenda-row-cell cronograma-legenda-row-cell-fake">
-                                            </TableCell>
-                                        </TableRow>
-
-                                    </>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                  </>  }
+                    </>}
                 </div>
                 <div className="cronograma-content">
-                            
+
                     {cronogramaPorPeriodoCursoFase && <Calendario meses={cronogramaPorPeriodoCursoFase.meses}/>}
                 </div>
             </div>

@@ -1,5 +1,4 @@
 import { IDiaCronograma } from "./diaCronograma";
-import { DIA_SEMANA_ENUM } from "./diaSemanaEnum";
 import { MES_ENUM } from "./mesEnum";
 
 export interface ICronograma {
@@ -18,11 +17,8 @@ export interface ICronogramaDisciplina {
 }
 
 export interface ICronogramaMes {
-    mesEnum:MES_ENUM,
-    diasSemana:IDiasSemana[]
-}
-
-export interface IDiasSemana {
-    diaSemanaEnum:DIA_SEMANA_ENUM,
-    diaCronograma:IDiaCronograma[]
+    mesEnum: MES_ENUM,
+    semanasMes: {
+        [key: number]: IDiaCronograma[];
+    }
 }

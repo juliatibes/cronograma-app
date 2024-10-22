@@ -1,59 +1,47 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { FC } from "react";
 import { ICronogramaMes } from "../../types/cronograma";
-import { DIA_SEMANA_ENUM } from "../../types/diaSemanaEnum";
+import { IDiaCronograma } from "../../types/diaCronograma";
 
 interface CalendarioProperties {
-  meses: ICronogramaMes[]
+  meses: ICronogramaMes[];
 }
 
 const Calendario: FC<CalendarioProperties> = ({ meses }) => {
+  return (
+    <>
+      {meses.map((mes: ICronogramaMes) => (
+        <div key={mes.mesEnum}>
+          <div>{mes.mesEnum}</div>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>SEG</TableCell>
+                <TableCell>TER</TableCell>
+                <TableCell>QUA</TableCell>
+                <TableCell>QUI</TableCell>
+                <TableCell>SEX</TableCell>
+                <TableCell>SAB</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {Object.entries(mes.semanasMes).map(([semanaNumero, diasCronograma]) => (
+                <TableRow key={semanaNumero}>
+                  {diasCronograma.map((diaCronograma: IDiaCronograma) => {
 
-  return <>
-    {meses.map((mes: ICronogramaMes) => (
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>S</TableCell>
-            <TableCell>T</TableCell>
-            <TableCell>Q</TableCell>
-            <TableCell>Q</TableCell>
-            <TableCell>S</TableCell>
-            <TableCell>S</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          
-          <TableRow>
-          {
-          mes.diasSemana.some(diaSemana => diaSemana.diaSemanaEnum === DIA_SEMANA_ENUM.SEGUNDA_FEIRA) ?  
-          <TableCell>1</TableCell>:
-          <TableCell>VAZIO</TableCell>
-          }
-            <TableCell>
-              1
-            </TableCell>
-            <TableCell>
-              1
-            </TableCell>
-            <TableCell>
-              1
-            </TableCell>
-            <TableCell>
-              1
-            </TableCell>
-            <TableCell>
-              1
-            </TableCell>
-            <TableCell>
-              1
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    ))}
-
-  </>
-}
+                    return (
+                      
+                      <TableCell key={diaCronograma.id}>{diaCronograma.data.toString().slice(8,10)}</TableCell>
+                    )
+})}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ))}
+    </>
+  );
+};
 
 export default Calendario;
