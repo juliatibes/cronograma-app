@@ -26,6 +26,7 @@ export enum STATUS_CODE {
     BAD_REQUEST = 400,
     INTERNAL_SERVER_ERROR = 500,
     FORBIDDEN = 403,
+    UNAUTHORIZED = 401,
 }
 
 const DEFAULT_ERROR_MESSAGE = "Erro não mapeado";
@@ -50,6 +51,13 @@ export const apiGet = async (url: string, paginacao?:IPaginacao): Promise<IDataR
             return {
                 status: STATUS_CODE.INTERNAL_SERVER_ERROR,
                 messages: [DEFAULT_ERROR_MESSAGE],
+            }
+        }
+
+        if (response.status === STATUS_CODE.UNAUTHORIZED) {
+            return {
+                status: response.status,
+                messages: JSON.parse(response.data).messages
             }
         }
 
@@ -114,6 +122,13 @@ export const apiPost = async (url: string, data: any): Promise<IDataResponse> =>
             }
         }
 
+        if (response.status === STATUS_CODE.UNAUTHORIZED) {
+            return {
+                status: response.status,
+                messages: JSON.parse(response.data).messages
+            }
+        }
+
         if (response.status === STATUS_CODE.NO_CONTENT) {
             return {
                 status: response.status,
@@ -145,7 +160,7 @@ export const apiPost = async (url: string, data: any): Promise<IDataResponse> =>
         return {
             status: response.status,
             messages: [SUCCESS_MESSAGE],
-            data: JSON.parse(response.data),
+            data: response.data && JSON.parse(response.data),
         }
 
     } catch (e) {
@@ -156,12 +171,12 @@ export const apiPost = async (url: string, data: any): Promise<IDataResponse> =>
     }
 }
 
-export const apiPut = async (url: string, data: any): Promise<IDataResponse> => {
+export const apiPut = async (url: string, data?: any): Promise<IDataResponse> => {
 
     const usuarioSessao = buscaUsuarioSessao();
 
     try {
-        const response: AxiosResponse = await api.put(url, JSON.stringify(data), {
+        const response: AxiosResponse = await api.put(url,(data && JSON.stringify(data)), {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${usuarioSessao?.token ?? ""}`
@@ -172,6 +187,13 @@ export const apiPut = async (url: string, data: any): Promise<IDataResponse> => 
             return {
                 status: STATUS_CODE.INTERNAL_SERVER_ERROR,
                 messages: [DEFAULT_ERROR_MESSAGE],
+            }
+        }
+
+        if (response.status === STATUS_CODE.UNAUTHORIZED) {
+            return {
+                status: response.status,
+                messages: JSON.parse(response.data).messages
             }
         }
 
@@ -229,12 +251,17 @@ export const apiDelete = async (url: string): Promise<IDataResponse> => {
             }
         });
 
-        console.log(response);
-
         if (response === undefined) {
             return {
                 status: STATUS_CODE.INTERNAL_SERVER_ERROR,
                 messages: [DEFAULT_ERROR_MESSAGE],
+            }
+        }
+
+        if (response.status === STATUS_CODE.UNAUTHORIZED) {
+            return {
+                status: response.status,
+                messages: JSON.parse(response.data).messages
             }
         }
 
@@ -286,6 +313,13 @@ export const apiPutRedefinirSenha = async (url: string, data: any, token:string)
             return {
                 status: STATUS_CODE.INTERNAL_SERVER_ERROR,
                 messages: [DEFAULT_ERROR_MESSAGE],
+            }
+        }
+
+        if (response.status === STATUS_CODE.UNAUTHORIZED) {
+            return {
+                status: response.status,
+                messages: JSON.parse(response.data).messages
             }
         }
 

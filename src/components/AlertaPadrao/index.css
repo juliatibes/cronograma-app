@@ -1,0 +1,22 @@
+.alerta-padrao {
+    position: fixed;
+    top: auto !important;
+    right: 16px !important;
+    left: auto !important;
+    bottom: 16px !important;
+    animation: slide-up 1s ease-out;
+}
+
+.alerta-padrao > div {
+    box-shadow: 0px 0px 6px 1px #b6b6b6;
+}
+
+@keyframes slide-up {
+    0% {
+        transform: translateY(100px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}

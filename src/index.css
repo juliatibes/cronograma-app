@@ -1,3 +1,7 @@
+html{
+  background-color: #e2f0fd;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -14,15 +18,20 @@ body {
   --gray: #EBEBEB;
 }
 
-main {
+.content {
   min-width: 100%;
   width: 100%;
   height: auto;
   display: flex;
   justify-items: center;
-  overflow: hidden;
 }
 
-html{
-  background-color: #e2f0fd;
+.page-main {
+  max-width: 100%;
+  padding: 40px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 20px;
+  flex-direction: column;
 }
