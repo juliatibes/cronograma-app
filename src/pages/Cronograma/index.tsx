@@ -188,8 +188,8 @@ const Cronograma: FC = () => {
             </div>
             <Divider className="divider" />
             <div className="cronograma-container">
-                <div className="cronograma-header">
-                    {cronogramaPorPeriodoCursoFase && <>
+                {cronogramaPorPeriodoCursoFase && <>
+                    <div className="cronograma-header">
                         <h2 className="cronograma-titulo">{`${cronogramaPorPeriodoCursoFase.faseNumero}ª Fase - ${cronogramaPorPeriodoCursoFase.cursoNome}`}</h2>
                         <div className="cronograma-legenda">
                             <div className="cronograma-legenda-default" >
@@ -249,12 +249,12 @@ const Cronograma: FC = () => {
                                 </TableBody>
                             </Table>
                         </div>
-                    </>}
-                </div>
-                <div className="cronograma-content">
 
-                    {cronogramaPorPeriodoCursoFase && <Calendario meses={cronogramaPorPeriodoCursoFase.meses}/>}
-                </div>
+                    </div>
+                    <div className="cronograma-content">
+                        <Calendario meses={cronogramaPorPeriodoCursoFase.meses} />
+                    </div>
+                </>}
             </div>
 
 

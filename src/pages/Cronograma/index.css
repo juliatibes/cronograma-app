@@ -159,3 +159,11 @@
     height: 16px;
 }
 
+.cronograma-content {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
