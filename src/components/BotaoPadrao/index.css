@@ -2,10 +2,11 @@
     background-color: var(--dark-orange-senac) !important;
     color: var(--dark-blue-senac) !important;
     font-weight: bold !important;
-    padding: 10px !important;
-    width: 90px !important;
+    padding: 6px 12px !important;
+
 }
 
 .standard-button:hover {
-    background-color: var(--light) !important;
+    background-color: #fca63d !important;
+    color: var(--dark-blue-senac) !important;
 }

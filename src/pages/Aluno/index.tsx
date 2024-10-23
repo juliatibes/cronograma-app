@@ -11,13 +11,15 @@ const Aluno: FC = () => {
     navigate("/cadastroaluno");
   };
   return(
-<main >
+    <main >
       <SideMenu />
       <div className="cadastro-aluno">
-          <h2>Aluno</h2>
+        <div className="aluno-header">
+          <h2>Alunos</h2>
           <div className="botao-adicionar">
               <BotaoPadrao label={"Adicionar"}  onClick={handleAddClick} />
           </div>
+        </div>
       </div>
   </main>
 )};
