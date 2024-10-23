@@ -6,6 +6,7 @@ import IconeLogin from "../IconLogin";
 const MenuBar: FC = () => {
   return (
     <>
+    <header>
       <div className="menu-header">
         <ul>
           <li>
@@ -16,6 +17,7 @@ const MenuBar: FC = () => {
         </ul>
         <IconeLogin />
       </div>
+    </header>
     </>
   );
 };
