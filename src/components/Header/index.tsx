@@ -1,6 +1,7 @@
 import { FC } from "react";
 import "./index.css";
 import logoEmpresa from "../../assets/logo-senacplan.png";
+import IconeLogin from "../IconLogin";
 
 const MenuBar: FC = () => {
   return (
@@ -13,6 +14,7 @@ const MenuBar: FC = () => {
             </a>
           </li>
         </ul>
+        <IconeLogin />
       </div>
     </>
   );
