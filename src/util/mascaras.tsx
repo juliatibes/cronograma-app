@@ -1,3 +1,5 @@
+import dayjs, { Dayjs } from "dayjs";
+
 export const aplicarMascaraTelefone = (value: String | undefined) => {
     if (!value) return ''
     
@@ -22,4 +24,10 @@ export const removerMascaraNumeros = (value: string | undefined) => {
     if (!value) return "";
 
     return value.replace(/\D/g, "");
+}
+
+export const aplicarMascaraDataPtBr = (value: Dayjs | undefined) => {
+    if (!value) return "";
+
+    return dayjs(value).format('DD/MM/YYYY').toString();
 }
