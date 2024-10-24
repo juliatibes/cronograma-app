@@ -6,12 +6,12 @@ import SideBar from "./components/SideMenu";
 import { useEffect, useState } from "react";
 
 function App() {
-  const [isLogado, setIsLogado] = useState<boolean>(true);
+  const [isLogado, setIsLogado] = useState<boolean>(false);
 
   useEffect(() => {
     setTimeout(() => {
       setIsLogado(buscaUsuarioSessao().token ? true : false);
-    }, 50);
+    }, 30);
   },[])
 
   return (

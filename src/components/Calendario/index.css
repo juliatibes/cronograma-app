@@ -1,11 +1,34 @@
   .calendario-container {
-    max-width: min-content;
-    border: 1px solid red;
+    max-width: 310px;
   }
-  
+
+  .calendario-container table tbody tr td {
+    border-bottom: none;
+    font-size: 1rem !important;
+    border: 1px solid var(--dark);
+  }
+
+  .calendario-container table thead tr th {
+    border-bottom: none;
+    border: 1px solid var(--dark);
+    font-weight: 500;
+    font-size: 1.1rem !important;
+  }
+
+  .calendario-container div {
+    width: 100%;
+  }
+
   .calendario-mes {
     text-align: center;
     margin: 0;
-    padding: 10px 0px 5px 0px;
+    padding: 15px 0px;
+    font-weight: 500;
+    border-top: 1px solid var(--dark);
+    border-right: 1px solid var(--dark);
+    border-left: 1px solid var(--dark);
+    border-radius: 4px 4px 0px 0px;
+    color:  var(--light);
+    letter-spacing: 1px;
+    background-color: var(--light-blue-senac);
   }
-  

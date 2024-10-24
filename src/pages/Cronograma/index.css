@@ -28,8 +28,8 @@
     flex-direction: column;
     gap: 4px;
     line-height: normal !important;
-    background-color:  var(--dark-blue-senac) !important;
-    color: var(--dark-orange-senac) !important;
+    background-color:  #2b71b3 !important;
+    color: var(--gray) !important;
     border-radius: 10px !important;
     text-transform: none !important;
     font-size: 1rem !important;
@@ -37,7 +37,6 @@
     opacity: 0.8;
     transition: 0.2s !important;
 }
-
 
 .cronograma-periodo-btn:hover {
    opacity: 0.9;
@@ -53,7 +52,7 @@
 
 .cronogram-cursos {
     width: 96%;
-    margin: 0px 2%;
+    margin: 0.4rem 2%;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -97,7 +96,7 @@
     justify-content: center;
     align-items: center;
     border-radius: 5px;
-    box-shadow: 0px 0px 2px 0px #000;
+    box-shadow: 0px 0px 2px 0px var(--dark);
 }
 
 .cronograma-legenda-default div span {
@@ -106,7 +105,7 @@
     height: 24px;
     border-radius: 5px;
     background-color: pink;
-    box-shadow: 0px 0px 2px 0px #000;
+    box-shadow: 0px 0px 2px 0px var(--dark);
 }
 
 .cronograma-legenda-default div p {
@@ -123,11 +122,11 @@
 
 
 #cronograma-legenda-sem-aula {
-    background-color: #fff;
+    background-color: var(--light);
 }
 
 #cronograma-legenda-sem-aula span {
-    background-color: #fff;
+    background-color: var(--light);
 }
 
 .cronograma-legenda-table {
@@ -150,7 +149,7 @@
     width: 15px;
     height: 24px;
     border-radius: 5px;
-    box-shadow: 0px 0px 2px 0px #000;
+    box-shadow: 0px 0px 2px 0px var(--dark);
     padding-left: 0px !important;
     margin: 0px !important;
 }

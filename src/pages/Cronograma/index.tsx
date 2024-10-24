@@ -7,13 +7,15 @@ import { apiGet, STATUS_CODE } from "../../api/RestClient";
 import CursoFaseLista from "../../components/CursoFaseLista";
 import { ICursoPorPeriodo } from "../../types/curso";
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules'; // Módulo de navegação
-import 'swiper/css'; // CSS básico do Swiper
-import 'swiper/css/navigation'; // CSS para botões de navegação
+import { Navigation } from 'swiper/modules';
+import 'swiper/css'; 
+import 'swiper/css/navigation';
 import BotaoPadrao from "../../components/BotaoPadrao";
 import { ICronograma, ICronogramaDisciplina } from "../../types/cronograma";
 import Calendario from "../../components/Calendario";
 import React from "react";
+import { hexToRgba } from "../../util/conversorCores";
+
 const Cronograma: FC = () => {
     const navigate = useNavigate();
     const [periodoSelecionado, setPeriodoSelecionado] = useState<IPeriodo>();
@@ -78,7 +80,6 @@ const Cronograma: FC = () => {
         }
 
         if (response.status === STATUS_CODE.OK) {
-            console.log(response.data)
             setCronogramaPorPeriodoCursoFase(response.data);
         }
 
@@ -91,15 +92,6 @@ const Cronograma: FC = () => {
             //   exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
         }
     }
-
-    const hexToRgba = (hex: string, opacity: number): string => {
-        const r = parseInt(hex.slice(1, 3), 16);
-        const g = parseInt(hex.slice(3, 5), 16);
-        const b = parseInt(hex.slice(5, 7), 16);
-        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-    }
-
-    console.log(cronogramaPorPeriodoCursoFase?.meses);
 
     useEffect(() => {
         carregarPeriodo();
@@ -182,7 +174,7 @@ const Cronograma: FC = () => {
                         curso={curso}
                         editavel={curso.editavel}
                         onClickListItemText={carregarCrogramaPorPeriodoCursoFase}
-                        onClickRemoveCircleOutlineIcon={() => { }}
+                        onClickRemoveCircleOutlineIcon={() => {}}
                     />
                 ))}
             </div>
@@ -256,8 +248,6 @@ const Cronograma: FC = () => {
                     </div>
                 </>}
             </div>
-
-
         </main >
     </>
 }

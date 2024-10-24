@@ -1,10 +1,9 @@
-import { Collapse, List, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { Collapse, List, ListItemButton, ListItemText } from "@mui/material";
 import Rotate90DegreesCwIcon from '@mui/icons-material/Rotate90DegreesCw';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import "./index.css";
 import { FC, useState } from "react"
 import { ICursoPorPeriodo } from "../../types/curso";
-
+import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 interface CursoFaseListaProperties {
   curso: ICursoPorPeriodo,
   editavel: boolean,
@@ -34,19 +33,24 @@ const CursoFaseLista: FC<CursoFaseListaProperties> = ({
   return (
     <List
       key={curso.id}
+      onClick={
+        (e) => {
+          const target = e.target as HTMLElement;
+          ((target.localName !== "path" && target.localName !== "svg")  && handleClick());
+        }
+      }
       className={`curso-fase-lista ${open ? "curso-fase-lista-open" : "curso-fase-lista-close"}`}
       component="nav"
       aria-labelledby="nested-list-subheader"
     >
       <ListItemButton sx={{ display: 'flex', gap: '10px' }} >
-        <RemoveCircleOutlineIcon
-          color="error"
-          className={`curso-fase-icon ${!editavel && "curso-fase-hide"}`}
-          onClick={() => { onClickRemoveCircleOutlineIcon(curso.id) }}
+        <PlaylistRemoveIcon
+          className={`curso-fase-icon-delete ${!editavel && "curso-fase-hide"}`}
+          onClick={() => { onClickRemoveCircleOutlineIcon(curso.id)}}
         />
         <ListItemText sx={{textAlign:'center'}} primary={curso.sigla} />
         <Rotate90DegreesCwIcon
-          className={`curso-fase-icon ${open && "curso-fase-rotate"}`}
+          className={`curso-fase-icon-drop ${open && "curso-fase-rotate"}`}
           onClick={handleClick}
         />
       </ListItemButton>
