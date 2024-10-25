@@ -10,7 +10,6 @@ import {
   Divider,
   Modal,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 import "dayjs/locale/pt-br";
@@ -29,20 +28,17 @@ import {
 import { IPeriodo, IPeriodoRequest } from "../../types/periodo";
 import AlertPadrao from "../../components/AlertaPadrao";
 import InputPadrao from "../../components/InputPadrao";
-// import DatePicker from "@mui/lab/DatePicker";
-import { DatePicker, DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import CardPadrao from "../../components/CardPadrao";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import {
   AccountBalance,
   EditNote,
+  EventOutlined,
   People,
-  ToggleOffOutlined,
-  ToggleOnOutlined,
   VisibilityOutlined,
 } from "@mui/icons-material";
-import AutoStories from "@mui/icons-material/AutoStories";
 import { STATUS_ENUM } from "../../types/statusEnum";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import dayjs, { Dayjs } from "dayjs";
@@ -173,40 +169,6 @@ const Periodo: FC = () => {
     ) {
       const mensagens = response.messages;
       exibirAlerta(mensagens, "error"); //tratamento erro
-    }
-
-    if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
-    }
-  };
-
-  const alterarStatusPeriodo = async (
-    id: number,
-    nome: string,
-    ativar: boolean
-  ) => {
-    const response = await apiPut(
-      `/periodo/${ativar ? "ativar" : "inativar"}/${id}`
-    );
-
-    if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
-    }
-
-    if (response.status === STATUS_CODE.NO_CONTENT) {
-      exibirAlerta(
-        [`${nome} ${ativar ? "ativado" : "inativado"} com sucesso!`],
-        "success"
-      );
-      carregarPeriodo();
-    }
-
-    if (
-      response.status === STATUS_CODE.BAD_REQUEST ||
-      response.status === STATUS_CODE.UNAUTHORIZED
-    ) {
-      const mensagens = response.messages;
-      exibirErros(mensagens); //tratamento erro
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
@@ -411,11 +373,11 @@ const Periodo: FC = () => {
                 titulo={periodo.nome}
                 body={[
                   <CardPadraoBodyItem
-                    icon={<AccountBalance titleAccess="Data Inicial" />}
+                    icon={<EventOutlined titleAccess="Data Inicial" />}
                     label={aplicarMascaraDataPtBr(periodo.dataInicial)}
                   />,
                   <CardPadraoBodyItem
-                    icon={<People titleAccess="Data Final" />}
+                    icon={<EventOutlined titleAccess="Data Final" />}
                     label={aplicarMascaraDataPtBr(periodo.dataFinal)}
                   />,
                 ]}
