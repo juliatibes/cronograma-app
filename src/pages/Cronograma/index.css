@@ -1,6 +1,5 @@
 
 .cronograma-periodo {
-    margin-inline: 20px;
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap-reverse;
@@ -20,7 +19,6 @@
 
 .cronograma-carousel {
     display: flex;
-    max-width: 55vw;
 }
 
 .cronograma-periodo-btn {

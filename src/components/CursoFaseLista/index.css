@@ -17,7 +17,7 @@
 
 .curso-fase-lista-close {
    border-radius: 10px !important;
-   transition: border-radius 2s ease !important;
+   transition: border-radius 1.2s ease !important;
 }
 
 .curso-fase-lista-open {

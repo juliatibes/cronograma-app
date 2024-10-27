@@ -9,7 +9,7 @@ const MenuBar: FC = () => {
         <div className="menu-header">
           <ul>
             <li>
-              <a href="/">
+              <a href="/cronograma">
                 <img src={logoEmpresa} alt="logo" className="logo" />
               </a>
             </li>

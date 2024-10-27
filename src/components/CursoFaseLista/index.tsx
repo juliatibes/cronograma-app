@@ -7,7 +7,7 @@ import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 interface CursoFaseListaProperties {
   curso: ICursoPorPeriodo,
   editavel: boolean,
-  onClickListItemText: (faseId: number, cursoId: number) => void,
+  onClickListItemText: (faseId: number, cursoId: number, editavel:boolean) => void,
   onClickRemoveCircleOutlineIcon: (cursoId: number) => void,
 }
 
@@ -26,7 +26,7 @@ const CursoFaseLista: FC<CursoFaseListaProperties> = ({
 
   const onClickListaItem = (faseId: number, cursoId: number) => {
     handleClick();
-    onClickListItemText(faseId, cursoId);
+    onClickListItemText(faseId, cursoId, editavel);
   }
 
 
