@@ -18,3 +18,12 @@ export interface ICursoRequest {
     coordenadorId?:number
     faseIds:number[]
 }
+
+export interface ICursoPorPeriodo {
+    find(arg0: (curso: any) => any): ICursoPorPeriodo | undefined;
+    id:number,
+    nome:string,
+    sigla:string,
+    editavel:boolean,
+    fases:IFase[]
+}

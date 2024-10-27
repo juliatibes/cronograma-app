@@ -1,0 +1,73 @@
+.curso-fase-lista {
+    width: 100%;
+    padding: 0 !important;
+    width: auto;
+    min-width: 140px;
+    max-width: 180px;
+    background-color: #2b71b3 !important;
+    color: var(--gray) !important;
+    box-shadow: 0px 0px 2px 0px #f5a543 !important;
+}
+
+.curso-fase-lista > div:nth-child(1) {
+    border-radius: 10px !important;
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+}
+
+.curso-fase-lista-close {
+   border-radius: 10px !important;
+   transition: border-radius 1.2s ease !important;
+}
+
+.curso-fase-lista-open {
+    border-radius: 10px 10px 0px 0px !important;
+}
+
+.curso-fase-icon-drop {
+    font-size: 1.8rem !important;
+    transition: transform 0.3s !important;
+    color: #f5a543;
+}
+
+.curso-fase-icon-delete {
+    font-size: 1.9rem !important;
+    color: rgb(226, 38, 38);
+}
+
+
+.curso-fase-hide {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.curso-fase-rotate {
+    transform: rotate(180deg);
+}
+
+.curso-fase-collapse {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+    background-color: #2b71b3;
+    color: var(--gray);
+    z-index: 1;
+    border-radius: 0px 0px 4px 4px;
+    box-shadow: 0px 2px 3px -2px #f5a543,-2px 0px 2px -2px #f5a543,2px 0px 2px -2px #f5a543 !important;
+}
+
+.curso-fase-lista-item {
+    text-align: center !important;
+    border-top: 1px solid transparent !important;
+    border-bottom: 1px solid transparent !important;
+    transition: 0.2s !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+}
+
+.curso-fase-lista-item:hover {
+    border-top: 1px solid var(--light-orange-senac) !important;
+    border-bottom: 1px solid var(--light-orange-senac) !important;
+    color: var(--light-orange-senac) !important;
+}
