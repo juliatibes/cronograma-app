@@ -19,6 +19,7 @@ import AlertaPadrao from "../../components/AlertaPadrao";
 import { IFase } from "../../types/fase";
 import { buscaUsuarioSessao } from "../../store/UsuarioStore/usuarioStore";
 import { IUsuarioStore } from "../../store/UsuarioStore/types";
+import dayjs from "dayjs";
 
 const Cronograma: FC = () => {
     const [usuarioSessao] = useState<IUsuarioStore>(buscaUsuarioSessao());
@@ -150,7 +151,7 @@ const Cronograma: FC = () => {
     const primeiroCarregamento = async () => {
         const periodosEncontrados: IPeriodo[] = await carregarPeriodo();
         const ultimoPeriodo: IPeriodo | undefined = periodosEncontrados
-            .sort((a, b) => new Date(b.dataInicial).getTime() - new Date(a.dataInicial).getTime())[0];
+            .sort((a, b) => dayjs(b.dataInicial).valueOf() - dayjs(a.dataInicial).valueOf())[0];
 
         if (ultimoPeriodo) {
             setPeriodoSelecionado(ultimoPeriodo);
@@ -241,7 +242,7 @@ const Cronograma: FC = () => {
                                             size="large"
                                             variant="contained"
                                         >
-                                            <span>{new Date(periodo.dataInicial).getFullYear()}</span>
+                                            <span>{dayjs(periodo.dataInicial).year()}</span>
                                             {periodo.nome}
                                         </Button>
                                     </SwiperSlide>
