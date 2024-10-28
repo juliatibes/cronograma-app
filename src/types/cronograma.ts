@@ -22,3 +22,7 @@ export interface ICronogramaMes {
         [key: number]: IDiaCronograma[];
     }
 }
+
+export interface ICronogramaRequest {
+    cursoId:number
+}

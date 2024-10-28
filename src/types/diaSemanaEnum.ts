@@ -20,7 +20,7 @@ export const diaSemanaEnumGetLabel = (diaSemana: DIA_SEMANA_ENUM):string => {
         case DIA_SEMANA_ENUM.SEXTA_FEIRA:
             return "Sexta-Feira";
         case DIA_SEMANA_ENUM.SABADO:
-            return "Sabado";
+            return "Sábado";
         default:
             return "";
     }

@@ -5,7 +5,7 @@ import { LoadingButton } from "@mui/lab";
 interface ButtonPadraoProperty {
     label: string;
     variant?: 'text' | 'contained' | 'outlined';
-    onClick?: () => void;
+    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
     carregando?:boolean
 }
 

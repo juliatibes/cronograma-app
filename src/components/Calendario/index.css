@@ -192,8 +192,7 @@
   #calendario-modal-title {
     text-align: center;
     margin-bottom: 2.5rem;
-    color: var(--gray);
-    filter: drop-shadow(0px 1px 1px #000000);
+    color: var(--dark);
   }
 
   #calendario-modal-description {
@@ -204,7 +203,7 @@
   }
 
   .calendario-modal-group {
-    color: var(--gray);
+    color: var(--dark);
     padding-inline: 20px;
     display: flex;
     justify-content: start;
@@ -212,17 +211,13 @@
     gap: 10px;
   }
 
-  .calendario-modal-group svg {
-    filter: drop-shadow(0px 1px 1px #000000);
-  }
 
   .calendario-modal-group > p {
     font-size: 1.1rem;
-    filter: drop-shadow(0px 1px 1px #000000);
   }
 
  .calendario-modal-divider{
-  background-color:  var(--gray);
+  background-color:  var(--dark);
  }
 
   .calendario-modal-divider-icon {
@@ -231,7 +226,7 @@
    left: 44%;
    font-size: 3.4rem !important;
    color: var(--light-orange-senac) !important;
-   filter: drop-shadow(0px 1px 1px #000) !important;
+   filter: drop-shadow(0px 2px 2px #000) !important;
   }
 
 

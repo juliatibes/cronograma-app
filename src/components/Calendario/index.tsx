@@ -106,7 +106,10 @@ const Calendario: FC<CalendarioProperties> = ({ meses, editavel, onClickConfirma
         return diaCronogramaTrocaSelecionadoPrimeiro.professorDiasSemanaEnum
           .some((diaSemana) => diaCronograma.diaSemanaEnum === diaSemana) &&
           diaCronograma.professorDiasSemanaEnum
-          .some((diaSemana) => diaCronogramaTrocaSelecionadoPrimeiro.diaSemanaEnum === diaSemana)
+            .some((diaSemana) => diaCronogramaTrocaSelecionadoPrimeiro.diaSemanaEnum === diaSemana) &&
+          (diaCronograma.disciplinaNome !== diaCronogramaTrocaSelecionadoPrimeiro?.disciplinaNome ||
+            (diaCronograma.disciplinaNome === diaCronogramaTrocaSelecionadoPrimeiro?.disciplinaNome &&
+              diaCronograma.professorNome !== diaCronogramaTrocaSelecionadoPrimeiro?.professorNome))
       } else {
         return false;
       }
@@ -160,8 +163,8 @@ const Calendario: FC<CalendarioProperties> = ({ meses, editavel, onClickConfirma
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            bgcolor: "#2b71b3",
-            outline: "0.2px solid var(--gray)",
+            bgcolor: "#9cc5eb",
+            outline: "0.2px solid var(--dark)",
             p: 3,
             borderRadius: 2,
             maxWidth: "350px"
@@ -176,7 +179,7 @@ const Calendario: FC<CalendarioProperties> = ({ meses, editavel, onClickConfirma
               <Event fontSize="large" />
               <Typography variant="h6" component="p" >
                 {
-                  diaCronogramaTrocaSelecionadoPrimeiro && 
+                  diaCronogramaTrocaSelecionadoPrimeiro &&
                   `${new Date(diaCronogramaTrocaSelecionadoPrimeiro.data).toLocaleDateString('pt-BR')} - 
                    ${diaSemanaEnumGetLabel(diaCronogramaTrocaSelecionadoPrimeiro?.diaSemanaEnum)}`
                 }
@@ -206,8 +209,8 @@ const Calendario: FC<CalendarioProperties> = ({ meses, editavel, onClickConfirma
             <Typography className="calendario-modal-group" component="div" >
               <Event fontSize="large" />
               <Typography variant="h6" component="p" >
-              {
-                  diaCronogramaTrocaSelecionadoSegundo && 
+                {
+                  diaCronogramaTrocaSelecionadoSegundo &&
                   `${new Date(diaCronogramaTrocaSelecionadoSegundo.data).toLocaleDateString('pt-BR')} - 
                    ${diaSemanaEnumGetLabel(diaCronogramaTrocaSelecionadoSegundo?.diaSemanaEnum)}`
                 }
@@ -230,11 +233,11 @@ const Calendario: FC<CalendarioProperties> = ({ meses, editavel, onClickConfirma
           <Divider sx={{ marginBlock: "1.1rem" }} className="calendario-modal-divider"></Divider>
 
           <Box id="calendario-modal-actions">
-            <Button variant="contained" sx={{ backgroundColor: "var(--gray)", color: "#2b71b3", fontWeight: "bolder" }} onClick={confirmar}>
-              Confirmar
-            </Button>
-            <Button sx={{ color: "var(--gray)", borderColor: "var(--gray)", fontWeight: "bolder" }} variant="outlined" onClick={cancelar}>
+            <Button sx={{ color: "var(--dark-blue-senac)", borderColor: "var(--dark-blue-senac)", fontWeight: "bolder" }} variant="outlined" onClick={cancelar}>
               Cancelar
+            </Button>
+            <Button variant="contained" sx={{ backgroundColor: "var(--dark-blue-senac)", color: "var(--gray)", fontWeight: "bolder" }} onClick={confirmar}>
+              Confirmar
             </Button>
           </Box>
         </Box>

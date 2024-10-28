@@ -1,5 +1,6 @@
 import { Stack, Autocomplete, TextField } from "@mui/material";
 import { FC } from "react";
+import { diaSemanaEnumGetLabel } from "../../types/diaSemanaEnum";
 
 interface MultiSelectProperties {
   options:any[]
@@ -26,7 +27,11 @@ const MultiSelect: FC<MultiSelectProperties> = ({
         size="small"
         id="tags-outlined"
         options={options}
-        getOptionLabel={(option) => option.nome ? option.nome : `${option.numero}ª Fase`}
+        getOptionLabel={
+          (option) => 
+            option.nome ? option.nome : 
+                (option.numero ? `${option.numero}ª Fase` : diaSemanaEnumGetLabel(option.diaSemanaEnum))
+        }
         value={values} 
         filterSelectedOptions
         onChange={(event, value) => onChange(value)}
