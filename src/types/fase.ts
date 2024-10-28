@@ -5,3 +5,9 @@ export interface IFase {
     numero:number,
     statusEnum?:STATUS_ENUM
 }
+
+export interface IFasesRequest {
+    id?:number,
+    numero?:number,
+    statusEnum?:STATUS_ENUM
+}

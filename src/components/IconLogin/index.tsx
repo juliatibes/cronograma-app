@@ -9,6 +9,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 import { Person } from '@mui/icons-material';
+import { removerUsuario } from '../../store/UsuarioStore/usuarioStore';
 
 export default function IconeLogin() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -25,7 +26,6 @@ export default function IconeLogin() {
 
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); 
     window.location.href = '/login';
   };
   
