@@ -1,17 +1,15 @@
 import { FC, useEffect, useState } from "react";
-import { AlertColor, Box, Button, Divider, IconButton, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
+import { AlertColor, Box, Button, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
 import "./index.css";
 import { IPeriodo } from "../../types/periodo";
-import { useNavigate } from "react-router-dom";
-import { apiGet, apiPut, STATUS_CODE } from "../../api/RestClient";
+import { apiGet, apiPost, apiPut, STATUS_CODE } from "../../api/RestClient";
 import CursoFaseLista from "../../components/CursoFaseLista";
-import { ICurso, ICursoPorPeriodo } from "../../types/curso";
+import { ICurso, ICursoPorPeriodo, ICursoPorUsuario, ICursoRequest } from "../../types/curso";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
-import BotaoPadrao from "../../components/BotaoPadrao";
-import { ICronograma, ICronogramaDisciplina } from "../../types/cronograma";
+import { ICronograma, ICronogramaDisciplina, ICronogramaRequest } from "../../types/cronograma";
 import Calendario from "../../components/Calendario";
 import React from "react";
 import { hexToRgba } from "../../util/conversorCores";
@@ -19,7 +17,9 @@ import AlertaPadrao from "../../components/AlertaPadrao";
 import { IFase } from "../../types/fase";
 import { buscaUsuarioSessao } from "../../store/UsuarioStore/usuarioStore";
 import { IUsuarioStore } from "../../store/UsuarioStore/types";
+import semCronograma from "../../assets/sem_cronograma.gif";
 import dayjs from "dayjs";
+import { AccountBalance } from "@mui/icons-material";
 
 const Cronograma: FC = () => {
     const [usuarioSessao] = useState<IUsuarioStore>(buscaUsuarioSessao());
@@ -37,6 +37,11 @@ const Cronograma: FC = () => {
     const [cursosPorPeriodo, setCursosPorPeriodo] = useState<ICursoPorPeriodo[]>([]);
     const [cronogramaPorPeriodoCursoFase, setCronogramaPorPeriodoCursoFase] = useState<ICronograma>();
 
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [exibirMenu, setExibirMenu] = useState<boolean>(false);
+    const [loading, setLoading] = useState(true);
+    const [cursosPorUsuario, setCursosPorUsuario] = useState<ICursoPorUsuario[]>();
+
 
     const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
         setEstadoAlerta(false);
@@ -46,8 +51,29 @@ const Cronograma: FC = () => {
         setEstadoAlerta(true);
     }
 
+    const exibirMenuGerar = async (event: React.MouseEvent<HTMLButtonElement>) => {
+        setLoading(true);
+
+        setAnchorEl(event.currentTarget);
+        setExibirMenu(true);
+
+        await carregarCursoPorUsuario();
+
+        setLoading(false);
+    };
+
+    const fecharMenuGerar = () => {
+        setAnchorEl(null);
+        setExibirMenu(false);
+    };
+
+    const selecionarCursoGerar = (cursoPorUsuario: ICursoPorUsuario) => {
+        gerarCronograma(cursoPorUsuario.id);
+        fecharMenuGerar();
+    };
+
     const carregarPeriodo = async () => {
-        const response = await apiGet('/periodo/carregar/usuario');
+        const response = await apiGet('/periodo/carregar');
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
             window.location.href = "/login";
@@ -90,7 +116,29 @@ const Cronograma: FC = () => {
         }
     }
 
+    const carregarCursoPorUsuario = async () => {
+        const response = await apiGet(`/curso/carregar/usuario`);
+
+        if (response.status === STATUS_CODE.FORBIDDEN) {
+            window.location.href = "/login";
+        }
+
+        if (response.status === STATUS_CODE.OK) {
+            setCursosPorUsuario(response.data);
+        }
+
+        if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
+            const mensagens = response.messages;
+            exibirAlerta(mensagens, "error");
+        }
+
+        if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
+            exibirAlerta(["Erro inesperado!"], "error");
+        }
+    }
+
     const selecionarPeriodo = async (periodo: IPeriodo) => {
+        setCronogramaPorPeriodoCursoFase(undefined);
         setPeriodoSelecionado(periodo);
         await carregarCursoPorPeriodo(periodo.id);
     }
@@ -148,6 +196,34 @@ const Cronograma: FC = () => {
         }
     }
 
+    const gerarCronograma = async (cursoId: number) => {
+
+        const cronogramaRequest: ICronogramaRequest = {
+            cursoId: cursoId,
+        }
+
+        const response = await apiPost(`/evento/criar/cronograma`, cronogramaRequest);
+
+        if (response.status === STATUS_CODE.FORBIDDEN) {
+            window.location.href = "/login";
+        }
+
+        if (response.status === STATUS_CODE.CREATED) {
+            exibirAlerta([`Curso está sendo gerado fique de olho nas notificações`], "warning");
+            setCronogramaPorPeriodoCursoFase(undefined);
+            primeiroCarregamento();
+        }
+
+        if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
+            const mensagens = response.messages;
+            exibirAlerta(mensagens, "error");
+        }
+
+        if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
+            exibirAlerta(["Erro inesperado!"], "error");
+        }
+    }
+
     const primeiroCarregamento = async () => {
         const periodosEncontrados: IPeriodo[] = await carregarPeriodo();
         const ultimoPeriodo: IPeriodo | undefined = periodosEncontrados
@@ -155,8 +231,8 @@ const Cronograma: FC = () => {
 
         if (ultimoPeriodo) {
             setPeriodoSelecionado(ultimoPeriodo);
-            const cursosPorPeriodoEncontrados: ICursoPorPeriodo = await carregarCursoPorPeriodo(ultimoPeriodo.id);
-            const primeiroCurso: ICursoPorPeriodo | undefined = cursosPorPeriodoEncontrados.find(curso => curso);
+            const cursosPorPeriodoEncontrados: ICursoPorPeriodo[] = await carregarCursoPorPeriodo(ultimoPeriodo.id);
+            const primeiroCurso: ICursoPorPeriodo | undefined = cursosPorPeriodoEncontrados.find((curso: ICursoPorPeriodo) => curso);
             const primeiraFase: IFase | undefined = primeiroCurso?.fases.find(fase => fase);
 
             if (primeiroCurso && primeiraFase) {
@@ -171,12 +247,12 @@ const Cronograma: FC = () => {
     }
 
     useEffect(() => {
-        primeiroCarregamento()
+        primeiroCarregamento();
     }, []);
 
     return <>
         <AlertaPadrao
-            key={estadoAlerta ? "show" : "close"} //componente tratamento erro
+            key={estadoAlerta ? "show" : "close"} 
             estado={estadoAlerta}
             cor={corAlerta}
             mensagens={mensagensAlerta}
@@ -186,10 +262,10 @@ const Cronograma: FC = () => {
         />
         <main className="page-main">
             {
-             usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 4) && 
-             <>
-                <div className="cronograma-periodo">
-                        <Box sx={{ position: 'relative', flex:"5 0 0", margin:"0px 24px"}}>
+                usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 4) &&
+                <>
+                    <div className="cronograma-periodo">
+                        <Box sx={{ position: 'relative', flex: "5 0 0", margin: "0px 24px"}}>
                             <IconButton
                                 className="swiper-button-prev"
                                 sx={{
@@ -249,27 +325,90 @@ const Cronograma: FC = () => {
                                 ))}
                             </Swiper>
                         </Box>
+
                         {
-                         usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 3) &&
-                         <div className="cronograma-botao">
-                             <BotaoPadrao label={"Gerar"} />
-                         </div>
+                            usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 3) &&
+                            <div className="cronograma-botao">
+                                <Button
+                                    className="standard-button"
+                                    onClick={exibirMenuGerar}
+                                >
+                                    Gerar
+                                </Button>
+
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={exibirMenu}
+                                    onClose={fecharMenuGerar}
+                                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                                    slotProps={{
+                                        paper: {
+
+                                            elevation: 0,
+                                            sx: {
+                                                mx: -2.1,
+                                                overflow: 'visible',
+                                                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                                                mt: 1.5,
+                                                '& .MuiAvatar-root': {
+                                                    width: 32,
+                                                    height: 32,
+                                                    ml: -0.5,
+                                                    mr: 1,
+                                                },
+                                                '&::before': {
+                                                    content: '""',
+                                                    display: 'block',
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    right: 14,
+                                                    width: 10,
+                                                    height: 10,
+                                                    bgcolor: 'background.paper',
+                                                    transform: 'translateY(-50%) rotate(45deg)',
+                                                    zIndex: 0,
+                                                },
+                                            },
+                                        },
+                                    }}
+
+                                >
+                                    {loading ? (
+                                        <MenuItem disabled>
+                                            <CircularProgress size={24} />
+                                        </MenuItem>
+                                    ) : (
+                                        cursosPorUsuario &&
+                                        cursosPorUsuario.map((curso) => (
+                                            <MenuItem key={curso.id} onClick={() => selecionarCursoGerar(curso)}>
+                                                <ListItemIcon>
+                                                    <AccountBalance fontSize="small" />
+                                                </ListItemIcon>
+                                                <Typography>{curso.nome}</Typography>
+                                            </MenuItem>
+                                        ))
+                                    )}
+                                </Menu>
+                            </div>
                         }
-                        
-                </div>
-                <Divider className="divider" />
-             </>
+
+                    </div>
+                    <Divider className="divider" />
+                </>
             }
 
-            
-            <div className="cronogram-cursos" 
+
+            <div className="cronogram-cursos"
                 style={{
-                    justifyContent: 
-                    usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 4) ? "flex-start" : "center"
+                    justifyContent:
+                        usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 4) ? "flex-start" : "center"
                 }}
-            
+
             >
-                {cursosPorPeriodo.map((curso) => (
+                {
+                cursosPorPeriodo && cursosPorPeriodo.length > 0 ?
+                cursosPorPeriodo.map((curso) => (
                     <CursoFaseLista
                         key={curso.id}
                         curso={curso}
@@ -277,11 +416,15 @@ const Cronograma: FC = () => {
                         onClickListItemText={carregarCrogramaPorPeriodoCursoFase}
                         onClickRemoveCircleOutlineIcon={() => { }}
                     />
-                ))}
+                )) :
+                    <p className="cronograma-sem-curso">Não existem cronogramas para o periodo selecionado</p>
+                }
+
+                
             </div>
             <Divider className="divider" />
             <div className="cronograma-container">
-                {cronogramaPorPeriodoCursoFase && <>
+                {cronogramaPorPeriodoCursoFase ? <>
                     <div className="cronograma-header">
                         <h2 className="cronograma-titulo">{`${cronogramaPorPeriodoCursoFase.faseNumero}ª Fase - ${cronogramaPorPeriodoCursoFase.cursoNome} - ${cronogramaPorPeriodoCursoFase.ano}`}</h2>
                         <div className="cronograma-legenda">
@@ -352,7 +495,11 @@ const Cronograma: FC = () => {
                             onClickConfirmar={editarCronograma}
                         />
                     </div>
-                </>}
+                </>
+                : <div className="cronograma-sem-calendario-container">
+                    <img src={semCronograma} alt="sem cronograma" className="cronograma-sem-calendario-gif"/>
+                  </div>
+                }
             </div>
         </main >
     </>
