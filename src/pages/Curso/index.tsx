@@ -240,7 +240,6 @@ const Curso: FC = () => {
     if (validarCampos()) return;//tratamento erro
 
     setCarregando(true);
-    
     const cursoRequest: ICursoRequest = {
       id: id,
       nome: nome,
@@ -415,7 +414,6 @@ const Curso: FC = () => {
             <div className="modal-one-form-group">
               <FormControl fullWidth>
                 <Autocomplete
-                  size="small"
                   options={coordenadores}
                   getOptionLabel={(coordenador: ICoordenador) => coordenador.nome}
                   value={coordenadorSelecionado || null}
@@ -475,18 +473,8 @@ const Curso: FC = () => {
               ),
               (
                 curso.statusEnum === STATUS_ENUM.INATIVO ?
-                (
-                <CardPadraoActionItem 
-                  icon={<ToggleOffOutlined titleAccess="Inativado" color="error" />} 
-                  onClick={() => alterarStatusCurso(curso.id, curso.nome, true)} 
-                  />
-                ) :
-                (
-                <CardPadraoActionItem 
-                icon={<ToggleOnOutlined titleAccess="Ativado" />} 
-                onClick={() => alterarStatusCurso(curso.id, curso.nome, false)} 
-                />
-              )
+                (<CardPadraoActionItem icon={<ToggleOffOutlined titleAccess="Inativado" color="error" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, true)} />) :
+                (<CardPadraoActionItem icon={<ToggleOnOutlined titleAccess="Ativado" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, false)} />)
               ),
             ]}
           />

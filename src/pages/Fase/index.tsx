@@ -12,6 +12,7 @@ import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import InputPadrao from "../../components/InputPadrao";
 import { STATUS_ENUM } from "../../types/statusEnum";
 import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
+import AlertaPadrao from "../../components/AlertaPadrao";
 
 const Fase: FC = () => {
   const navigate = useNavigate();
@@ -278,7 +279,7 @@ const Fase: FC = () => {
     </Box>
   </Modal>
 
-  {/* <AlertPadrao
+  <AlertaPadrao
     key={estadoAlerta ? "show" : "close"} //componente tratamento erro
     estado={estadoAlerta}
     cor={corAlerta}
@@ -286,7 +287,7 @@ const Fase: FC = () => {
     onClose={() => {
       setEstadoAlerta(false);
     }}
-  /> */}
+  />
 
   <main className="page-main">
     <div style={{ display: 'flex' }}>
