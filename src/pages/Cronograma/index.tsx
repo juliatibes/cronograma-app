@@ -73,7 +73,15 @@ const Cronograma: FC = () => {
     };
 
     const carregarPeriodo = async () => {
-        const response = await apiGet('/periodo/carregar');
+
+        let urlPeriodo;
+        if(usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 3)){
+            urlPeriodo = "/periodo/carregar";
+        } else {
+            urlPeriodo = "/periodo/carregar/usuario";
+        }
+
+        const response = await apiGet(urlPeriodo);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
             window.location.href = "/login";
@@ -246,6 +254,10 @@ const Cronograma: FC = () => {
         }
     }
 
+    const validarNivelAcessoMenorCoordenador = ():boolean => {
+        return usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso > 2);
+    }
+
     useEffect(() => {
         primeiroCarregamento();
     }, []);
@@ -265,7 +277,12 @@ const Cronograma: FC = () => {
                 usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 4) &&
                 <>
                     <div className="cronograma-periodo">
-                        <Box sx={{ position: 'relative', flex: "5 0 0", margin: "0px 24px"}}>
+                        <Box id="cronograma-periodo-carousel" 
+                            sx={{
+                                maxWidth:`${validarNivelAcessoMenorCoordenador() ? "90%" : "80%"}`,
+                                minWidth:`${validarNivelAcessoMenorCoordenador() ? "90%" : "80%"}`
+                            }} 
+                        >
                             <IconButton
                                 className="swiper-button-prev"
                                 sx={{
@@ -490,6 +507,7 @@ const Cronograma: FC = () => {
                     <div className="cronograma-content">
                         <Calendario
                             editavel={editavel}
+                            periodoSelecionado={periodoSelecionado}
                             key={cronogramaPorPeriodoCursoFase.faseNumero}
                             meses={cronogramaPorPeriodoCursoFase.meses}
                             onClickConfirmar={editarCronograma}
