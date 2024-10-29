@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from "react";
-import { AlertColor, Box, Button, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
+import { AlertColor, Box, Button, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Modal, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
 import "./index.css";
 import { IPeriodo } from "../../types/periodo";
-import { apiGet, apiPost, apiPut, STATUS_CODE } from "../../api/RestClient";
+import { apiDelete, apiGet, apiPost, apiPut, STATUS_CODE } from "../../api/RestClient";
 import CursoFaseLista from "../../components/CursoFaseLista";
 import { ICurso, ICursoPorPeriodo, ICursoPorUsuario, ICursoRequest } from "../../types/curso";
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -42,6 +42,9 @@ const Cronograma: FC = () => {
     const [loading, setLoading] = useState(true);
     const [cursosPorUsuario, setCursosPorUsuario] = useState<ICursoPorUsuario[]>();
 
+    const [exibirModal, setExibirModal] = useState(false);
+    const [cursoIdSelecionadoExclusao, setCursoIdSelecionadoExclusao] = useState<number>();
+
 
     const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
         setEstadoAlerta(false);
@@ -67,6 +70,10 @@ const Cronograma: FC = () => {
         setExibirMenu(false);
     };
 
+    const fecharModal = () => setExibirModal(false);
+
+    const abrirModal = () =>  setExibirModal(true);
+
     const selecionarCursoGerar = (cursoPorUsuario: ICursoPorUsuario) => {
         gerarCronograma(cursoPorUsuario.id);
         fecharMenuGerar();
@@ -75,7 +82,7 @@ const Cronograma: FC = () => {
     const carregarPeriodo = async () => {
 
         let urlPeriodo;
-        if(usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 3)){
+        if (usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 3)) {
             urlPeriodo = "/periodo/carregar";
         } else {
             urlPeriodo = "/periodo/carregar/usuario";
@@ -254,9 +261,42 @@ const Cronograma: FC = () => {
         }
     }
 
-    const validarNivelAcessoMenorCoordenador = ():boolean => {
+    const validarNivelAcessoMenorCoordenador = (): boolean => {
         return usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso > 2);
     }
+
+    const excluirCurso = async () => {
+
+        const response = await apiDelete(`/cronograma/excluir/${cronogramaPorPeriodoCursoFase?.id}`);
+
+        if (response.status === STATUS_CODE.FORBIDDEN) {
+            window.location.href = "/login";
+        }
+
+        if (response.status === STATUS_CODE.NO_CONTENT) {
+            exibirAlerta([`Curso excluido com sucesso!`], "success");
+            setCronogramaPorPeriodoCursoFase(undefined);
+            primeiroCarregamento();
+        }
+
+        if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
+            const mensagens = response.messages;
+            exibirAlerta(mensagens, "error");
+        }
+
+        if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
+            exibirAlerta(["Erro inesperado!"], "error");
+        }
+    }
+
+    const confirmar = () => {
+        excluirCurso();
+        fecharModal();
+    };
+    
+    const cancelar = () => {
+        fecharModal();
+    };
 
     useEffect(() => {
         primeiroCarregamento();
@@ -264,7 +304,7 @@ const Cronograma: FC = () => {
 
     return <>
         <AlertaPadrao
-            key={estadoAlerta ? "show" : "close"} 
+            key={estadoAlerta ? "show" : "close"}
             estado={estadoAlerta}
             cor={corAlerta}
             mensagens={mensagensAlerta}
@@ -272,16 +312,53 @@ const Cronograma: FC = () => {
                 setEstadoAlerta(false);
             }}
         />
+
+
+        <Modal
+            open={exibirModal}
+            onClose={(_, reason) => {
+                if (reason !== 'backdropClick') fecharModal();
+            }}
+            disableEscapeKeyDown
+        >
+            <Box
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    bgcolor: "var(--gray)",
+                    boxShadow:3,
+                    p: 3,
+                    borderRadius: 2,
+                    maxWidth: "350px"
+                }}
+            >
+                <Typography id="cronograma-modal-title" variant="h6" component="h2">
+                    Deseja confirmar a exclusão ?
+                </Typography>
+
+                <Box id="cronograma-modal-actions">
+                    <Button  variant="outlined" sx={{fontSize:"0.8rem", letterSpacing:"1px",fontWeight:"bolder", border:"2px solid currentColor"}} onClick={cancelar}>
+                        Cancelar
+                    </Button>
+                    <Button variant="contained" sx={{fontSize:"0.8rem", letterSpacing:"1px", fontWeight:"bolder"}} onClick={confirmar}>
+                        Confirmar
+                    </Button>
+                </Box>
+            </Box>
+        </Modal>
+
         <main className="page-main">
             {
                 usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 4) &&
                 <>
                     <div className="cronograma-periodo">
-                        <Box id="cronograma-periodo-carousel" 
+                        <Box id="cronograma-periodo-carousel"
                             sx={{
-                                maxWidth:`${validarNivelAcessoMenorCoordenador() ? "90%" : "80%"}`,
-                                minWidth:`${validarNivelAcessoMenorCoordenador() ? "90%" : "80%"}`
-                            }} 
+                                maxWidth: `${validarNivelAcessoMenorCoordenador() ? "90%" : "80%"}`,
+                                minWidth: `${validarNivelAcessoMenorCoordenador() ? "90%" : "80%"}`
+                            }}
                         >
                             <IconButton
                                 className="swiper-button-prev"
@@ -424,20 +501,20 @@ const Cronograma: FC = () => {
 
             >
                 {
-                cursosPorPeriodo && cursosPorPeriodo.length > 0 ?
-                cursosPorPeriodo.map((curso) => (
-                    <CursoFaseLista
-                        key={curso.id}
-                        curso={curso}
-                        editavel={curso.editavel}
-                        onClickListItemText={carregarCrogramaPorPeriodoCursoFase}
-                        onClickRemoveCircleOutlineIcon={() => { }}
-                    />
-                )) :
-                    <p className="cronograma-sem-curso">Não existem cronogramas para o periodo selecionado</p>
+                    cursosPorPeriodo && cursosPorPeriodo.length > 0 ?
+                        cursosPorPeriodo.map((curso) => (
+                            <CursoFaseLista
+                                key={curso.id}
+                                curso={curso}
+                                editavel={curso.editavel}
+                                onClickListItemText={carregarCrogramaPorPeriodoCursoFase}
+                                onClickRemoveCircleOutlineIcon={() => {abrirModal()}}
+                            />
+                        )) :
+                        <p className="cronograma-sem-curso">Não existem cronogramas para o periodo selecionado</p>
                 }
 
-                
+
             </div>
             <Divider className="divider" />
             <div className="cronograma-container">
@@ -514,9 +591,9 @@ const Cronograma: FC = () => {
                         />
                     </div>
                 </>
-                : <div className="cronograma-sem-calendario-container">
-                    <img src={semCronograma} alt="sem cronograma" className="cronograma-sem-calendario-gif"/>
-                  </div>
+                    : <div className="cronograma-sem-calendario-container">
+                        <img src={semCronograma} alt="sem cronograma" className="cronograma-sem-calendario-gif" />
+                    </div>
                 }
             </div>
         </main >
