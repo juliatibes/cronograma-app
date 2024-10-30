@@ -258,7 +258,21 @@ export const apiDelete = async (url: string): Promise<IDataResponse> => {
             }
         }
 
+        if (response.status === STATUS_CODE.FORBIDDEN) {
+            return {
+                status: response.status,
+                messages: [FORBIDDEN_ERROR_MESSAGE]
+            }
+        }
+
         if (response.status === STATUS_CODE.UNAUTHORIZED) {
+            return {
+                status: response.status,
+                messages: JSON.parse(response.data).messages
+            }
+        }
+
+        if (response.status === STATUS_CODE.BAD_REQUEST) {
             return {
                 status: response.status,
                 messages: JSON.parse(response.data).messages
@@ -269,13 +283,6 @@ export const apiDelete = async (url: string): Promise<IDataResponse> => {
             return {
                 status: response.status,
                 messages: [NO_CONTENT_ERROR_MESSAGE]
-            }
-        }
-
-        if (response.status === STATUS_CODE.FORBIDDEN) {
-            return {
-                status: response.status,
-                messages: [FORBIDDEN_ERROR_MESSAGE]
             }
         }
 

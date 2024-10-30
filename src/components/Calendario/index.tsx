@@ -7,14 +7,17 @@ import { DATA_STATUS_ENUM } from "../../types/dataStatusEnum";
 import { hexToRgba } from "../../util/conversorCores";
 import { Close, ScreenRotationAlt, Event, HistoryEdu, School } from "@mui/icons-material";
 import { diaSemanaEnumGetLabel } from "../../types/diaSemanaEnum";
+import { IPeriodo } from "../../types/periodo";
+import { STATUS_ENUM } from "../../types/statusEnum";
 
 interface CalendarioProperties {
   meses: ICronogramaMes[],
+  periodoSelecionado:IPeriodo | undefined,
   editavel: boolean,
   onClickConfirmar: (idPrimeiroDiaCronograma: number | undefined, idSegundoDiaCronograma: number | undefined) => void,
 }
 
-const Calendario: FC<CalendarioProperties> = ({ meses, editavel, onClickConfirmar }) => {
+const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado ,editavel, onClickConfirmar }) => {
   const [exibirModal, setExibirModal] = useState(false);
   const [exibirToolTip, setExibirToolTip] = useState<boolean>(false);
   const [exibirSnackBar, setExibirSnackBar] = useState<boolean>(false);
@@ -316,7 +319,9 @@ const Calendario: FC<CalendarioProperties> = ({ meses, editavel, onClickConfirma
             <div style={{ backgroundColor: definirBackgorundColor(toolTipDiaCronograma) }} className="calendario-tooltip-container">
 
               {
-                editavel && toolTipDiaCronograma.dataStatusEnum !== DATA_STATUS_ENUM.BLOQUEADA &&
+                (editavel &&
+                periodoSelecionado?.statusEnum === STATUS_ENUM.ATIVO && 
+                toolTipDiaCronograma.dataStatusEnum !== DATA_STATUS_ENUM.BLOQUEADA) &&
                 <>
                   <div className="calendario-tooltip-actions">
                     <Button

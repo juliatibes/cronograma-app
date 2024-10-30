@@ -1,23 +1,20 @@
 .cronograma-periodo {
     display: flex;
     justify-content: space-between;
-    flex-wrap: wrap-reverse;
     align-items: center;
-    gap: 20px;
     width: 100%;
-    max-width: 100%;
 }
 
 .cronograma-botao {
-    flex: 1 1 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+    margin: 0 auto;
+    text-align: center;
+    width: 10%;
 }
 
-.cronograma-carousel {
-    display: flex;
+#cronograma-periodo-carousel {
+    position: relative;
+    width: 100%;
+    margin: 0px auto;
 }
 
 .cronograma-periodo-btn {
@@ -164,7 +161,7 @@
     flex-wrap: wrap;
 }
 
-.cronograma-sem-curso{
+.cronograma-sem-curso {
     font-size: 1.2rem;
     font-weight: 500;
     margin: 13px auto;
@@ -178,4 +175,15 @@
 
 .cronograma-sem-calendario-gif {
     width: 400px;
+}
+
+@media(max-width:1200px) {
+    .cronograma-periodo {
+        flex-direction: column-reverse;
+        gap: 20px;
+    }
+
+    #cronograma-periodo-carousel {
+        max-width: 94%;
+    }
 }

@@ -4,12 +4,8 @@ import { useNavigate } from "react-router-dom";
 import {
   AlertColor,
   Box,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Divider,
+  Button,
   Modal,
-  Stack,
   Typography,
 } from "@mui/material";
 import "dayjs/locale/pt-br";
@@ -19,7 +15,7 @@ import {
   valorInicialValidarCampos,
 } from "../../util/validarCampos";
 import {
-    apiDelete,
+  apiDelete,
   apiGet,
   apiPost,
   apiPut,
@@ -33,15 +29,10 @@ import BotaoPadrao from "../../components/BotaoPadrao";
 import CardPadrao from "../../components/CardPadrao";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import {
-  AccountBalance,
   EditNote,
   EventOutlined,
   RemoveCircleOutlineOutlined,
-  ToggleOffOutlined,
-  ToggleOnOutlined,
-  VisibilityOutlined,
 } from "@mui/icons-material";
-import { STATUS_ENUM } from "../../types/statusEnum";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -60,13 +51,15 @@ const DataBloqueada: FC = () => {
   const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
 
   const [estadoModal, setEstadoModal] = useState(false);
-  const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false); //exemplo visualizar
+  const [exibirModalExclusao, setExibirModalExclusao] = useState(false);
 
   const [datasBloqueadas, setDatasBloqueadas] = useState<IDataBloqueada[]>([]);
 
   const [id, setId] = useState<number>();
   const [motivo, setMotivo] = useState<string>("");
   const [data, setData] = useState<Dayjs>();
+
+  const [dataBloqueadaSelecionadaExclusao, setDataBloqueadaSelecionadaExclusao] = useState<IDataBloqueada>();//excluir
 
   const [validarCampoMotivo, setValidarCampoMotivo] = useState<IValidarCampos>(
     valorInicialValidarCampos
@@ -123,8 +116,6 @@ const DataBloqueada: FC = () => {
     return existeErro;
   };
 
-  const fecharModalVisualizar = () => setEstadoModalVisualizar(false); //exemplo visualizar
-
   const fecharModal = () => setEstadoModal(false);
 
   const carregarDataBloqueada = async () => {
@@ -179,15 +170,15 @@ const DataBloqueada: FC = () => {
     }
   };
 
-  const excluirDataBloqueada = async (id: number, motivo: string) => {
-    const response = await apiDelete(`/databloqueada/excluir/${id}`);
+  const excluirDataBloqueada = async () => {
+    const response = await apiDelete(`/databloqueada/excluir/${dataBloqueadaSelecionadaExclusao?.id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
       navigate("/login");
     }
 
     if (response.status === STATUS_CODE.NO_CONTENT) {
-      exibirAlerta([`${motivo} excluído com sucesso!`], "success");
+      exibirAlerta([`${dataBloqueadaSelecionadaExclusao?.motivo} excluído com sucesso!`], "success");
       carregarDataBloqueada();
     }
 
@@ -266,11 +257,17 @@ const DataBloqueada: FC = () => {
     setEstadoModal(true);
   };
 
-  const visualizar = async (id: number) => {
-    //exemplo visualizar
-    limparModal();
-    carregarDataBloqueadaPorId(id);
-    setEstadoModalVisualizar(true);
+  const fecharModalExclusao = () => setExibirModalExclusao(false);//excluir
+
+  const abrirModalExclusao = () =>  setExibirModalExclusao(true);//excluir
+
+  const confirmar = () => {//excluir
+    excluirDataBloqueada();
+    fecharModalExclusao();
+  };
+
+  const cancelar = () => {//excluir
+    fecharModalExclusao();
   };
 
   useEffect(() => {
@@ -279,43 +276,47 @@ const DataBloqueada: FC = () => {
 
   return (
     <>
-      {/*//exemplo visualizar */}
-      <Dialog
-        open={estadoModalVisualizar}
-        onClose={fecharModalVisualizar}
-        fullWidth
-        maxWidth="sm"
-        sx={{ borderRadius: 4, padding: 2 }}
-        PaperProps={{
-          sx: {
-            outline: "2px solid var(--dark-blue-senac)",
-          },
-        }}
-      >
-        <DialogTitle sx={{ textAlign: "center", fontWeight: "bold" }}>
-          {motivo}
-        </DialogTitle>
-        <Divider />
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 2, margin: "0px 0px 8px 0px" }}>
-            <Box>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                Motivo:
-              </Typography>
-              <Typography variant="body1">{motivo}</Typography>
-            </Box>
 
-            <Box>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                Data:
-              </Typography>
-              <Typography variant="body1">
-                {aplicarMascaraDataPtBr(data)}
-              </Typography>
-            </Box>
-          </Stack>
-        </DialogContent>
-      </Dialog>
+      {/* excluir */}
+      <Modal
+        open={exibirModalExclusao}
+        onClose={(_, reason) => {
+          if (reason !== 'backdropClick') fecharModalExclusao();
+        }}
+        disableEscapeKeyDown
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: "var(--gray)",
+            boxShadow: 3,
+            padding: "24px 16px",
+            borderRadius: 2,
+            maxWidth: "350px",
+            outline: 'none',
+            '&:focus': {
+              outline: 'none',
+              boxShadow: 'none',
+            }
+          }}
+        >
+          <Typography id="modal-excluir-title" component="h2">
+            Deseja confirmar a exclusão do {dataBloqueadaSelecionadaExclusao?.motivo}?
+          </Typography>
+
+          <Box id="modal-excluir-actions">
+            <Button variant="outlined" sx={{ fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder", border: "2px solid currentColor" }} onClick={cancelar}>
+              Cancelar
+            </Button>
+            <Button variant="contained" sx={{ fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder" }} onClick={confirmar}>
+              Confirmar
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
 
       <Modal open={estadoModal} onClose={fecharModal} className="modal">
         <Box className="modal-box">
@@ -367,6 +368,7 @@ const DataBloqueada: FC = () => {
           </Typography>
         </Box>
       </Modal>
+
       <AlertPadrao
         key={estadoAlerta ? "show" : "close"} //componente tratamento erro
         estado={estadoAlerta}
@@ -395,19 +397,16 @@ const DataBloqueada: FC = () => {
                 />,
               ]}
               actions={[
-                // <CardPadraoActionItem //exemplo visualizar
-                //   icon={<VisibilityOutlined titleAccess="Visualizar" />}
-                //   onClick={() => visualizar(dataBloqueada.id)}
-                // />,
                 <CardPadraoActionItem
                   icon={<EditNote titleAccess="Editar" />}
                   onClick={() => abrirModal(dataBloqueada.id)}
                 />,
                 <CardPadraoActionItem
                   icon={<RemoveCircleOutlineOutlined titleAccess="Excluir" />}
-                  onClick={() =>
-                    excluirDataBloqueada(dataBloqueada.id, dataBloqueada.motivo)
-                  }
+                  onClick={() => {
+                    setDataBloqueadaSelecionadaExclusao(dataBloqueada);
+                    abrirModalExclusao();
+                  }}
                 />,
               ]}
             />

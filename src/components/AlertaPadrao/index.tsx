@@ -4,9 +4,9 @@ import { FC } from "react";
 import "./index.css";
 
 interface AlertaPadraoProperties {
-    estado:boolean,
+    estado: boolean,
     cor: AlertColor,
-    mensagens:string[],
+    mensagens: string[],
     onClose: () => void,
 }
 
@@ -18,23 +18,24 @@ const AlertaPadrao: FC<AlertaPadraoProperties> = ({
 }) => {
     return <>
         <Snackbar
-            key={estado ? "ativo": "inativo"}
+            key={estado ? "ativo-snack" : "inativo-snack"}
             open={estado}
             className="alerta-padrao"
             onClose={onClose}
         >
-            <Alert 
+            <Alert
                 iconMapping={{
                     success: <CheckIcon fontSize="inherit" />,
-                }} 
-                key={estado ? "ativo": "inativo"}
-                severity={cor} 
+                }}
+                key={estado ? "ativo-alert" : "inativo-alert"}
+                severity={cor}
                 onClose={onClose}>
-                {mensagens.map((mensagem:string) => {
-                    return <>
-                        {mensagem}<br />
-                    </>
-                })}
+                {mensagens.map((mensagem: string, index) => (
+                    <span key={index}>
+                        {mensagem}
+                        <br />
+                    </span>
+                ))}
             </Alert>
         </Snackbar>
     </>

@@ -8,7 +8,7 @@ import { buscaUsuarioSessao } from "../../store/UsuarioStore/usuarioStore";
 const MenuBar: FC = () => {
   return (
     <>
-      <header>
+      <header className="header">
         <div className="menu-header">
           <ul>
             <li>

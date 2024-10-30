@@ -14,7 +14,8 @@
 }
 
 .side-menu-lista li {
-    padding: 12px 46px 12px 22px;
+    width: 190px;
+    padding: 12px;
     display: flex;
     justify-items: center;
     align-items: center;

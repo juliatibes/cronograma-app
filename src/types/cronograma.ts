@@ -2,6 +2,8 @@ import { IDiaCronograma } from "./diaCronograma";
 import { MES_ENUM } from "./mesEnum";
 
 export interface ICronograma {
+    id:number
+    cursoId:number,
     cursoNome:string,
     faseNumero:number,
     ano:number,
