@@ -6,10 +6,9 @@ import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
-import { Person } from '@mui/icons-material';
-import { removerUsuario } from '../../store/UsuarioStore/usuarioStore';
+import { Person, Key } from '@mui/icons-material';
+import { buscaUsuarioSessao } from '../../store/UsuarioStore/usuarioStore';
 
 export default function IconeLogin() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -32,12 +31,13 @@ export default function IconeLogin() {
 
   return (
     <React.Fragment>
-      <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center', marginRight: 6 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center', marginRight: 5, gap:1 }}>
+        
         <Tooltip title="Conta">
           <IconButton
             onClick={handleClick}
             size="small"
-            sx={{ ml: 2 }}
+            sx={{ ml: 1 }}
             aria-controls={open ? 'account-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
@@ -45,6 +45,7 @@ export default function IconeLogin() {
             <Avatar sx={{ width: 40, height: 40 }}><Person /></Avatar>
           </IconButton>
         </Tooltip>
+        <span  style={{color:"var(--gray)", letterSpacing:"0.5px", fontSize:"0.9rem"}}>{buscaUsuarioSessao().nome}</span>
       </Box>
       <Menu
         anchorEl={anchorEl}
@@ -86,15 +87,9 @@ export default function IconeLogin() {
         
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
-            <Person fontSize="small" />
+            <Key fontSize="small" />
           </ListItemIcon>
-          Minha conta
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <Settings fontSize="small" />
-          </ListItemIcon>
-          Configurações
+          Redefinir Senha
         </MenuItem>
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>

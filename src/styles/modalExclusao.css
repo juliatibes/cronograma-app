@@ -1,0 +1,13 @@
+#modal-excluir-title {
+    text-align: center;
+    font-size: 1.3rem;
+    margin-bottom: 2.5rem;
+    color: var(--dark);
+}
+
+#modal-excluir-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+

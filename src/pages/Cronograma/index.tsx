@@ -4,7 +4,7 @@ import "./index.css";
 import { IPeriodo } from "../../types/periodo";
 import { apiDelete, apiGet, apiPost, apiPut, STATUS_CODE } from "../../api/RestClient";
 import CursoFaseLista from "../../components/CursoFaseLista";
-import { ICurso, ICursoPorPeriodo, ICursoPorUsuario, ICursoRequest } from "../../types/curso";
+import { ICursoPorPeriodo, ICursoPorUsuario } from "../../types/curso";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
@@ -15,15 +15,12 @@ import React from "react";
 import { hexToRgba } from "../../util/conversorCores";
 import AlertaPadrao from "../../components/AlertaPadrao";
 import { IFase } from "../../types/fase";
-import { buscaUsuarioSessao } from "../../store/UsuarioStore/usuarioStore";
-import { IUsuarioStore } from "../../store/UsuarioStore/types";
 import semCronograma from "../../assets/sem_cronograma.gif";
 import dayjs from "dayjs";
 import { AccountBalance } from "@mui/icons-material";
+import { OPERADOR_ENUM, validarPermissao } from "../../permissoes";
 
 const Cronograma: FC = () => {
-    const [usuarioSessao] = useState<IUsuarioStore>(buscaUsuarioSessao());
-
     const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
     const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
     const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
@@ -43,7 +40,7 @@ const Cronograma: FC = () => {
     const [cursosPorUsuario, setCursosPorUsuario] = useState<ICursoPorUsuario[]>();
 
     const [exibirModal, setExibirModal] = useState(false);
-    const [cursoIdSelecionadoExclusao, setCursoIdSelecionadoExclusao] = useState<number>();
+    const [cursoPorPeriodoSelecionadoExclusao, setCursoPorPeriodoSelecionadoExclusao] = useState<ICursoPorPeriodo>();
 
 
     const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
@@ -72,7 +69,7 @@ const Cronograma: FC = () => {
 
     const fecharModal = () => setExibirModal(false);
 
-    const abrirModal = () =>  setExibirModal(true);
+    const abrirModal = () => setExibirModal(true);
 
     const selecionarCursoGerar = (cursoPorUsuario: ICursoPorUsuario) => {
         gerarCronograma(cursoPorUsuario.id);
@@ -82,7 +79,7 @@ const Cronograma: FC = () => {
     const carregarPeriodo = async () => {
 
         let urlPeriodo;
-        if (usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 3)) {
+        if (validarPermissao(OPERADOR_ENUM.MENOR, 3)) {
             urlPeriodo = "/periodo/carregar";
         } else {
             urlPeriodo = "/periodo/carregar/usuario";
@@ -213,6 +210,8 @@ const Cronograma: FC = () => {
 
     const gerarCronograma = async (cursoId: number) => {
 
+        exibirAlerta([`O Cronograma está sendo gerado fique de olho nas notificações`], "warning");
+
         const cronogramaRequest: ICronogramaRequest = {
             cursoId: cursoId,
         }
@@ -224,9 +223,9 @@ const Cronograma: FC = () => {
         }
 
         if (response.status === STATUS_CODE.CREATED) {
-            exibirAlerta([`Curso está sendo gerado fique de olho nas notificações`], "warning");
-            setCronogramaPorPeriodoCursoFase(undefined);
-            primeiroCarregamento();
+            periodoSelecionado ?
+                carregarCursoPorPeriodo(periodoSelecionado.id) :
+                exibirAlerta(["Erro inesperado ao carregar cursos!"], "error");
         }
 
         if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
@@ -261,22 +260,22 @@ const Cronograma: FC = () => {
         }
     }
 
-    const validarNivelAcessoMenorCoordenador = (): boolean => {
-        return usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso > 2);
-    }
+    const excluirCronograma = async () => {
 
-    const excluirCurso = async () => {
-
-        const response = await apiDelete(`/cronograma/excluir/${cronogramaPorPeriodoCursoFase?.id}`);
+        const response = await apiDelete(`/cronograma/excluir/periodo/${periodoSelecionado?.id}/curso/${cursoPorPeriodoSelecionadoExclusao?.id}`);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
             window.location.href = "/login";
         }
 
         if (response.status === STATUS_CODE.NO_CONTENT) {
-            exibirAlerta([`Curso excluido com sucesso!`], "success");
-            setCronogramaPorPeriodoCursoFase(undefined);
-            primeiroCarregamento();
+            exibirAlerta([`Cronograma excluido com sucesso!`], "success");
+
+            cursoPorPeriodoSelecionadoExclusao?.id === cronogramaPorPeriodoCursoFase?.cursoId ?
+                primeiroCarregamento() :
+                (periodoSelecionado ?
+                    carregarCursoPorPeriodo(periodoSelecionado.id) :
+                    exibirAlerta(["Erro inesperado ao carregar cursos!"], "error"));
         }
 
         if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
@@ -290,11 +289,12 @@ const Cronograma: FC = () => {
     }
 
     const confirmar = () => {
-        excluirCurso();
+        excluirCronograma();
         fecharModal();
     };
-    
+
     const cancelar = () => {
+        setCursoPorPeriodoSelecionadoExclusao(undefined);
         fecharModal();
     };
 
@@ -313,7 +313,6 @@ const Cronograma: FC = () => {
             }}
         />
 
-
         <Modal
             open={exibirModal}
             onClose={(_, reason) => {
@@ -328,21 +327,26 @@ const Cronograma: FC = () => {
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     bgcolor: "var(--gray)",
-                    boxShadow:3,
-                    p: 3,
+                    boxShadow: 3,
+                    padding: "24px 16px",
                     borderRadius: 2,
-                    maxWidth: "350px"
+                    maxWidth: "350px",
+                    outline: 'none',
+                    '&:focus': {
+                        outline: 'none',
+                        boxShadow: 'none',
+                    }
                 }}
             >
-                <Typography id="cronograma-modal-title" variant="h6" component="h2">
-                    Deseja confirmar a exclusão ?
+                <Typography id="modal-excluir-title" component="h2">
+                    Deseja confirmar a exclusão do cronograma de {cursoPorPeriodoSelecionadoExclusao?.sigla}?
                 </Typography>
 
-                <Box id="cronograma-modal-actions">
-                    <Button  variant="outlined" sx={{fontSize:"0.8rem", letterSpacing:"1px",fontWeight:"bolder", border:"2px solid currentColor"}} onClick={cancelar}>
+                <Box id="modal-excluir-actions">
+                    <Button variant="outlined" sx={{ fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder", border: "2px solid currentColor" }} onClick={cancelar}>
                         Cancelar
                     </Button>
-                    <Button variant="contained" sx={{fontSize:"0.8rem", letterSpacing:"1px", fontWeight:"bolder"}} onClick={confirmar}>
+                    <Button variant="contained" sx={{ fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder" }} onClick={confirmar}>
                         Confirmar
                     </Button>
                 </Box>
@@ -351,13 +355,13 @@ const Cronograma: FC = () => {
 
         <main className="page-main">
             {
-                usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 4) &&
+                validarPermissao(OPERADOR_ENUM.MENOR, 4) &&
                 <>
                     <div className="cronograma-periodo">
                         <Box id="cronograma-periodo-carousel"
                             sx={{
-                                maxWidth: `${validarNivelAcessoMenorCoordenador() ? "90%" : "80%"}`,
-                                minWidth: `${validarNivelAcessoMenorCoordenador() ? "90%" : "80%"}`
+                                maxWidth: `${validarPermissao(OPERADOR_ENUM.MAIOR, 2) ? "90%" : "80%"}`,
+                                minWidth: `${validarPermissao(OPERADOR_ENUM.MAIOR, 2) ? "90%" : "80%"}`
                             }}
                         >
                             <IconButton
@@ -421,7 +425,7 @@ const Cronograma: FC = () => {
                         </Box>
 
                         {
-                            usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 3) &&
+                            validarPermissao(OPERADOR_ENUM.MENOR, 3) &&
                             <div className="cronograma-botao">
                                 <Button
                                     className="standard-button"
@@ -495,8 +499,7 @@ const Cronograma: FC = () => {
 
             <div className="cronogram-cursos"
                 style={{
-                    justifyContent:
-                        usuarioSessao.niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 4) ? "flex-start" : "center"
+                    justifyContent: validarPermissao(OPERADOR_ENUM.MENOR, 4) ? "flex-start" : "center"
                 }}
 
             >
@@ -508,7 +511,10 @@ const Cronograma: FC = () => {
                                 curso={curso}
                                 editavel={curso.editavel}
                                 onClickListItemText={carregarCrogramaPorPeriodoCursoFase}
-                                onClickRemoveCircleOutlineIcon={() => {abrirModal()}}
+                                onClickRemoveCircleOutlineIcon={() => {
+                                    abrirModal();
+                                    setCursoPorPeriodoSelecionadoExclusao(curso);
+                                }}
                             />
                         )) :
                         <p className="cronograma-sem-curso">Não existem cronogramas para o periodo selecionado</p>

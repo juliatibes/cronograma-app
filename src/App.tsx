@@ -1,4 +1,3 @@
-import "./index.css";
 import Header from "./components/Header";
 import Router from "./Router";
 import { buscaUsuarioSessao } from "./store/UsuarioStore/usuarioStore";

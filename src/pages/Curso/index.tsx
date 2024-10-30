@@ -1,8 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import { useNavigate } from "react-router-dom";
-import "../../styles/modal.css";
-import "../../styles/gridContent.css";
 import CardPadrao from "../../components/CardPadrao";
 import { AccountBalance, People, EditNote, ToggleOffOutlined, ToggleOnOutlined, AutoStories, VisibilityOutlined } from "@mui/icons-material";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";

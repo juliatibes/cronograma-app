@@ -145,6 +145,7 @@ const Notificacao: FC = () => {
       </IconButton>
 
       <Popover
+        key={open ? "aberto" : "fechado"}
         open={open}
         anchorEl={anchorEl}
         onClose={fecharNotificacoes}
@@ -211,14 +212,15 @@ const Notificacao: FC = () => {
         <DialogContent>
           <List >
             {notificacaoSelecionada?.mensagens ? (
-              notificacaoSelecionada.mensagens.map((mensagem, index) => (<>
-                <ListItem sx={{ padding: 0 }} key={index} alignItems="flex-start">
-                  <ListItemText
-                    primary={mensagem}
-                  />
-                </ListItem>
-                {notificacaoSelecionada?.mensagens.length > 1 && <Divider sx={{margin:"5px"}}/>}
-                </>))
+              notificacaoSelecionada.mensagens.map((mensagem, index) => (
+                <React.Fragment key={index} >
+                  <ListItem sx={{ padding: 0 }} alignItems="flex-start">
+                    <ListItemText
+                      primary={mensagem}
+                    />
+                  </ListItem>
+                  {notificacaoSelecionada?.mensagens.length > 1 && <Divider sx={{ margin: "5px" }} />}
+                </React.Fragment>))
             ) : (
               <Typography>Nenhuma mensagem disponível.</Typography>
             )}
