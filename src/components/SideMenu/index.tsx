@@ -1,48 +1,104 @@
-import { CalendarMonth, School, AccountBalance, Person, People, HistoryEdu, AutoStories, TimelapseOutlined, EventBusy } from "@mui/icons-material";
+import {
+  CalendarMonth,
+  School,
+  AccountBalance,
+  Person,
+  People,
+  HistoryEdu,
+  AutoStories,
+  TimelapseOutlined,
+  EventBusy,
+} from "@mui/icons-material";
 import { FC } from "react";
 import "./index.css";
 import { OPERADOR_ENUM, validarPermissao } from "../../permissoes";
 const SideBar: FC = () => {
-    return (
-        <div className="side-menu">
-            <ul className="side-menu-lista">
-                {
-                 validarPermissao(OPERADOR_ENUM.MENOR, 4) &&
-                 <li> <CalendarMonth /> <a href="/cronograma">Cronograma</a></li>
-                }
+  return (
+    <div className="side-menu">
+      <ul className="side-menu-lista">
+        {validarPermissao(OPERADOR_ENUM.MENOR, 4) && (
+          <a href="/cronograma">
+            <li>
+              {" "}
+              <CalendarMonth /> 
+              Cronogramas
+            </li>
+          </a>
+        )}
 
+        {validarPermissao(OPERADOR_ENUM.MENOR, 3) && (
+          <>
+            <a href="/aluno">
+              <li>
+                {" "}
+                <Person /> 
+                Alunos
+              </li>
+            </a>
+            <a href="/professor">
+              <li>
+                {" "}
+                <School />
+                Professores
+              </li>
+            </a>
+          </>
+        )}
 
-                {
-                 validarPermissao(OPERADOR_ENUM.MENOR, 3) &&
-                 <>
-                    <li> <Person /> <a href="/aluno">Alunos</a></li>
-                    <li> <School /> <a href="/professor">Professores</a></li>
-                 </>
-                }
+        {validarPermissao(OPERADOR_ENUM.MENOR, 2) && (
+          <a href="/coordenador">
+            <li>
+              <People /> 
+              Coordenadores
+            </li>
+          </a>
+        )}
 
-                {
-                 validarPermissao(OPERADOR_ENUM.MENOR, 2) && 
-                 <li> <People /> <a href="/coordenador">Coordenadores</a></li>
-                }
+        {validarPermissao(OPERADOR_ENUM.MENOR, 3) && (
+          <a href="#">
+            <li>
+              {" "}
+              <HistoryEdu /> 
+              Disciplinas
+            </li>
+          </a>
+        )}
 
-                {
-                 validarPermissao(OPERADOR_ENUM.MENOR, 3) && 
-                 <li> <HistoryEdu /> <a href="#">Disciplinas</a></li>
-                }
-
-                {
-                validarPermissao(OPERADOR_ENUM.MENOR, 2) &&
-                <>
-                    <li> <AutoStories /> <a href="/fase">Fases</a></li>
-                    <li> <AccountBalance /> <a href="/curso">Cursos</a></li>
-                    <li> <EventBusy /> <a href="/databloqueada">Data Bloqueada</a></li>
-                    <li> <TimelapseOutlined /> <a href="/periodo">Periodo</a></li>
-                 </>
-                }
-
-            </ul>
-        </div>
-    );
+        {validarPermissao(OPERADOR_ENUM.MENOR, 2) && (
+          <>
+            <a href="/fase">
+              <li>
+                {" "}
+                <AutoStories /> 
+                Fases
+              </li>
+            </a>
+            <a href="/curso">
+              <li>
+                {" "}
+                <AccountBalance />
+                Cursos
+              </li>
+            </a>
+            <a href="/databloqueada">
+              <li>
+                {" "}
+                <EventBusy /> 
+                Datas Bloqueadas
+              </li>
+            </a>
+            <a href="/periodo">
+              <li>
+                {" "}
+                <TimelapseOutlined />
+                Períodos
+              </li>
+            </a>
+          </>
+        )}
+      </ul>
+    </div>
+  );
 };
 
 export default SideBar;

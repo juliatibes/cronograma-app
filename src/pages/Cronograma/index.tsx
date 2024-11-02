@@ -239,6 +239,8 @@ const Cronograma: FC = () => {
     }
 
     const primeiroCarregamento = async () => {
+        setCronogramaPorPeriodoCursoFase(undefined);
+        
         const periodosEncontrados: IPeriodo[] = await carregarPeriodo();
         const ultimoPeriodo: IPeriodo | undefined = periodosEncontrados
             .sort((a, b) => dayjs(b.dataInicial).valueOf() - dayjs(a.dataInicial).valueOf())[0];

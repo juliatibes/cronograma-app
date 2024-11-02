@@ -357,7 +357,7 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado ,edita
           )
         }
       >
-        <Box sx={{ display: 'inline-block', width: 0, height: 0 }} />
+        <Box sx={{ display: 'none', width: 0, height: 0 }} />
       </Tooltip>
 
       {

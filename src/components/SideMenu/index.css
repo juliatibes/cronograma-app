@@ -27,10 +27,18 @@
     text-decoration: none;
 }
 
+.side-menu-lista a {
+    color: #f1f1f1;
+    text-decoration: none;
+    transition: 200ms;
+}
+
 .side-menu-lista li path {
     color: #f1f1f1;
 }
 
-.side-menu-lista li:hover {
-    color: var(--dark-orange-senac);
+.side-menu-lista a:hover {
+    background-color: #d48a2f;
+    border-radius: 5px;
+    transition: 200ms;
 }
