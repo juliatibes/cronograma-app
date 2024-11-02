@@ -12,7 +12,6 @@ const Aluno: FC = () => {
   };
   return(
     <main >
-      <SideMenu />
       <div className="cadastro-aluno">
         <div className="aluno-header">
           <h2>Alunos</h2>
