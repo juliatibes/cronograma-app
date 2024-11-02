@@ -44,6 +44,7 @@ import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { aplicarMascaraDataPtBr } from "../../util/mascaras";
+import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 
 const Periodo: FC = () => {
   const navigate = useNavigate();
@@ -127,7 +128,8 @@ const Periodo: FC = () => {
     const response = await apiGet("/periodo/carregar");
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -151,7 +153,8 @@ const Periodo: FC = () => {
     const response = await apiGet(`/periodo/carregar/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -197,7 +200,8 @@ const Periodo: FC = () => {
     }
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.CREATED) {

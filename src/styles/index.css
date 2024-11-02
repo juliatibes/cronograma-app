@@ -38,3 +38,17 @@ body {
   gap: 20px;
   flex-direction: column;
 }
+
+.page-main-title {
+  width: 98%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.page-main-title > h2 {
+  margin: 0;
+  font-size: 2rem;
+}

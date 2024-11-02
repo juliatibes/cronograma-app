@@ -103,12 +103,12 @@ export const apiGet = async (url: string, paginacao?:IPaginacao): Promise<IDataR
     }
 }
 
-export const apiPost = async (url: string, data: any): Promise<IDataResponse> => {
+export const apiPost = async (url: string, data?: any): Promise<IDataResponse> => {
 
     const usuarioSessao = buscaUsuarioSessao();
 
     try {
-        const response: AxiosResponse = await api.post(url, JSON.stringify(data), {
+        const response: AxiosResponse = await api.post(url, (data && JSON.stringify(data)), {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${usuarioSessao?.token ?? ""}`

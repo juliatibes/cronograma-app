@@ -15,6 +15,7 @@ import { IFase } from "../../types/fase";
 import { ICoordenador } from "../../types/coordenador";
 import MultiSelect from "../../components/MultiSelect";
 import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
+import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 
 const Curso: FC = () => {
   const navigate = useNavigate();
@@ -125,7 +126,8 @@ const Curso: FC = () => {
     const response = await apiGet('/curso/carregar');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -146,7 +148,8 @@ const Curso: FC = () => {
     const response = await apiGet('/fase/carregar/ativo');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -167,7 +170,8 @@ const Curso: FC = () => {
     const response = await apiGet('/coordenador/carregar');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -188,7 +192,8 @@ const Curso: FC = () => {
     const response = await apiGet(`/curso/carregar/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -215,7 +220,8 @@ const Curso: FC = () => {
     const response = await apiPut(`/curso/${ativar ? "ativar" : "inativar"}/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.NO_CONTENT) {
@@ -255,7 +261,8 @@ const Curso: FC = () => {
     }
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.CREATED) {
@@ -444,8 +451,8 @@ const Curso: FC = () => {
     />
 
     <main className="page-main">
-      <div style={{ display: 'flex' }}>
-        <h2>Curso</h2>
+      <div className="page-main-title">
+        <h2>Cursos</h2>
         <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
       </div>
       <div className="grid-content">

@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Logout from '@mui/icons-material/Logout';
 import { Person, Key } from '@mui/icons-material';
-import { buscaUsuarioSessao } from '../../store/UsuarioStore/usuarioStore';
+import { buscaUsuarioSessao, removerUsuario } from '../../store/UsuarioStore/usuarioStore';
 
 export default function IconeLogin() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -25,6 +25,7 @@ export default function IconeLogin() {
 
 
   const handleLogout = () => {
+    removerUsuario();
     window.location.href = '/login';
   };
   
