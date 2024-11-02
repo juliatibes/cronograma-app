@@ -45,7 +45,20 @@
     height: 2rem;
 }
 
+.card-padrao-actions span > .toggleOff {
+   fill:#679bcf;
+   width:2.3rem;
+   height:2.3rem;
+}
 
+.card-padrao-actions span > .toggleOn {
+    width:2.3rem;
+    height:2.3rem;
+}
+
+.card-padrao-actions span:has(.toggleOn) {
+    margin-left: 5px;
+}
 .card-padrao-actions span {
     cursor: pointer;
     opacity: 1 !important;

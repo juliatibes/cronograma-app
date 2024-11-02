@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from "react";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import { useNavigate } from "react-router-dom";
 import CardPadrao from "../../components/CardPadrao";
-import { AccountBalance, People, EditNote, ToggleOffOutlined, ToggleOnOutlined, AutoStories, VisibilityOutlined } from "@mui/icons-material";
+import { AccountBalance, People, EditNote, AutoStories, VisibilityOutlined, ToggleOn, ToggleOff } from "@mui/icons-material";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import { apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
@@ -478,8 +478,11 @@ const Curso: FC = () => {
               ),
               (
                 curso.statusEnum === STATUS_ENUM.INATIVO ?
-                (<CardPadraoActionItem icon={<ToggleOffOutlined titleAccess="Inativado" color="error" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, true)} />) :
-                (<CardPadraoActionItem icon={<ToggleOnOutlined titleAccess="Ativado" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, false)} />)
+                (<CardPadraoActionItem 
+                  icon={<ToggleOff titleAccess="Inativado" className="toggleOff"/>} 
+                  onClick={() => alterarStatusCurso(curso.id, curso.nome, true)} />
+                ) :
+                (<CardPadraoActionItem icon={<ToggleOn  className="toggleOn" titleAccess="Ativado" color="primary"/>} onClick={() => alterarStatusCurso(curso.id, curso.nome, false)} />)
               ),
             ]}
           />
