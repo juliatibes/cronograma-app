@@ -1,10 +1,10 @@
 import { FC, useEffect, useState } from "react";
 import "./index.css"; 
 import { apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
-import { AlertColor, Autocomplete, Box, Dialog, DialogContent, DialogTitle, Divider, FormControl, Modal, Stack, TextField, Typography } from "@mui/material";
+import { AlertColor, Box, Dialog, DialogContent, DialogTitle, Divider,  Modal, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { IFase, IFasesRequest } from "../../types/fase";
-import { AccountBalance, People, AutoStories, VisibilityOutlined, EditNote, ToggleOffOutlined, ToggleOnOutlined } from "@mui/icons-material";
+import { AutoStories,  EditNote, ToggleOff, ToggleOn } from "@mui/icons-material";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import CardPadrao from "../../components/CardPadrao";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
@@ -313,13 +313,13 @@ const Fase: FC = () => {
               fase.statusEnum === STATUS_ENUM.INATIVO ?
               (
               <CardPadraoActionItem 
-                icon={<ToggleOffOutlined titleAccess="Inativado" color="error" />} 
+                icon={<ToggleOff className="toggleOff" titleAccess="Inativado" />} 
                 onClick={() => alterarStatusFase(fase.id, fase.numero, true)} 
                 />
               ) :
               (
               <CardPadraoActionItem 
-              icon={<ToggleOnOutlined titleAccess="Ativado" />} 
+              icon={<ToggleOn className="toggleOn" titleAccess="Ativado" color="primary"/>} 
               onClick={() => alterarStatusFase(fase.id, fase.numero, false)} 
               />
             )

@@ -41,6 +41,7 @@ import {
   IDataBloqueada,
   IDataBloqueadaRequest,
 } from "../../types/dataBloqueada";
+import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 
 const DataBloqueada: FC = () => {
   const navigate = useNavigate();
@@ -122,7 +123,8 @@ const DataBloqueada: FC = () => {
     const response = await apiGet("/databloqueada/carregar");
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -146,7 +148,8 @@ const DataBloqueada: FC = () => {
     const response = await apiGet(`/databloqueada/carregar/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -174,7 +177,8 @@ const DataBloqueada: FC = () => {
     const response = await apiDelete(`/databloqueada/excluir/${dataBloqueadaSelecionadaExclusao?.id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.NO_CONTENT) {
@@ -218,7 +222,8 @@ const DataBloqueada: FC = () => {
     }
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.CREATED) {

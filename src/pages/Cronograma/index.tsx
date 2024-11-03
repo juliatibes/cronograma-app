@@ -19,6 +19,7 @@ import semCronograma from "../../assets/sem_cronograma.gif";
 import dayjs from "dayjs";
 import { AccountBalance } from "@mui/icons-material";
 import { OPERADOR_ENUM, validarPermissao } from "../../permissoes";
+import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 
 const Cronograma: FC = () => {
     const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
@@ -88,7 +89,8 @@ const Cronograma: FC = () => {
         const response = await apiGet(urlPeriodo);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
-            window.location.href = "/login";
+            removerUsuario();
+            window.location.href = '/login';
         }
 
         if (response.status === STATUS_CODE.OK) {
@@ -110,7 +112,8 @@ const Cronograma: FC = () => {
         const response = await apiGet(`/curso/carregar/periodo/${id}`);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
-            window.location.href = "/login";
+            removerUsuario();
+            window.location.href = '/login';
         }
 
         if (response.status === STATUS_CODE.OK) {
@@ -132,7 +135,8 @@ const Cronograma: FC = () => {
         const response = await apiGet(`/curso/carregar/usuario`);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
-            window.location.href = "/login";
+            removerUsuario();
+            window.location.href = '/login';
         }
 
         if (response.status === STATUS_CODE.OK) {
@@ -162,7 +166,8 @@ const Cronograma: FC = () => {
             apiGet(`/cronograma/carregar/periodo/${periodoIdParam}/curso/${cursoId}/fase/${faseId}`);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
-            window.location.href = "/login";
+            removerUsuario();
+            window.location.href = '/login';
         }
 
         if (response.status === STATUS_CODE.OK) {
@@ -187,7 +192,8 @@ const Cronograma: FC = () => {
         const response = await apiPut(`/diacronograma/editar/${idPrimeiroDiaCronograma}/${idSegundoDiaCronograma}`);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
-            window.location.href = "/login";
+            removerUsuario();
+            window.location.href = '/login';
         }
 
         if (response.status === STATUS_CODE.NO_CONTENT) {
@@ -219,7 +225,8 @@ const Cronograma: FC = () => {
         const response = await apiPost(`/evento/criar/cronograma`, cronogramaRequest);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
-            window.location.href = "/login";
+            removerUsuario();
+            window.location.href = '/login';
         }
 
         if (response.status === STATUS_CODE.CREATED) {

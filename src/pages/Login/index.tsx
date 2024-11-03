@@ -101,7 +101,7 @@ const Login: FC = () => {
 
       adicionaUsuarioSessao(usuario);
 
-      window.location.href = "/cronograma";
+      window.location.href = "/cronogramas";
     }
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {

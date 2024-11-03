@@ -17,9 +17,8 @@ const SideBar: FC = () => {
     <div className="side-menu">
       <ul className="side-menu-lista">
         {validarPermissao(OPERADOR_ENUM.MENOR, 4) && (
-          <a href="/cronograma">
+          <a href="/cronogramas">
             <li>
-              {" "}
               <CalendarMonth /> 
               Cronogramas
             </li>
@@ -28,16 +27,14 @@ const SideBar: FC = () => {
 
         {validarPermissao(OPERADOR_ENUM.MENOR, 3) && (
           <>
-            <a href="/aluno">
+            <a href="/alunos">
               <li>
-                {" "}
                 <Person /> 
                 Alunos
               </li>
             </a>
-            <a href="/professor">
+            <a href="/professores">
               <li>
-                {" "}
                 <School />
                 Professores
               </li>
@@ -46,7 +43,7 @@ const SideBar: FC = () => {
         )}
 
         {validarPermissao(OPERADOR_ENUM.MENOR, 2) && (
-          <a href="/coordenador">
+          <a href="/coordenadores">
             <li>
               <People /> 
               Coordenadores
@@ -55,9 +52,8 @@ const SideBar: FC = () => {
         )}
 
         {validarPermissao(OPERADOR_ENUM.MENOR, 3) && (
-          <a href="#">
+          <a href="/disciplinas">
             <li>
-              {" "}
               <HistoryEdu /> 
               Disciplinas
             </li>
@@ -66,30 +62,26 @@ const SideBar: FC = () => {
 
         {validarPermissao(OPERADOR_ENUM.MENOR, 2) && (
           <>
-            <a href="/fase">
+            <a href="/fases">
               <li>
-                {" "}
                 <AutoStories /> 
                 Fases
               </li>
             </a>
-            <a href="/curso">
+            <a href="/cursos">
               <li>
-                {" "}
                 <AccountBalance />
                 Cursos
               </li>
             </a>
-            <a href="/databloqueada">
+            <a href="/datasbloqueadas">
               <li>
-                {" "}
                 <EventBusy /> 
                 Datas Bloqueadas
               </li>
             </a>
-            <a href="/periodo">
+            <a href="/periodos">
               <li>
-                {" "}
                 <TimelapseOutlined />
                 Períodos
               </li>

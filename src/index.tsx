@@ -4,6 +4,7 @@ import './styles/index.css';
 import "./styles/modal.css";
 import "./styles/gridContent.css";
 import "./styles/modalExclusao.css";
+import "./styles/modalVisualizar.css";
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 

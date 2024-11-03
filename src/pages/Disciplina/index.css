@@ -1,0 +1,45 @@
+.disciplina-cursos {
+    width: 96%;
+    margin: 0.4rem 2%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.disciplina-sem-fase-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.disciplina-sem-fase-gif {
+    width: 400px;
+}
+
+.disciplina-sem-fase-message {
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    max-width: 140px;
+    position: absolute;
+    font-size: 0.7rem;
+    font-weight: 600;
+    right: 48px;
+    transform: rotate(8deg);
+    top: 7.5rem;
+    animation: opacity 4s ease-in-out forwards;
+}
+
+@keyframes opacity {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

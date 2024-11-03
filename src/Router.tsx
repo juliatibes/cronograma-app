@@ -12,8 +12,8 @@ import Fase from "./pages/Fase";
 import CadastroFase from "./pages/CadastroFase";
 import Aluno from "./pages/Aluno";
 import Cronograma from "./pages/Cronograma";
-import CadastroDisciplina from "./pages/CadastroDisciplina";
 import DataBloqueada from "./pages/DataBloqueada";
+import Disciplina from "./pages/Disciplina";
 
 const Router: FC = () => {
   return (
@@ -25,15 +25,15 @@ const Router: FC = () => {
         <Route path="/cadastroperiodo" element={<CadastroPeriodo/>} />
         <Route path="/cadastrocoordenador" element={<CadastroCoordenador />} />
         <Route path="/cadastrofase" element={<CadastroFase />} />
-        <Route path="/cadastrodisciplina" element={<CadastroDisciplina />} />
+        <Route path="/disciplinas" element={<Disciplina />} />
         <Route path="/professor" element={<Professor />} />
-        <Route path="/periodo" element={<Periodo />} />
-        <Route path="/coordenador" element={<Coordenador />} />
-        <Route path="/curso" element={<Curso />} />
-        <Route path="/fase" element={<Fase />} />
-        <Route path="/aluno" element={<Aluno />} />
-        <Route path="/cronograma" element={<Cronograma />} />
-        <Route path="/databloqueada" element={<DataBloqueada />} />
+        <Route path="/periodos" element={<Periodo />} />
+        <Route path="/coordenadores" element={<Coordenador />} />
+        <Route path="/cursos" element={<Curso />} />
+        <Route path="/fases" element={<Fase />} />
+        <Route path="/alunos" element={<Aluno />} />
+        <Route path="/cronogramas" element={<Cronograma />} />
+        <Route path="/datasbloqueadas" element={<DataBloqueada />} />
       </Routes>
     </BrowserRouter>
   );

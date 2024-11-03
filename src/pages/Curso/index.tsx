@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from "react";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import { useNavigate } from "react-router-dom";
 import CardPadrao from "../../components/CardPadrao";
-import { AccountBalance, People, EditNote, ToggleOffOutlined, ToggleOnOutlined, AutoStories, VisibilityOutlined } from "@mui/icons-material";
+import { AccountBalance, People, EditNote, AutoStories, VisibilityOutlined, ToggleOn, ToggleOff } from "@mui/icons-material";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import { apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
@@ -15,9 +15,9 @@ import { IFase } from "../../types/fase";
 import { ICoordenador } from "../../types/coordenador";
 import MultiSelect from "../../components/MultiSelect";
 import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
+import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 
 const Curso: FC = () => {
-  const navigate = useNavigate();
   const [carregando, setCarregando] = useState<boolean>(false);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
@@ -25,7 +25,6 @@ const Curso: FC = () => {
   const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
 
   const [estadoModal, setEstadoModal] = useState(false);
-  const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false);//exemplo visualizar
 
   const [cursos, setCursos] = useState<ICurso[]>([]);
   const [fases, setFases] = useState<IFase[]>([]);
@@ -117,15 +116,14 @@ const Curso: FC = () => {
     return existeErro;
   }
 
-  const fecharModalVisualizar = () => setEstadoModalVisualizar(false);//exemplo visualizar
-
   const fecharModal = () => setEstadoModal(false);
 
   const carregarCurso = async () => {
     const response = await apiGet('/curso/carregar');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -146,7 +144,8 @@ const Curso: FC = () => {
     const response = await apiGet('/fase/carregar/ativo');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -167,7 +166,8 @@ const Curso: FC = () => {
     const response = await apiGet('/coordenador/carregar');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -188,7 +188,8 @@ const Curso: FC = () => {
     const response = await apiGet(`/curso/carregar/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -215,7 +216,8 @@ const Curso: FC = () => {
     const response = await apiPut(`/curso/${ativar ? "ativar" : "inativar"}/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.NO_CONTENT) {
@@ -255,7 +257,8 @@ const Curso: FC = () => {
     }
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.CREATED) {
@@ -306,61 +309,11 @@ const Curso: FC = () => {
     setEstadoModal(true);
   }
 
-  const visualizar = async (id: number) => {//exemplo visualizar
-    limparModal();
-    carregarCursoPorId(id);
-    setEstadoModalVisualizar(true);
-  }
-
   useEffect(() => {
     carregarCurso();
   }, []);
 
   return <>
-    {/*//exemplo visualizar */}
-    <Dialog
-      open={estadoModalVisualizar}
-      onClose={fecharModalVisualizar}
-      fullWidth
-      maxWidth="sm"
-      sx={{ borderRadius: 4, padding: 2}}
-      PaperProps={{
-        sx: {
-          outline: '2px solid var(--dark-blue-senac)',
-        }
-      }}
-    >
-      <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-        {sigla}
-      </DialogTitle>
-      <Divider />
-      <DialogContent>
-        <Stack spacing={2} sx={{ mt: 2 , margin:"0px 0px 8px 0px"}}>
-          <Box>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Nome:
-            </Typography>
-            <Typography variant="body1">{nome}</Typography>
-          </Box>
-
-          <Box>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Coordenador:
-            </Typography>
-            <Typography variant="body1">{coordenadorSelecionado?.nome ? coordenadorSelecionado.nome : "Contratando..."}</Typography>
-          </Box>
-
-          <Box>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Fases:
-            </Typography>
-            <Typography variant="body1">
-              {fasesSelecionadas.map((fase) => (fase.numero + "ª Fase")).join(', ')}
-            </Typography>
-          </Box>
-        </Stack>
-      </DialogContent>
-    </Dialog>
 
     <Modal open={estadoModal} onClose={fecharModal} className="modal">
       <Box className='modal-box'>
@@ -444,8 +397,8 @@ const Curso: FC = () => {
     />
 
     <main className="page-main">
-      <div style={{ display: 'flex' }}>
-        <h2>Curso</h2>
+      <div className="page-main-title">
+        <h2>Cursos</h2>
         <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
       </div>
       <div className="grid-content">
@@ -460,10 +413,6 @@ const Curso: FC = () => {
               <CardPadraoBodyItem icon={<AutoStories titleAccess="Fases" />} label={curso.fases.map((fase) => (fase.numero + "ª Fase")).join(', ')} />,
             ]}
             actions={[
-              <CardPadraoActionItem //exemplo visualizar
-                icon={<VisibilityOutlined titleAccess="Visualizar" />} 
-                onClick={() => visualizar(curso.id)} 
-              />,
               (
                 curso.statusEnum === STATUS_ENUM.ATIVO ?
                 (<CardPadraoActionItem icon={<EditNote titleAccess="Editar" />} onClick={() => abrirModal(curso.id)} />) :
@@ -471,8 +420,11 @@ const Curso: FC = () => {
               ),
               (
                 curso.statusEnum === STATUS_ENUM.INATIVO ?
-                (<CardPadraoActionItem icon={<ToggleOffOutlined titleAccess="Inativado" color="error" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, true)} />) :
-                (<CardPadraoActionItem icon={<ToggleOnOutlined titleAccess="Ativado" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, false)} />)
+                (<CardPadraoActionItem 
+                  icon={<ToggleOff titleAccess="Inativado" className="toggleOff"/>} 
+                  onClick={() => alterarStatusCurso(curso.id, curso.nome, true)} />
+                ) :
+                (<CardPadraoActionItem icon={<ToggleOn  className="toggleOn" titleAccess="Ativado" color="primary"/>} onClick={() => alterarStatusCurso(curso.id, curso.nome, false)} />)
               ),
             ]}
           />
