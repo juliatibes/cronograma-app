@@ -9,7 +9,7 @@ import { AlertColor, Autocomplete, Box, Dialog, DialogContent, DialogTitle, Divi
 import { apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
 import AlertaPadrao from "../../components/AlertaPadrao";
 import CursoFaseLista from "../../components/CursoFaseLista";
-import faseNaoSelecionada from "../../assets/fase-nao-selecionada-disciplina.gif";
+import faseNaoSelecionada from "../../assets/fase-nao-selecionada.gif";
 import "./index.css";
 import { ICursoPorUsuario } from "../../types/curso";
 import { IDisciplina, IDisciplinaRequest } from "../../types/disciplina";
