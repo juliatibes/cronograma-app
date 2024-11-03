@@ -25,7 +25,6 @@ const Curso: FC = () => {
   const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
 
   const [estadoModal, setEstadoModal] = useState(false);
-  const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false);//exemplo visualizar
 
   const [cursos, setCursos] = useState<ICurso[]>([]);
   const [fases, setFases] = useState<IFase[]>([]);
@@ -116,8 +115,6 @@ const Curso: FC = () => {
 
     return existeErro;
   }
-
-  const fecharModalVisualizar = () => setEstadoModalVisualizar(false);//exemplo visualizar
 
   const fecharModal = () => setEstadoModal(false);
 
@@ -312,61 +309,11 @@ const Curso: FC = () => {
     setEstadoModal(true);
   }
 
-  const visualizar = async (id: number) => {//exemplo visualizar
-    limparModal();
-    carregarCursoPorId(id);
-    setEstadoModalVisualizar(true);
-  }
-
   useEffect(() => {
     carregarCurso();
   }, []);
 
   return <>
-    {/*//exemplo visualizar */}
-    <Dialog
-      open={estadoModalVisualizar}
-      onClose={fecharModalVisualizar}
-      fullWidth
-      maxWidth="sm"
-      sx={{ borderRadius: 4, padding: 2}}
-      PaperProps={{
-        sx: {
-          outline: '2px solid var(--dark-blue-senac)',
-        }
-      }}
-    >
-      <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-        {sigla}
-      </DialogTitle>
-      <Divider />
-      <DialogContent>
-        <Stack spacing={2} sx={{ mt: 2 , margin:"0px 0px 8px 0px"}}>
-          <Box>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Nome:
-            </Typography>
-            <Typography variant="body1">{nome}</Typography>
-          </Box>
-
-          <Box>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Coordenador:
-            </Typography>
-            <Typography variant="body1">{coordenadorSelecionado?.nome ? coordenadorSelecionado.nome : "Contratando..."}</Typography>
-          </Box>
-
-          <Box>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Fases:
-            </Typography>
-            <Typography variant="body1">
-              {fasesSelecionadas.map((fase) => (fase.numero + "ª Fase")).join(', ')}
-            </Typography>
-          </Box>
-        </Stack>
-      </DialogContent>
-    </Dialog>
 
     <Modal open={estadoModal} onClose={fecharModal} className="modal">
       <Box className='modal-box'>
@@ -466,10 +413,6 @@ const Curso: FC = () => {
               <CardPadraoBodyItem icon={<AutoStories titleAccess="Fases" />} label={curso.fases.map((fase) => (fase.numero + "ª Fase")).join(', ')} />,
             ]}
             actions={[
-              <CardPadraoActionItem //exemplo visualizar
-                icon={<VisibilityOutlined titleAccess="Visualizar" />} 
-                onClick={() => visualizar(curso.id)} 
-              />,
               (
                 curso.statusEnum === STATUS_ENUM.ATIVO ?
                 (<CardPadraoActionItem icon={<EditNote titleAccess="Editar" />} onClick={() => abrirModal(curso.id)} />) :

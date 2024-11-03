@@ -1,17 +1,17 @@
-import { AccountBalance, People, AutoStories, VisibilityOutlined, EditNote, ToggleOffOutlined, ToggleOnOutlined, AccessTimeRounded, SimCardAlert, ToggleOff, ToggleOn, School } from "@mui/icons-material";
+import { AccountBalance, VisibilityOutlined, EditNote, AccessTimeRounded, ToggleOff, ToggleOn, School } from "@mui/icons-material";
 import { FC, useEffect, useState } from "react";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import CardPadrao from "../../components/CardPadrao";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import { STATUS_ENUM } from "../../types/statusEnum";
-import { AlertColor, Autocomplete, Box, Divider, FormControl, FormControlLabel, FormLabel, Modal, Pagination, Radio, RadioGroup, Stack, TextField, Typography } from "@mui/material";
+import { AlertColor, Autocomplete, Box, Dialog, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, FormLabel, Modal, Pagination, Radio, RadioGroup, Stack, TextField, Typography } from "@mui/material";
 import { apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
 import AlertaPadrao from "../../components/AlertaPadrao";
 import CursoFaseLista from "../../components/CursoFaseLista";
-import { validarPermissao, OPERADOR_ENUM } from "../../permissoes";
+import faseNaoSelecionada from "../../assets/fase-nao-selecionada-disciplina.gif";
 import "./index.css";
-import { ICurso, ICursoPorUsuario } from "../../types/curso";
+import { ICursoPorUsuario } from "../../types/curso";
 import { IDisciplina, IDisciplinaRequest } from "../../types/disciplina";
 import { IPaginacao, IPaginacaoResponse } from "../../types/paginacao";
 import { BOOLEAN_ENUM, booleanEnumGetLabel } from "../../types/booleanEnum";
@@ -23,8 +23,6 @@ import { removerMascaraNumeros } from "../../util/mascaras";
 import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
 
-
-
 const Disciplina: FC = () => {
     const [carregando, setCarregando] = useState<boolean>(false);
 
@@ -33,6 +31,7 @@ const Disciplina: FC = () => {
     const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
 
     const [estadoModal, setEstadoModal] = useState(false);
+    const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false);
 
     const [exibir] = useState<number>(6);
     const [paginaInicial] = useState<number>(1);
@@ -272,7 +271,7 @@ const Disciplina: FC = () => {
             const disciplinaEncontrada: IDisciplina = response.data;
 
             carregarFasePorCurso(disciplinaEncontrada.curso.id);
-            
+
             setId(id);
             setNome(disciplinaEncontrada.nome)
             setCargaHoraria(disciplinaEncontrada.cargaHoraria.toString());
@@ -294,8 +293,9 @@ const Disciplina: FC = () => {
         }
     }
 
-
     const fecharModal = () => setEstadoModal(false);
+
+    const fecharModalVisualizar = () => setEstadoModalVisualizar(false);
 
     const abrirModal = async (id?: number) => {
         limparModal();
@@ -422,32 +422,38 @@ const Disciplina: FC = () => {
         setCarregando(false);
     }
 
-    const alterarStatusCurso = async (disciplina:IDisciplina, ativar: boolean) => {
+    const alterarStatusCurso = async (disciplina: IDisciplina, ativar: boolean) => {
         const response = await apiPut(`/disciplina/${ativar ? "ativar" : "inativar"}/${disciplina.id}`);
-    
+
         if (response.status === STATUS_CODE.FORBIDDEN) {
-          removerUsuario();
-          window.location.href = '/login';
+            removerUsuario();
+            window.location.href = '/login';
         }
-    
+
         if (response.status === STATUS_CODE.NO_CONTENT) {
-          exibirAlerta([`${disciplina.nome} ${ativar ? "ativada" : "inativada"} com sucesso!`], "success");
-          carregarDisciplinasCursoFase(
-            disciplina.fase.id,
-            disciplina.curso.id,
-            false,
-            paginaAtual
-        )
+            exibirAlerta([`${disciplina.nome} ${ativar ? "ativada" : "inativada"} com sucesso!`], "success");
+            carregarDisciplinasCursoFase(
+                disciplina.fase.id,
+                disciplina.curso.id,
+                false,
+                paginaAtual
+            )
         }
-    
+
         if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
-          const mensagens = response.messages;
-          exibirErros(mensagens);
+            const mensagens = response.messages;
+            exibirErros(mensagens);
         }
-    
+
         if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-          exibirAlerta(["Erro inesperado!"], "error");
+            exibirAlerta(["Erro inesperado!"], "error");
         }
+    }
+
+    const visualizar = async (id: number) => {
+        limparModal();
+        carregarDisciplinaPorId(id);
+        setEstadoModalVisualizar(true);
       }
 
     useEffect(() => {
@@ -464,6 +470,81 @@ const Disciplina: FC = () => {
                 setEstadoAlerta(false);
             }}
         />
+
+        <Dialog
+            open={estadoModalVisualizar}
+            onClose={fecharModalVisualizar}
+            fullWidth
+            maxWidth="sm"
+            sx={{ borderRadius: 4, padding: 2 }}
+            PaperProps={{
+                sx: {
+                    outline: '2px solid var(--dark-blue-senac)',
+                }
+            }}
+        >
+            <DialogTitle fontSize='1.6rem' sx={{ textAlign: 'center', fontWeight: 'bolder' }}>
+                {nome}
+            </DialogTitle>
+            <DialogContent>
+                <Stack spacing={2} sx={{ mt: 2, margin: "0px 0px 8px 0px",paddingTop: '2px' }}>
+                    <Typography className="info-modal-visualizar-fields" component="div">
+                        <Box component={'dl'}>
+                            <Typography className="info-modal-visualizar-linha" component="div">
+                                <Typography component="dt">
+                                    Carga Horária:
+                                </Typography>
+                                <Typography component="dd">
+                                    {cargaHoraria} hr
+                                </Typography>
+                            </Typography>
+                            <Typography className="info-modal-visualizar-linha" component="div">
+                                <Typography component="dt">
+                                    Carga Horária Diária:
+                                </Typography>
+                                <Typography component="dd">
+                                    {cargaHorariaDiaria} hr
+                                </Typography>
+                            </Typography>
+                     
+                            <Typography className="info-modal-visualizar-linha" component="div">
+                                <Typography component="dt">
+                                    Curso:
+                                </Typography>
+                                <Typography component="dd">
+                                    {cursoSelecionado?.sigla}
+                                </Typography>
+                            </Typography>
+                            <Typography className="info-modal-visualizar-linha" component="div">
+                                <Typography component="dt">
+                                    Fase:
+                                </Typography>
+                                <Typography component="dd">
+                                    {faseSelecionada?.numero + "ª Fase"}
+                                </Typography>
+                            </Typography>
+                            <Typography className="info-modal-visualizar-linha" component="div">
+                                <Typography component="dt">
+                                    Professor:
+                                </Typography>
+                                <Typography component="dd">
+                                    {professorSelecionado ? professorSelecionado.nome : "Contratando..."}
+                                </Typography>
+                            </Typography>
+                            <Typography className="info-modal-visualizar-linha" component="div">
+                                <Typography component="dt">
+                                    Extensão:
+                                </Typography>
+                                <Typography component="dd">
+                                    {booleanEnumGetLabel(extensaoBooleanEnum)}
+                                </Typography>
+                            </Typography>
+                        </Box>
+                    </Typography>
+
+                </Stack>
+            </DialogContent>
+        </Dialog>
 
         <Modal open={estadoModal} onClose={fecharModal} className="modal">
             <Box className='modal-box'>
@@ -643,54 +724,65 @@ const Disciplina: FC = () => {
                 }
             </div>
             <Divider className="divider" />
-            <div className="grid-content">
-                {disciplinasPorCursoFase.map((disciplina) => (
-                    <CardPadrao
-                        key={disciplina.id}
-                        statusEnum={disciplina.statusEnum}
-                        titulo={disciplina.nome}
-                        disciplinaCorHexadecimal={disciplina.corHexadecimal}
-                        body={[
-                            <CardPadraoBodyItem
-                                icon={<AccessTimeRounded titleAccess="Carga Horaria" />}
-                                label={disciplina.cargaHoraria.toString() + "hr"}
-                            />,
-                            <CardPadraoBodyItem
-                                icon={<AccountBalance titleAccess="Curso e Fase" />}
-                                label={`${disciplina.curso.sigla} - ${disciplina.fase.numero}ª Fase`}
-                            />,
-                            <CardPadraoBodyItem
-                                icon={<School titleAccess="Professor" />}
-                                label={disciplina.professor ? disciplina.professor.nome : "Contratando..."}
-                            />,
-                        ]}
-                        actions={[
-                            <CardPadraoActionItem
-                                icon={<VisibilityOutlined titleAccess="Visualizar" />}
-                                onClick={() => { }}
-                            />,
-                            (
-                                disciplina.statusEnum === STATUS_ENUM.ATIVO ?
+            {
+                disciplinasPorCursoFase.length > 0 ?
+                    <div className="grid-content">
+                        {disciplinasPorCursoFase.map((disciplina) => (
+                            <CardPadrao
+                                key={disciplina.id}
+                                statusEnum={disciplina.statusEnum}
+                                titulo={disciplina.nome}
+                                disciplinaCorHexadecimal={disciplina.corHexadecimal}
+                                body={[
+                                    <CardPadraoBodyItem
+                                        icon={<AccessTimeRounded titleAccess="Carga Horaria" />}
+                                        label={disciplina.cargaHoraria.toString() + "hr"}
+                                    />,
+                                    <CardPadraoBodyItem
+                                        icon={<AccountBalance titleAccess="Curso e Fase" />}
+                                        label={`${disciplina.curso.sigla} - ${disciplina.fase.numero}ª Fase`}
+                                    />,
+                                    <CardPadraoBodyItem
+                                        icon={<School titleAccess="Professor" />}
+                                        label={disciplina.professor ? disciplina.professor.nome : "Contratando..."}
+                                    />,
+                                ]}
+                                actions={[
+                                    <CardPadraoActionItem
+                                        icon={<VisibilityOutlined titleAccess="Visualizar" />}
+                                        onClick={() => visualizar(disciplina.id)}
+                                    />,
                                     (
-                                    <CardPadraoActionItem 
-                                        icon={<EditNote titleAccess="Editar" />} 
-                                        onClick={() => abrirModal(disciplina.id)} 
-                                     />
-                                    ) :
-                                    <></>
-                            ),
-                            (
-                                disciplina.statusEnum === STATUS_ENUM.INATIVO ?
-                                    (<CardPadraoActionItem icon={<ToggleOff className="toggleOff" titleAccess="Inativado" color="error" />} onClick={() => alterarStatusCurso(disciplina, true)} />) :
-                                    (<CardPadraoActionItem icon={<ToggleOn className="toggleOn" titleAccess="Ativado" color="primary" />} onClick={() => alterarStatusCurso(disciplina, false)} />)
-                            ),
-                        ]}
-                    />
-                ))}
-            </div>
+                                        disciplina.statusEnum === STATUS_ENUM.ATIVO ?
+                                            (
+                                                <CardPadraoActionItem
+                                                    icon={<EditNote titleAccess="Editar" />}
+                                                    onClick={() => abrirModal(disciplina.id)}
+                                                />
+                                            ) :
+                                            <></>
+                                    ),
+                                    (
+                                        disciplina.statusEnum === STATUS_ENUM.INATIVO ?
+                                            (<CardPadraoActionItem icon={<ToggleOff className="toggleOff" titleAccess="Inativado" color="error" />} onClick={() => alterarStatusCurso(disciplina, true)} />) :
+                                            (<CardPadraoActionItem icon={<ToggleOn className="toggleOn" titleAccess="Ativado" color="primary" />} onClick={() => alterarStatusCurso(disciplina, false)} />)
+                                    ),
+                                ]}
+                            />
+                        ))}
+                    </div> :
+                    <div className="disciplina-sem-fase-container">
+                        <div style={{ position: 'relative' }}>
+                            <p className="disciplina-sem-fase-message" >Nenhuma fase Selecionada</p>
+                            <img src={faseNaoSelecionada} alt="sem fase selecionada" className="disciplina-sem-fase-gif" />
+                        </div>
+                    </div>
+            }
+
+
             {
                 disciplinasPorCursoFase.length > 0 &&
-                <div className="pagination">
+                <div>
                     <Stack spacing={2}>
                         <Pagination
                             count={paginacaoResponse?.totalPaginas}
@@ -702,7 +794,7 @@ const Disciplina: FC = () => {
                                 '& .MuiPaginationItem-root': {
                                     fontSize: '1rem',
                                     minWidth: '40px',
-                                    minHeight: '40px',
+                                    minHeight: '38px',
                                 },
                             }}
                         />
