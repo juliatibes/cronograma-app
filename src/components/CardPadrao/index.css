@@ -1,4 +1,5 @@
 .card-padrao{
+    position: relative;
     height: 200px;
     padding: 16px 24px 10px 24px;
     display: flex;
@@ -7,6 +8,22 @@
     box-shadow: 0px 4px 8px 0px #00000013, 0px 0px 4px 0px #00000036!important;
     border-radius: 10px !important;
     gap: 6px;
+}
+
+.card-padrao-disciplina-cor {
+    position: absolute;
+    top: 0;
+    right: 0;
+    filter: drop-shadow(0px 1px 2px rgb(131, 131, 131));
+}
+
+.card-padrao-disciplina-cor-tag {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
 }
 
 .card-padrao-title {

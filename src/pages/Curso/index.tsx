@@ -18,7 +18,6 @@ import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../
 import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 
 const Curso: FC = () => {
-  const navigate = useNavigate();
   const [carregando, setCarregando] = useState<boolean>(false);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);

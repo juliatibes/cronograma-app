@@ -12,6 +12,7 @@ import AlertaPadrao from '../AlertaPadrao';
 import { apiGet, apiPut, STATUS_CODE } from '../../api/RestClient';
 import { BOOLEAN_ENUM } from '../../types/booleanEnum';
 import { Close } from '@mui/icons-material';
+import { removerUsuario } from '../../store/UsuarioStore/usuarioStore';
 
 const Notificacao: FC = () => {
 
@@ -64,6 +65,7 @@ const Notificacao: FC = () => {
     const response = await apiPut(`/evento/visualizar/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
+      removerUsuario();
       window.location.href = "/login";
     }
 
@@ -90,6 +92,7 @@ const Notificacao: FC = () => {
     const response = await apiGet('/evento/carregar');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
+      removerUsuario();
       window.location.href = "/login";
     }
 
