@@ -33,7 +33,7 @@ const Disciplina: FC = () => {
     const [estadoModal, setEstadoModal] = useState(false);
     const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false);
 
-    const [exibir] = useState<number>(6);
+    const [exibir] = useState<number>(8);
     const [paginaInicial] = useState<number>(1);
     const [paginaAtual, setPaginaAtual] = useState<number>(1);
     const [variosClicks, setVariosClicks] = useState<boolean>(false);
@@ -454,7 +454,7 @@ const Disciplina: FC = () => {
         limparModal();
         carregarDisciplinaPorId(id);
         setEstadoModalVisualizar(true);
-      }
+    }
 
     useEffect(() => {
         carregarCursoPorUsuario();
@@ -487,7 +487,7 @@ const Disciplina: FC = () => {
                 {nome}
             </DialogTitle>
             <DialogContent>
-                <Stack spacing={2} sx={{ mt: 2, margin: "0px 0px 8px 0px",paddingTop: '2px' }}>
+                <Stack spacing={2} sx={{ mt: 2, margin: "0px 0px 8px 0px", paddingTop: '2px' }}>
                     <Typography className="info-modal-visualizar-fields" component="div">
                         <Box component={'dl'}>
                             <Typography className="info-modal-visualizar-linha" component="div">
@@ -506,7 +506,7 @@ const Disciplina: FC = () => {
                                     {cargaHorariaDiaria} hr
                                 </Typography>
                             </Typography>
-                     
+
                             <Typography className="info-modal-visualizar-linha" component="div">
                                 <Typography component="dt">
                                     Curso:
@@ -771,10 +771,14 @@ const Disciplina: FC = () => {
                             />
                         ))}
                     </div> :
-                    <div className="disciplina-sem-fase-container">
+                    <div key={new Date().getSeconds()} className="disciplina-sem-fase-container">
                         <div style={{ position: 'relative' }}>
-                            <p className="disciplina-sem-fase-message" >Nenhuma fase Selecionada</p>
-                            <img src={faseNaoSelecionada} alt="sem fase selecionada" className="disciplina-sem-fase-gif" />
+                            <p className="disciplina-sem-fase-message" >
+                                {(!cursoIdSelecionado && !faseIdSelecionada) ? 
+                                "Nenhuma fase Selecionada" : 
+                                "Nenhuma Disciplina cadastrado até o momento"}
+                            </p>
+                            <img src={`${faseNaoSelecionada}?t=${new Date().getSeconds()}`} alt="sem fase selecionada" className="disciplina-sem-fase-gif" />
                         </div>
                     </div>
             }
