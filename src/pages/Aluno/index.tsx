@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from "react";
 import faseNaoSelecionada from "../../assets/fase-nao-selecionada.gif";
 import "./index.css";
-import { AccountBalance, VisibilityOutlined, EditNote, AutoStories, AlternateEmail, RemoveCircleOutlineOutlined } from "@mui/icons-material";
-import { AlertColor, Divider, Stack, Pagination, Autocomplete, Box, FormControl, Modal, TextField, Typography, Dialog, DialogContent, DialogTitle, Button } from "@mui/material";
+import { AccountBalance, VisibilityOutlined, EditNote, AutoStories, AlternateEmail, RemoveCircleOutlineOutlined, UploadFile } from "@mui/icons-material";
+import { AlertColor, Divider, Stack, Pagination, Autocomplete, Box, FormControl, Modal, TextField, Typography, Dialog, DialogContent, DialogTitle, Button, IconButton, InputAdornment } from "@mui/material";
 import { apiDelete, apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import CardPadrao from "../../components/CardPadrao";
@@ -23,6 +23,7 @@ import AlertaPadrao from "../../components/AlertaPadrao";
 
 const Aluno: FC = () => {
   const [carregando, setCarregando] = useState<boolean>(false);
+  const [carregandoImportar, setCarregandoImportar] = useState<boolean>(false);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
   const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
@@ -31,6 +32,7 @@ const Aluno: FC = () => {
   const [estadoModal, setEstadoModal] = useState(false);
   const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false);
   const [exibirModalExclusao, setExibirModalExclusao] = useState(false);
+  const [estadoModalImportar, setEstadoModalImportar] = useState(false);//importar
 
   const [alunoSelecionadoExclusao, setAlunoSelecionadoExclusao] = useState<IAluno>();
 
@@ -53,6 +55,7 @@ const Aluno: FC = () => {
   const [email, setEmail] = useState<string>('');
   const [cursoSelecionado, setCursoSelecionado] = useState<ICursoPorUsuario | null>();
   const [fasesSelecionadas, setFasesSelecionadas] = useState<IFase[]>([]);
+  const [arquivoSelecionado, setArquivoSelecionado] = useState<File>();
 
   const [validarCampoNome, setValidarCampoNome] = useState<IValidarCampos>(valorInicialValidarCampos);
   const [validarCampoCpf, setValidarCampoCpf] = useState<IValidarCampos>(valorInicialValidarCampos);
@@ -63,6 +66,7 @@ const Aluno: FC = () => {
   const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
     setEstadoAlerta(false);
     setEstadoModal(false);
+    setEstadoModalImportar(false);
 
     setMensagensAlerta(mensagens);
     setCorAlerta(cor);
@@ -134,6 +138,22 @@ const Aluno: FC = () => {
     return existeErro;
   }
 
+  const validarCamposImportar = (): boolean => {
+    let existeErro = false;
+
+    if (!cursoSelecionado) {
+      setValidarCampoCursoSelecionado(campoObrigatorio);
+      existeErro = true;
+    }
+
+    if (fasesSelecionadas.length < 1) {
+      setValidarCampoFasesSelecionadas(campoObrigatorio);
+      existeErro = true;
+    }
+
+    return existeErro;
+  }
+
   const exibirErros = (mensagens: string[]) => {
 
     const existeErroEspecifico = mensagens.some(mensagem =>
@@ -174,6 +194,8 @@ const Aluno: FC = () => {
   }
 
   const fecharModal = () => setEstadoModal(false);
+
+  const fecharModalImportar = () => setEstadoModalImportar(false);
 
   const fecharModalVisualizar = () => setEstadoModalVisualizar(false);
 
@@ -317,6 +339,13 @@ const Aluno: FC = () => {
     setEstadoModal(true);
   }
 
+  const abrirModalImportar = async () => {
+    limparModal();
+    limparErros();
+    carregarCursoPorUsuario();
+    setEstadoModalImportar(true);
+  }
+
   const salvar = async () => {
     limparErros();
     if (validarCampos()) return;
@@ -373,6 +402,54 @@ const Aluno: FC = () => {
     }
 
     setCarregando(false);
+  }
+
+  const importar = async () => {
+    limparErros();
+    if (validarCamposImportar()) return;
+
+    setCarregandoImportar(true);
+    const alunoRequest: IAlunoRequest = {
+      nome: nome,
+      cpf: cpf,
+      email: email,
+      cursoId: cursoSelecionado ? cursoSelecionado?.id : 0,
+      faseIds: fasesSelecionadas.map(fase => fase.id)
+    }
+
+    let response: IDataResponse | undefined = undefined;
+
+    if (id) {
+      response = await apiPut(`/aluno/editar/${id}`, alunoRequest);
+    } else {
+      response = await apiPost(`/aluno/criar`, alunoRequest);
+    }
+
+    if (response.status === STATUS_CODE.FORBIDDEN) {
+      removerUsuario();
+      window.location.href = '/login';
+    }
+
+    if (response.status === STATUS_CODE.CREATED) {
+      exibirAlerta([`Aluno criado com sucesso!`], "success");
+      carregarAlunosCursoFase(
+        alunoRequest.faseIds[0],
+        alunoRequest.cursoId,
+        false,
+        paginaAtual
+      )
+    }
+
+    if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
+      const mensagens = response.messages;
+      exibirErros(mensagens);
+    }
+
+    if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
+      exibirAlerta(["Erro inesperado!"], "error");
+    }
+
+    setCarregandoImportar(false);
   }
 
   const excluirAluno = async () => {
@@ -625,10 +702,98 @@ const Aluno: FC = () => {
       </Box>
     </Modal >
 
+    <Modal open={estadoModalImportar} onClose={fecharModalImportar} className="modal">
+      <Box className='modal-box'>
+        <Typography id="modal-modal-title" variant="h6" component="h2">
+          Aluno
+        </Typography>
+        <Typography
+          id="modal-modal-description"
+          component="div"
+        >
+          <div className="modal-content">
+            <div className="modal-two-form-group">
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <label htmlFor="file-upload">
+                  <TextField
+                    variant="outlined"
+                    fullWidth
+                    size="small"
+                    // error={error}
+                    // helperText={(arquivoSelecionado ? arquivoSelecionado.name : "Arquivo CSV")}
+                    placeholder="Arquivo CSV"
+                    value={arquivoSelecionado ? arquivoSelecionado.name : ''}
+                    onClick={() => document.getElementById('file-upload')?.click()}
+                    InputProps={{
+                      startAdornment: (
+                        <IconButton color="primary" component="span">
+                          <UploadFile />
+                        </IconButton>
+                      ),
+                      readOnly: true,
+                    }}
+                  />
+                </label>
+                <input
+                  id="file-upload"
+                  type="file"
+                  accept=".csv"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      setArquivoSelecionado(e.target.files[0]); // Captura o primeiro arquivo selecionado
+                    }
+                  }}
+                />
+              </Box>
+              <FormControl fullWidth>
+                <Autocomplete
+                  size="small"
+                  options={cursosPorUsuario}
+                  getOptionLabel={(curso: ICursoPorUsuario) => curso.sigla}
+                  value={cursoSelecionado}
+                  onChange={(event, value) => { selecionarCurso(value) }}
+                  renderInput={(params) =>
+                    <TextField
+                      {...params}
+                      label="Curso"
+                      error={validarCampoCursoSelecionado.existeErro}
+                      helperText={validarCampoCursoSelecionado.mensagem}
+                    />
+                  }
+                />
+              </FormControl>
+            </div>
+            <div className="modal-one-form-group">
+              <MultiSelect
+                options={fasesPorCurso}
+                values={fasesSelecionadas}
+                label={"Fases"}
+                onChange={selecionarFase}
+                error={validarCampoFasesSelecionadas.existeErro}
+                helperText={validarCampoFasesSelecionadas.mensagem}
+              />
+            </div>
+          </div>
+          <div className="modal-footer">
+            <BotaoPadrao
+              label={"Importar"}
+              carregando={carregandoImportar}
+              onClick={importar}
+            />
+
+          </div>
+        </Typography>
+      </Box>
+    </Modal >
+
     <main className="page-main">
       <div className="page-main-title" style={{ marginBottom: 0 }}>
         <h2>Alunos</h2>
-        <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
+        <div className="page-main-title-actions">
+          <BotaoPadrao label={"Importar"} onClick={() => abrirModalImportar()} />
+          <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
+        </div>
       </div>
       <Divider className="divider" />
       <div className="aluno-cursos">
@@ -691,9 +856,9 @@ const Aluno: FC = () => {
           <div key={new Date().getSeconds()} className="aluno-sem-fase-container">
             <div style={{ position: 'relative' }}>
               <p className="aluno-sem-fase-message" >
-                {(!cursoIdSelecionado && !faseIdSelecionada) ? 
-                "Nenhuma fase Selecionada" :
-                "Nenhum Aluno cadastrado até o momento"}
+                {(!cursoIdSelecionado && !faseIdSelecionada) ?
+                  "Nenhuma fase Selecionada" :
+                  "Nenhum Aluno cadastrado até o momento"}
               </p>
               <img src={`${faseNaoSelecionada}?t=${new Date().getSeconds()}`} alt="sem fase selecionada" className="aluno-sem-fase-gif" />
             </div>
