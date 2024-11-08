@@ -175,12 +175,12 @@ const Fase: FC = () => {
     }
 
     if (response.status === STATUS_CODE.CREATED) {
-      exibirAlerta([`Curso criado com sucesso!`], "success");
+      exibirAlerta([`Fase criado com sucesso!`], "success");
       carregarFase();
     }
 
     if (response.status === STATUS_CODE.NO_CONTENT) {
-      exibirAlerta([`Curso editado com sucesso!`], "success");
+      exibirAlerta([`Fase editado com sucesso!`], "success");
       carregarFase();
     }
 
@@ -291,7 +291,7 @@ const Fase: FC = () => {
 
   <main className="page-main">
     <div style={{ display: 'flex' }}>
-      <h2>Curso</h2>
+      <h2>Fase</h2>
       <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
     </div>
     <div className="grid-content">
@@ -301,7 +301,7 @@ const Fase: FC = () => {
           statusEnum={fase.statusEnum}
           titulo={fase.numero.toString() + "ª Fase"}
           body={[
-            <CardPadraoBodyItem icon={<AutoStories titleAccess="Fase" />} label={fase.numero.toString() + 'ª'} />,
+            <CardPadraoBodyItem icon={<AutoStories titleAccess="Fase" />} label={fase.numero.toString()} />,
           ]}
           actions={[
             (
