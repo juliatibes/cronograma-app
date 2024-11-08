@@ -2,8 +2,8 @@ import { FC, useEffect, useState } from "react";
 import faseNaoSelecionada from "../../assets/fase-nao-selecionada.gif";
 import "./index.css";
 import { AccountBalance, VisibilityOutlined, EditNote, AutoStories, AlternateEmail, RemoveCircleOutlineOutlined, UploadFile } from "@mui/icons-material";
-import { AlertColor, Divider, Stack, Pagination, Autocomplete, Box, FormControl, Modal, TextField, Typography, Dialog, DialogContent, DialogTitle, Button, IconButton, InputAdornment } from "@mui/material";
-import { apiDelete, apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
+import { AlertColor, Divider, Stack, Pagination, Autocomplete, Box, FormControl, Modal, TextField, Typography, Dialog, DialogContent, DialogTitle, Button} from "@mui/material";
+import { apiDelete, apiGet, apiPost, apiPostImportar, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import CardPadrao from "../../components/CardPadrao";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
@@ -13,13 +13,12 @@ import { ICursoPorUsuario } from "../../types/curso";
 import { IFase } from "../../types/fase";
 import { IPaginacao, IPaginacaoResponse } from "../../types/paginacao";
 import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
-import { IAluno, IAlunoRequest } from "../../types/aluno";
+import { IAluno, IAlunoImportar, IAlunoRequest } from "../../types/aluno";
 import { aplicarMascaraCpf } from "../../util/mascaras";
 import InputPadrao from "../../components/InputPadrao";
 import MultiSelect from "../../components/MultiSelect";
 import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
 import AlertaPadrao from "../../components/AlertaPadrao";
-
 
 const Aluno: FC = () => {
   const [carregando, setCarregando] = useState<boolean>(false);
@@ -434,32 +433,30 @@ const Aluno: FC = () => {
     if (validarCamposImportar()) return;
 
     setCarregandoImportar(true);
-    const alunoRequest: IAlunoRequest = {
-      nome: nome,
-      cpf: cpf,
-      email: email,
+
+    const alunoImportar: IAlunoImportar = {
       cursoId: cursoSelecionado ? cursoSelecionado?.id : 0,
-      faseIds: fasesSelecionadas.map(fase => fase.id)
+      faseId: faseSelecionada ? faseSelecionada?.id : 0,
+      arquivo: arquivoSelecionado ? arquivoSelecionado : null,
     }
 
-    let response: IDataResponse | undefined = undefined;
+    const formData = new FormData();
+    formData.append('cursoId',alunoImportar.cursoId.toString());
+    formData.append('faseId',alunoImportar.faseId.toString());
+    formData.append('arquivo',arquivoSelecionado as File);
 
-    if (id) {
-      response = await apiPut(`/aluno/editar/${id}`, alunoRequest);
-    } else {
-      response = await apiPost(`/aluno/criar`, alunoRequest);
-    }
-
+    const response = await apiPostImportar(`/aluno/importar`, formData);
+    
     if (response.status === STATUS_CODE.FORBIDDEN) {
       removerUsuario();
       window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.CREATED) {
-      exibirAlerta([`Aluno criado com sucesso!`], "success");
+      exibirAlerta([`Alunos importados com sucesso!`], "success");
       carregarAlunosCursoFase(
-        alunoRequest.faseIds[0],
-        alunoRequest.cursoId,
+        alunoImportar.faseId,
+        alunoImportar.cursoId,
         false,
         paginaAtual
       )
@@ -467,7 +464,7 @@ const Aluno: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirErros(mensagens);
+      exibirAlerta(mensagens,'warning');
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
@@ -623,7 +620,7 @@ const Aluno: FC = () => {
         }}
       >
         <Typography id="modal-excluir-title" component="h2">
-          Deseja confirmar a exclusão do {alunoSelecionadoExclusao?.nome}?
+          Deseja confirmar a exclusão de {alunoSelecionadoExclusao?.nome}?
         </Typography>
 
         <Box id="modal-excluir-actions">
@@ -765,7 +762,6 @@ const Aluno: FC = () => {
                 <input
                   id="file-upload"
                   type="file"
-                  accept=".csv"
                   style={{ display: 'none' }}
                   onChange={(e) => {
                     if (e.target.files && e.target.files.length > 0) {

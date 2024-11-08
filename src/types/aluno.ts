@@ -17,3 +17,9 @@ export interface IAlunoRequest {
     cursoId:number,
     faseIds:number[],
 }
+
+export interface IAlunoImportar {
+    cursoId: number
+    faseId:number
+    arquivo:File | null
+}
