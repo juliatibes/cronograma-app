@@ -31,7 +31,7 @@
     right: 48px;
     transform: rotate(8deg);
     top: 7.5rem;
-    animation: opacity 4s ease-in-out forwards;
+    animation: opacity 3s ease-in-out forwards;
 }
 
 @keyframes opacity {

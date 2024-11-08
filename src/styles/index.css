@@ -52,3 +52,11 @@ body {
   margin: 0;
   font-size: 1.9rem;
 }
+
+.page-main-title-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}

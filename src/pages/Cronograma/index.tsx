@@ -367,10 +367,11 @@ const Cronograma: FC = () => {
                 validarPermissao(OPERADOR_ENUM.MENOR, 4) &&
                 <>
                     <div className="cronograma-periodo">
-                        <Box id="cronograma-periodo-carousel"
+                        {periodos.length > 0 ?
+                           <Box id="cronograma-periodo-carousel"
                             sx={{
-                                maxWidth: `${validarPermissao(OPERADOR_ENUM.MAIOR, 2) ? "90%" : "80%"}`,
-                                minWidth: `${validarPermissao(OPERADOR_ENUM.MAIOR, 2) ? "90%" : "80%"}`
+                                maxWidth: `${validarPermissao(OPERADOR_ENUM.MENOR, 3) ? "80%" : "90%" }`,
+                                minWidth: `${validarPermissao(OPERADOR_ENUM.MENOR, 3) ? "80%" : "90%" }`
                             }}
                         >
                             <IconButton
@@ -431,8 +432,9 @@ const Cronograma: FC = () => {
                                     </SwiperSlide>
                                 ))}
                             </Swiper>
-                        </Box>
-
+                           </Box> :
+                           <p className="cronograma-sem-curso">Nenhum período encontrado com cronograma</p>
+                        }
                         {
                             validarPermissao(OPERADOR_ENUM.MENOR, 3) &&
                             <div className="cronograma-botao">
@@ -526,7 +528,7 @@ const Cronograma: FC = () => {
                                 }}
                             />
                         )) :
-                        <p className="cronograma-sem-curso">Não existem cronogramas para o periodo selecionado</p>
+                        <p className="cronograma-sem-curso">Não existem cronogramas para o período selecionado</p>
                 }
 
 
