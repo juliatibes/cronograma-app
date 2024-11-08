@@ -771,14 +771,14 @@ const Disciplina: FC = () => {
                             />
                         ))}
                     </div> :
-                    <div key={new Date().getSeconds()} className="disciplina-sem-fase-container">
+                    <div className="disciplina-sem-fase-container">
                         <div style={{ position: 'relative' }}>
                             <p className="disciplina-sem-fase-message" >
                                 {(!cursoIdSelecionado && !faseIdSelecionada) ? 
                                 "Nenhuma fase Selecionada" : 
                                 "Nenhuma Disciplina cadastrado até o momento"}
                             </p>
-                            <img src={`${faseNaoSelecionada}?t=${new Date().getSeconds()}`} alt="sem fase selecionada" className="disciplina-sem-fase-gif" />
+                            <img src={faseNaoSelecionada} alt="sem fase selecionada" className="disciplina-sem-fase-gif" />
                         </div>
                     </div>
             }

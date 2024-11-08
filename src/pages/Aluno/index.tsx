@@ -55,6 +55,8 @@ const Aluno: FC = () => {
   const [email, setEmail] = useState<string>('');
   const [cursoSelecionado, setCursoSelecionado] = useState<ICursoPorUsuario | null>();
   const [fasesSelecionadas, setFasesSelecionadas] = useState<IFase[]>([]);
+
+  const [faseSelecionada, setFaseSelecionada] = useState<IFase | null>();
   const [arquivoSelecionado, setArquivoSelecionado] = useState<File>();
 
   const [validarCampoNome, setValidarCampoNome] = useState<IValidarCampos>(valorInicialValidarCampos);
@@ -62,6 +64,8 @@ const Aluno: FC = () => {
   const [validarCampoEmail, setValidarCampoEmail] = useState<IValidarCampos>(valorInicialValidarCampos);
   const [validarCampoCursoSelecionado, setValidarCampoCursoSelecionado] = useState<IValidarCampos>(valorInicialValidarCampos);
   const [validarCampoFasesSelecionadas, setValidarCampoFasesSelecionadas] = useState<IValidarCampos>(valorInicialValidarCampos);
+  const [validarCampoFaseSelecionada, setValidarCampoFaseSelecionada] = useState<IValidarCampos>(valorInicialValidarCampos);
+  const [validarCampoArquivoSelecionado, setValidarCampoArquivoSelecionado] = useState<IValidarCampos>(valorInicialValidarCampos);
 
   const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
     setEstadoAlerta(false);
@@ -99,12 +103,22 @@ const Aluno: FC = () => {
     setFasesSelecionadas([]);
   }
 
+  const limparModalImportar = () => {
+    setFaseSelecionada(null);
+    setArquivoSelecionado(undefined);
+  }
+
   const limparErros = () => {
     setValidarCampoNome(valorInicialValidarCampos);
     setValidarCampoCpf(valorInicialValidarCampos);
     setValidarCampoEmail(valorInicialValidarCampos);
     setValidarCampoCursoSelecionado(valorInicialValidarCampos);
     setValidarCampoFasesSelecionadas(valorInicialValidarCampos);
+  }
+
+  const limparErrosImportar = () => {
+    setValidarCampoFaseSelecionada(valorInicialValidarCampos);
+    setValidarCampoArquivoSelecionado(valorInicialValidarCampos);
   }
 
   const validarCampos = (): boolean => {
@@ -146,8 +160,13 @@ const Aluno: FC = () => {
       existeErro = true;
     }
 
-    if (fasesSelecionadas.length < 1) {
-      setValidarCampoFasesSelecionadas(campoObrigatorio);
+    if (!faseSelecionada) {
+      setValidarCampoFaseSelecionada(campoObrigatorio);
+      existeErro = true;
+    }
+
+    if (!arquivoSelecionado) {
+      setValidarCampoArquivoSelecionado(campoObrigatorio);
       existeErro = true;
     }
 
@@ -310,18 +329,24 @@ const Aluno: FC = () => {
     }
   }
 
-  const selecionarFase = (fases: IFase[]) => {
+  const selecionarFases = (fases: IFase[]) => {
     setFasesSelecionadas(fases);
+  };
+
+  const selecionarFase = (fase: IFase | null) => {
+    setFaseSelecionada(fase);
   };
 
   const selecionarCurso = (cursosPorUsuario: ICursoPorUsuario | null) => {
     if (cursosPorUsuario) {
       setFasesSelecionadas([]);
+      setFaseSelecionada(null);
       setCursoSelecionado(cursosPorUsuario);
       carregarFasePorCurso(cursosPorUsuario.id);
     } else {
       setCursoSelecionado(null);
       setFasesSelecionadas([]);
+      setFaseSelecionada(null);
       setFasesPorCurso([]);
     }
   };
@@ -340,8 +365,8 @@ const Aluno: FC = () => {
   }
 
   const abrirModalImportar = async () => {
-    limparModal();
-    limparErros();
+    limparModalImportar();
+    limparErrosImportar();
     carregarCursoPorUsuario();
     setEstadoModalImportar(true);
   }
@@ -684,7 +709,7 @@ const Aluno: FC = () => {
                 options={fasesPorCurso}
                 values={fasesSelecionadas}
                 label={"Fases"}
-                onChange={selecionarFase}
+                onChange={selecionarFases}
                 error={validarCampoFasesSelecionadas.existeErro}
                 helperText={validarCampoFasesSelecionadas.mensagem}
               />
@@ -703,7 +728,7 @@ const Aluno: FC = () => {
     </Modal >
 
     <Modal open={estadoModalImportar} onClose={fecharModalImportar} className="modal">
-      <Box className='modal-box'>
+      <Box className='modal-box' sx={{ maxWidth: "380px" }}>
         <Typography id="modal-modal-title" variant="h6" component="h2">
           Aluno
         </Typography>
@@ -712,26 +737,29 @@ const Aluno: FC = () => {
           component="div"
         >
           <div className="modal-content">
-            <div className="modal-two-form-group">
+            <div className="modal-one-form-group">
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <label htmlFor="file-upload">
                   <TextField
                     variant="outlined"
                     fullWidth
                     size="small"
-                    // error={error}
-                    // helperText={(arquivoSelecionado ? arquivoSelecionado.name : "Arquivo CSV")}
                     placeholder="Arquivo CSV"
                     value={arquivoSelecionado ? arquivoSelecionado.name : ''}
                     onClick={() => document.getElementById('file-upload')?.click()}
-                    InputProps={{
-                      startAdornment: (
-                        <IconButton color="primary" component="span">
-                          <UploadFile />
-                        </IconButton>
-                      ),
-                      readOnly: true,
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                            <UploadFile color="primary" sx={{marginRight:"10px"}}/>
+                        ),
+                        readOnly: true,
+                      },
+                      formHelperText: {
+                        onClick: (e: React.MouseEvent<HTMLParagraphElement>) => {e.stopPropagation()} ,
+                      },
                     }}
+                    error={validarCampoArquivoSelecionado.existeErro}
+                    helperText={validarCampoArquivoSelecionado.mensagem}
                   />
                 </label>
                 <input
@@ -741,11 +769,14 @@ const Aluno: FC = () => {
                   style={{ display: 'none' }}
                   onChange={(e) => {
                     if (e.target.files && e.target.files.length > 0) {
-                      setArquivoSelecionado(e.target.files[0]); // Captura o primeiro arquivo selecionado
+                      setArquivoSelecionado(e.target.files[0]);
                     }
                   }}
                 />
               </Box>
+            </div>
+
+            <div className="modal-two-form-group">
               <FormControl fullWidth>
                 <Autocomplete
                   size="small"
@@ -763,16 +794,23 @@ const Aluno: FC = () => {
                   }
                 />
               </FormControl>
-            </div>
-            <div className="modal-one-form-group">
-              <MultiSelect
-                options={fasesPorCurso}
-                values={fasesSelecionadas}
-                label={"Fases"}
-                onChange={selecionarFase}
-                error={validarCampoFasesSelecionadas.existeErro}
-                helperText={validarCampoFasesSelecionadas.mensagem}
-              />
+              <FormControl fullWidth>
+                <Autocomplete
+                  size="small"
+                  options={fasesPorCurso}
+                  getOptionLabel={(fase: IFase) => fase.numero + "ª Fase"}
+                  value={faseSelecionada}
+                  onChange={(event, value) => { selecionarFase(value) }}
+                  renderInput={(params) =>
+                    <TextField
+                      {...params}
+                      label="Fase"
+                      error={validarCampoFaseSelecionada.existeErro}
+                      helperText={validarCampoFaseSelecionada.mensagem}
+                    />
+                  }
+                />
+              </FormControl>
             </div>
           </div>
           <div className="modal-footer">
@@ -853,14 +891,14 @@ const Aluno: FC = () => {
               />
             ))}
           </div> :
-          <div key={new Date().getSeconds()} className="aluno-sem-fase-container">
+          <div className="aluno-sem-fase-container">
             <div style={{ position: 'relative' }}>
               <p className="aluno-sem-fase-message" >
                 {(!cursoIdSelecionado && !faseIdSelecionada) ?
                   "Nenhuma fase Selecionada" :
                   "Nenhum Aluno cadastrado até o momento"}
               </p>
-              <img src={`${faseNaoSelecionada}?t=${new Date().getSeconds()}`} alt="sem fase selecionada" className="aluno-sem-fase-gif" />
+              <img src={faseNaoSelecionada} alt="sem fase selecionada" className="aluno-sem-fase-gif" />
             </div>
           </div>
       }
