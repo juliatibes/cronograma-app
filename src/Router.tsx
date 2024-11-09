@@ -10,6 +10,7 @@ import Aluno from "./pages/Aluno";
 import Cronograma from "./pages/Cronograma";
 import DataBloqueada from "./pages/DataBloqueada";
 import Disciplina from "./pages/Disciplina";
+import RedefinirSenhaEmail from "./pages/RedefinirSenhaEmail";
 
 const Router: FC = () => {
   return (
@@ -17,6 +18,7 @@ const Router: FC = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/redefinirsenha" element={<RedefinirSenhaEmail />} />
         <Route path="/disciplinas" element={<Disciplina />} />
         <Route path="/professores" element={<Professor />} />
         <Route path="/periodos" element={<Periodo />} />
