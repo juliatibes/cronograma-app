@@ -33,7 +33,6 @@ const InputPadrao: FC<InputPadraoProperty> = ({
     <TextField
       className={`login-input ${className}`}
       fullWidth={width ? false : true}
-      id="outlined-basic"
       value={value}
       onChange={onChange}
       error={error}

@@ -306,7 +306,7 @@ export const apiDelete = async (url: string): Promise<IDataResponse> => {
     }
 }
 
-export const apiPutRedefinirSenha = async (url: string, data: any, token:string): Promise<IDataResponse> => {
+export const apiPutRedefinirSenhaEmail = async (url: string, data: any, token:string): Promise<IDataResponse> => {
 
     try {
         const response: AxiosResponse = await api.put(url, JSON.stringify(data), {
@@ -439,3 +439,70 @@ export const apiPostImportar = async (url: string, data: FormData): Promise<IDat
         }
     }
 }
+
+export const apiPostValidarToken = async (url: string, token:string, data?: any): Promise<IDataResponse> => {
+
+    try {
+        const response: AxiosResponse = await api.post(url, data && JSON.stringify(data), {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token ?? ""}`
+            }
+        });
+
+        if (response === undefined) {
+            return {
+                status: STATUS_CODE.INTERNAL_SERVER_ERROR,
+                messages: [DEFAULT_ERROR_MESSAGE],
+            }
+        }
+
+        if (response.status === STATUS_CODE.UNAUTHORIZED) {
+            return {
+                status: response.status,
+                messages: JSON.parse(response.data).messages
+            }
+        }
+
+        if (response.status === STATUS_CODE.NO_CONTENT) {
+            return {
+                status: response.status,
+                messages: [NO_CONTENT_ERROR_MESSAGE]
+            }
+        }
+
+        if (response.status === STATUS_CODE.BAD_REQUEST) {
+            return {
+                status: response.status,
+                messages: JSON.parse(response.data).messages
+            }
+        }
+
+        if (response.status === STATUS_CODE.FORBIDDEN) {
+            return {
+                status: response.status,
+                messages: [FORBIDDEN_ERROR_MESSAGE]
+            }
+        }
+
+        if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
+            return {
+                status: response.status,
+                messages: JSON.parse(response.data).messages
+            }
+        }
+
+        return {
+            status: response.status,
+            messages: [SUCCESS_MESSAGE],
+            data: JSON.parse(response.data),
+        }
+
+    } catch (e) {
+        return {
+            status: STATUS_CODE.INTERNAL_SERVER_ERROR,
+            messages: [DEFAULT_ERROR_MESSAGE]
+        }
+    }
+}
+

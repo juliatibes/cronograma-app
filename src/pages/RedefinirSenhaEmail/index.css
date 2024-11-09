@@ -1,0 +1,65 @@
+.redefinirsenhaemail-content {
+    min-width: 100%;
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-items: center;
+}
+
+.redefinirsenhaemail-blue-side{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 45vw;
+    height: 100vh;
+    gap: 24px;
+    background-color: var(--dark-blue-senac);
+}
+.redefinirsenhaemail-blue-side h2{
+    font-size: 28px;
+    margin: 0;
+    color: var(--light);
+}
+.redefinirsenhaemail-senha-label{
+    width: 60%;
+}
+.redefinirsenhaemail-senha-label input-padrao{
+    background-color: var(--light);
+}
+.icon-clickable {
+    cursor: pointer;
+}
+.redefinirsenhaemail-white-side{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 55vw;
+    height: 100vh;
+}
+.redefinirsenhaemail-white-side .img-redefinirsenhaemail{
+    width: 50%;
+}
+
+.redefinirsenhaemail-regras {
+    text-align: center;
+    font-style: italic;
+    color: #c7c7c7;
+    font-size: 0.9rem;
+    max-width: 50%;
+    margin: 0;
+}
+
+.redefinirsenhaemail-regra {
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    transition: 0.2s;
+}
+
+.redefinirsenhaemail-valida {
+    color: rgb(121, 247, 121);
+}
+
+.redefinirsenhaemail-invalida {
+    color: rgb(255, 110, 110);
+}
