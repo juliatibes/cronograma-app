@@ -9,6 +9,7 @@ import { Close, Event, HistoryEdu, School, SyncAlt, CloseRounded, CheckRounded }
 import { diaSemanaEnumGetLabel } from "../../types/enums/diaSemanaEnum";
 import { IPeriodo } from "../../types/periodo";
 import { STATUS_ENUM } from "../../types/enums/statusEnum";
+import BotaoPadrao from "../BotaoPadrao";
 
 interface CalendarioProperties {
   meses: ICronogramaMes[],
@@ -72,7 +73,7 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado, edita
     if (
       (diaCronograma.id === diaCronogramaTrocaSelecionadoPrimeiro?.id) ||
       (diaCronograma.disciplinaNome === diaCronogramaTrocaSelecionadoPrimeiro?.disciplinaNome &&
-      diaCronograma.professorNome === diaCronogramaTrocaSelecionadoPrimeiro?.professorNome)
+        diaCronograma.professorNome === diaCronogramaTrocaSelecionadoPrimeiro?.professorNome)
     ) {
       return;
     } else if (diaCronogramaTrocaSelecionadoPrimeiro) {
@@ -173,18 +174,9 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado, edita
             borderRadius: 2,
           }}
         >
-
-          <Box id="calendario-modal-header">
-
-            <Typography id="calendario-modal-title" variant="h5" component="h2">
-              Deseja confirmar a troca ?
-            </Typography>
-
-            <Typography component="div" id="calendario-modal-actions">
-              <CloseRounded onClick={cancelar} id="iconButtonClose"/>
-              <CheckRounded onClick={confirmar} id="iconButtonCheck"/>
-            </Typography>
-          </Box>
+          <Typography id="calendario-modal-title" variant="h5" component="h2">
+            Deseja confirmar a troca?
+          </Typography>
 
           <Typography id="calendario-modal-description" sx={{ mt: 2 }} component="div" >
             <Typography className="calendario-modal-container" component="div"
@@ -246,7 +238,38 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado, edita
                 </Typography>
               </Typography>
             </Typography>
+          </Typography>
 
+          <Typography component="div" id="calendario-modal-actions">
+            <Button
+              onClick={cancelar}
+              sx={{
+                color: '#4c89bf',
+                borderColor: 'var(--light-blue-senac)',
+                fontWeight: 'bold',
+                padding: '5px 12px',
+                transition:"0.2s",
+                '&:hover': {
+                  backgroundColor: '#d1e4f5',
+                },
+              }}
+              variant="outlined">
+              Cancelar
+            </Button>
+            <Button
+              onClick={confirmar}
+              sx={{
+                backgroundColor: 'var(--light-blue-senac)',
+                color: 'var(--light)',
+                fontWeight: 'bold',
+                padding: '6px 12px',
+                transition:"0.2s",
+                '&:hover': {
+                  opacity:"0.9"
+                },
+              }}>
+              Confirmar
+            </Button>
           </Typography>
         </Box>
       </Modal>

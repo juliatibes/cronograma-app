@@ -55,6 +55,7 @@ import { IDiaSemanaDisponivel } from "../../types/diaSemanaDisponivel";
 import { ICoordenador } from "../../types/coordenador";
 import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 import LoadingContent from "../../components/LoadingContent";
+import { OPERADOR_ENUM, validarPermissao } from "../../permissoes";
 
 const Professor: FC = () => {
   const [carregando, setCarregando] = useState<boolean>(false);
@@ -121,7 +122,6 @@ const Professor: FC = () => {
   };
 
   const exibirErros = (mensagens: string[]) => {
-
 
     const existeErroEspecifico = mensagens.some(
       (mensagem) =>
@@ -728,7 +728,10 @@ const Professor: FC = () => {
         <div className="page-main-title">
           <h2>Professores</h2>
           <div className="page-main-title-actions">
-            <BotaoPadrao label={"Associar"} onClick={() => abrirModalAssociar()} />
+            {
+              validarPermissao(OPERADOR_ENUM.MENOR, 2) &&
+              <BotaoPadrao label={"Associar"} onClick={() => abrirModalAssociar()} />
+            }
             <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
           </div>
         </div>

@@ -1,7 +1,7 @@
 .redefinirsenha-regras {
     text-align: center;
     font-style: italic;
-    color: #c7c7c7;
+    color: #464545;
     font-size: 0.9rem;
     margin: 0;
 }
@@ -13,9 +13,9 @@
 }
 
 .redefinirsenha-valida {
-    color: rgb(121, 247, 121);
+    color: rgb(24, 139, 24);
 }
 
 .redefinirsenha-invalida {
-    color: rgb(255, 110, 110);
+    color: rgb(206, 39, 39);
 }

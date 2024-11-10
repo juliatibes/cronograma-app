@@ -13,6 +13,10 @@
     height: 100vh;
 }
 
+.side-menu-lista a {
+    text-decoration: none;
+}
+
 .side-menu-lista li {
     width: 190px;
     padding: 12px;
@@ -20,16 +24,14 @@
     justify-items: center;
     align-items: center;
     gap: 12px;
+    color: #f1f1f1;
+    transition: 200ms;
+    cursor: pointer;
 }
 
-.side-menu-lista li a {
-    color: #f1f1f1;
-    text-decoration: none;
-}
-
-.side-menu-lista a {
-    color: #f1f1f1;
-    text-decoration: none;
+.side-menu-lista li:hover {
+    background-color: #d48a2f;
+    border-radius: 5px;
     transition: 200ms;
 }
 
@@ -37,8 +39,3 @@
     color: #f1f1f1;
 }
 
-.side-menu-lista a:hover {
-    background-color: #d48a2f;
-    border-radius: 5px;
-    transition: 200ms;
-}

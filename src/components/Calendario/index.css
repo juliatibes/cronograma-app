@@ -191,53 +191,10 @@
 
   /* Modal */
 
-  #calendario-modal-header {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 1.5rem;
-  }
-
   #calendario-modal-title {
     text-align: center;
     color: var(--dark);
-  }
-
-
-  #calendario-modal-actions {
-    position: absolute;
-    right: 4px;
-    top: 0;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-  }
-
-  #calendario-modal-actions #iconButtonCheck {
-    font-size: 2rem;
-    box-shadow: 0px 0px 2px 1px #2e7d32;
-    border-radius: 4px;
-    color: #2e7d32;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  #calendario-modal-actions #iconButtonCheck:hover {
-    background-color: #cdf1cf;
-  }
-
-  #calendario-modal-actions #iconButtonClose {
-    font-size: 2rem;
-    box-shadow: 0px 0px 2px 1px #d32f2f;
-    border-radius: 4px;
-    color: #d32f2f;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  #calendario-modal-actions #iconButtonClose:hover {
-    background-color: #f8d9d9;
+    margin-bottom: 20px;
   }
 
   #calendario-modal-description {
@@ -281,6 +238,14 @@
     background-color: transparent;
   }
 
+  #calendario-modal-actions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+  }
+
   .calendario-modal-divider-icon {
     align-self: center;
     font-size: 3rem !important;
@@ -295,16 +260,7 @@
       align-items: center;
     }
 
-    #calendario-modal-header {
-      flex-direction: column;
-      gap: 10px;
-    }
-
     #calendario-modal-title {
       font-size: 1.4rem;
-    }
-
-    #calendario-modal-actions {
-      position: relative;
     }
   }
