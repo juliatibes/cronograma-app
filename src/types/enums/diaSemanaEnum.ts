@@ -27,7 +27,6 @@ export const diaSemanaEnumGetLabel = (diaSemana: DIA_SEMANA_ENUM):string => {
 }
 
 export const diaSemanaEnumAbreviado = (diaSemana: DIA_SEMANA_ENUM):string => {
-    console.log(diaSemana);
     switch (diaSemana) {
         case DIA_SEMANA_ENUM.SEGUNDA_FEIRA:
             return "Seg";

@@ -4,8 +4,7 @@ import "./index.css";
 import React from "react";
 import { CardPadraoBodyItemProperties } from "../CardPadraoBodyItem";
 import { CardPadraoActionItemProperties } from "../CardPadraoActionItem";
-import { STATUS_ENUM } from "../../types/statusEnum";
-import { IDisciplina } from "../../types/disciplina";
+import { STATUS_ENUM } from "../../types/enums/statusEnum";
 
 interface CardPadraoProperties {
   titulo: string,

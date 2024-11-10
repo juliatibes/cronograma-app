@@ -1,10 +1,10 @@
 import { AccountBalance, VisibilityOutlined, EditNote, AccessTimeRounded, ToggleOff, ToggleOn, School } from "@mui/icons-material";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import CardPadrao from "../../components/CardPadrao";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
-import { STATUS_ENUM } from "../../types/statusEnum";
+import { STATUS_ENUM } from "../../types/enums/statusEnum";
 import { AlertColor, Autocomplete, Box, Dialog, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, FormLabel, Modal, Pagination, Radio, RadioGroup, Stack, TextField, Typography } from "@mui/material";
 import { apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
 import AlertaPadrao from "../../components/AlertaPadrao";
@@ -14,7 +14,6 @@ import "./index.css";
 import { ICursoPorUsuario } from "../../types/curso";
 import { IDisciplina, IDisciplinaRequest } from "../../types/disciplina";
 import { IPaginacao, IPaginacaoResponse } from "../../types/paginacao";
-import { BOOLEAN_ENUM, booleanEnumGetLabel } from "../../types/booleanEnum";
 import InputPadrao from "../../components/InputPadrao";
 import { HexColorPicker } from "react-colorful";
 import { IFase } from "../../types/fase";
@@ -22,9 +21,14 @@ import { IProfessor } from "../../types/professor";
 import { removerMascaraNumeros } from "../../util/mascaras";
 import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
+import { BOOLEAN_ENUM, booleanEnumGetLabel } from "../../types/enums/booleanEnum";
+import LoadingContent from "../../components/LoadingContent";
 
 const Disciplina: FC = () => {
     const [carregando, setCarregando] = useState<boolean>(false);
+
+    const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+    const [carregandoInformacoesModal, setCarregandoInformacoesModal] = useState<boolean>(true);
 
     const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
     const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
@@ -36,8 +40,8 @@ const Disciplina: FC = () => {
     const [exibir] = useState<number>(8);
     const [paginaInicial] = useState<number>(1);
     const [paginaAtual, setPaginaAtual] = useState<number>(1);
-    const [variosClicks, setVariosClicks] = useState<boolean>(false);
     const [paginacaoResponse, setPaginacaoResponse] = useState<IPaginacaoResponse>();
+    const timeoutId = useRef<NodeJS.Timeout | null>(null);
 
     const [cursosPorUsuario, setCursosPorUsuario] = useState<ICursoPorUsuario[]>([]);
     const [fasesPorCurso, setFasesPorCurso] = useState<IFase[]>([]);
@@ -112,14 +116,12 @@ const Disciplina: FC = () => {
     }
 
     const trocarPagina = (event: React.ChangeEvent<unknown>, page: number) => {
-        if (variosClicks) {
-            return;
+        setCarregandoInformacoesPagina(true);
+        if (timeoutId.current) {
+            clearTimeout(timeoutId.current);
         }
 
-        setVariosClicks(true);
-
-        setTimeout(() => {
-            setVariosClicks(false);
+        timeoutId.current = setTimeout(() => {
             (
                 faseIdSelecionada && cursoIdSelecionado &&
                 carregarDisciplinasCursoFase(faseIdSelecionada, cursoIdSelecionado, false, page)
@@ -180,6 +182,7 @@ const Disciplina: FC = () => {
     }
 
     const carregarCursoPorUsuario = async () => {
+        setCarregandoInformacoesPagina(true);
 
         const response = await apiGet('/curso/carregar/usuario');
 
@@ -202,6 +205,8 @@ const Disciplina: FC = () => {
         if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
             exibirAlerta(["Erro inesperado!"], "error");
         }
+
+        setCarregandoInformacoesPagina(false);
     }
 
     const carregarProfessor = async () => {
@@ -227,7 +232,10 @@ const Disciplina: FC = () => {
     }
 
     const carregarDisciplinasCursoFase = async (faseId: number, cursoId: number, editavel: boolean, page?: number) => {
-        page ?? setPaginaAtual(1);
+        if (!page) {
+            setCarregandoInformacoesPagina(true);
+            setPaginaAtual(1);
+        }
 
         const paginacao: IPaginacao = {
             exibir: exibir,
@@ -257,6 +265,8 @@ const Disciplina: FC = () => {
         if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
             exibirAlerta(["Erro inesperado!"], "error");
         }
+
+        setCarregandoInformacoesPagina(false);
     }
 
     const carregarDisciplinaPorId = async (id: number) => {
@@ -298,17 +308,19 @@ const Disciplina: FC = () => {
     const fecharModalVisualizar = () => setEstadoModalVisualizar(false);
 
     const abrirModal = async (id?: number) => {
+        setCarregandoInformacoesModal(true);
+        setEstadoModal(true);
         limparModal();
         limparErros();
 
-        carregarCursoPorUsuario();
-        carregarProfessor();
+        await carregarCursoPorUsuario();
+        await carregarProfessor();
 
         if (id) {
-            carregarDisciplinaPorId(id);
+            await carregarDisciplinaPorId(id);
         }
 
-        setEstadoModal(true);
+        setCarregandoInformacoesModal(false);
     }
 
     const carregarFasePorCurso = async (cursoId: number) => {
@@ -451,9 +463,11 @@ const Disciplina: FC = () => {
     }
 
     const visualizar = async (id: number) => {
-        limparModal();
-        carregarDisciplinaPorId(id);
+        setCarregandoInformacoesModal(true);
         setEstadoModalVisualizar(true);
+        limparModal();
+        await carregarDisciplinaPorId(id);
+        setCarregandoInformacoesModal(false);
     }
 
     useEffect(() => {
@@ -480,9 +494,15 @@ const Disciplina: FC = () => {
             PaperProps={{
                 sx: {
                     outline: '2px solid var(--dark-blue-senac)',
+                    justifyContent: "center"
                 }
             }}
         >
+            <LoadingContent
+                carregandoInformacoes={carregandoInformacoesModal}
+                isModal={true}
+                circleOn={true}
+            />
             <DialogTitle fontSize='1.6rem' sx={{ textAlign: 'center', fontWeight: 'bolder' }}>
                 {nome}
             </DialogTitle>
@@ -548,6 +568,11 @@ const Disciplina: FC = () => {
 
         <Modal open={estadoModal} onClose={fecharModal} className="modal">
             <Box className='modal-box'>
+                <LoadingContent
+                    carregandoInformacoes={carregandoInformacoesModal}
+                    isModal={true}
+                    circleOn={true}
+                />
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                     Disciplina
                 </Typography>
@@ -708,7 +733,7 @@ const Disciplina: FC = () => {
                 <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
             </div>
             <Divider className="divider" />
-            <div className="disciplina-cursos">
+            <div className="disciplina-cursos" style={{ position: "relative" }}>
                 {
                     cursosPorUsuario && cursosPorUsuario.length > 0 ?
                         cursosPorUsuario.map((curso) => (
@@ -727,6 +752,11 @@ const Disciplina: FC = () => {
             {
                 disciplinasPorCursoFase.length > 0 ?
                     <div className="grid-content">
+                        <LoadingContent
+                            carregandoInformacoes={carregandoInformacoesPagina}
+                            isModal={false}
+                            circleOn={true}
+                        />
                         {disciplinasPorCursoFase.map((disciplina) => (
                             <CardPadrao
                                 key={disciplina.id}
@@ -764,7 +794,7 @@ const Disciplina: FC = () => {
                                     ),
                                     (
                                         disciplina.statusEnum === STATUS_ENUM.INATIVO ?
-                                            (<CardPadraoActionItem icon={<ToggleOff className="toggleOff" titleAccess="Inativado" color="error" />} onClick={() => alterarStatusCurso(disciplina, true)} />) :
+                                            (<CardPadraoActionItem icon={<ToggleOff className="toggleOff" titleAccess="Inativado" />} onClick={() => alterarStatusCurso(disciplina, true)} />) :
                                             (<CardPadraoActionItem icon={<ToggleOn className="toggleOn" titleAccess="Ativado" color="primary" />} onClick={() => alterarStatusCurso(disciplina, false)} />)
                                     ),
                                 ]}
@@ -774,9 +804,9 @@ const Disciplina: FC = () => {
                     <div className="disciplina-sem-fase-container">
                         <div style={{ position: 'relative' }}>
                             <p className="disciplina-sem-fase-message" >
-                                {(!cursoIdSelecionado && !faseIdSelecionada) ? 
-                                "Nenhuma fase Selecionada" : 
-                                "Nenhuma Disciplina cadastrado até o momento"}
+                                {(!cursoIdSelecionado && !faseIdSelecionada) ?
+                                    "Nenhuma fase Selecionada" :
+                                    "Nenhuma Disciplina cadastrado até o momento"}
                             </p>
                             <img src={faseNaoSelecionada} alt="sem fase selecionada" className="disciplina-sem-fase-gif" />
                         </div>

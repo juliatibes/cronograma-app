@@ -39,7 +39,7 @@ import {
   People,
   VisibilityOutlined,
 } from "@mui/icons-material";
-import { STATUS_ENUM } from "../../types/statusEnum";
+import { STATUS_ENUM } from "../../types/enums/statusEnum";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";

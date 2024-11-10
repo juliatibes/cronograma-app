@@ -1,6 +1,6 @@
 import { ICoordenador } from "./coordenador";
 import { IFase } from "./fase";
-import { STATUS_ENUM } from "./statusEnum";
+import { STATUS_ENUM } from "./enums/statusEnum";
 
 export interface ICurso {
     id:number,

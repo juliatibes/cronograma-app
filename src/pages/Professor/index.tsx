@@ -1,6 +1,5 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import "./index.css";
-import { useNavigate } from "react-router-dom";
 import {
   AlertColor,
   Autocomplete,
@@ -11,6 +10,7 @@ import {
   Divider,
   FormControl,
   Modal,
+  Pagination,
   Stack,
   TextField,
   Typography,
@@ -38,77 +38,90 @@ import {
   EditNote,
   EventAvailable,
   LocalPhone,
-  ToggleOffOutlined,
-  ToggleOnOutlined,
+  ToggleOff,
+  ToggleOn,
   VisibilityOutlined,
 } from "@mui/icons-material";
-import { STATUS_ENUM } from "../../types/statusEnum";
+import { STATUS_ENUM } from "../../types/enums/statusEnum";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import { aplicarMascaraCpf, aplicarMascaraTelefone } from "../../util/mascaras";
 import { IProfessor, IProfessorRequest } from "../../types/professor";
 import {
   diaSemanaEnumAbreviado,
-} from "../../types/diaSemanaEnum";
+} from "../../types/enums/diaSemanaEnum";
 import MultiSelect from "../../components/MultiSelect";
-import { IPaginacao } from "../../types/paginacao";
+import { IPaginacao, IPaginacaoResponse } from "../../types/paginacao";
 import { IDiaSemanaDisponivel } from "../../types/diaSemanaDisponivel";
 import { ICoordenador } from "../../types/coordenador";
+import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
+import LoadingContent from "../../components/LoadingContent";
 
 const Professor: FC = () => {
-  const navigate = useNavigate();
   const [carregando, setCarregando] = useState<boolean>(false);
+  const [carregandoAssociar, setCarregandoAssociar] = useState<boolean>(false);
+
+  const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+  const [carregandoInformacoesModal, setCarregandoInformacoesModal] = useState<boolean>(true);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
   const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
   const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
 
+  const [exibir] = useState<number>(8);
+  const [paginaInicial] = useState<number>(1);
+  const [paginaAtual, setPaginaAtual] = useState<number>(1);
+  const [paginacaoResponse, setPaginacaoResponse] = useState<IPaginacaoResponse>();
+  const timeoutId = useRef<NodeJS.Timeout | null>(null);
+
   const [estadoModal, setEstadoModal] = useState(false);
-  const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false); //exemplo visualizar
+  const [estadoModalAssociar, setEstadoModalAssociar] = useState(false);
+  const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false);
 
   const [professores, setProfessores] = useState<IProfessor[]>([]);
+  const [diasSemanaDisponiveis, setDiasSemanaDisponiveis] = useState<IDiaSemanaDisponivel[]>([]);
+  const [coordenadores, setCoordenadores] = useState<ICoordenador[]>([]);
 
   const [id, setId] = useState<number>();
   const [nome, setNome] = useState<string>("");
   const [telefone, setTelefone] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [cpf, setCpf] = useState<string>("");
+  const [diasSemanaDisponiveisSelecionados, setDiasSemanaDisponiveisSelecionados] = useState<IDiaSemanaDisponivel[]>([]);
+  const [coordenadorSelecionado, setCoordenadorSelecionado] = useState<ICoordenador | null>();
 
-  const [diasSemanaDisponiveis, setDiasSemanaDisponiveis] = useState<
-    IDiaSemanaDisponivel[]
-  >([]);
+  const [validarCampoNome, setValidarCampoNome] = useState<IValidarCampos>(valorInicialValidarCampos);
+  const [validarCampoTelefone, setValidarCampoTelefone] = useState<IValidarCampos>(valorInicialValidarCampos);
+  const [validarCampoEmail, setValidarCampoEmail] = useState<IValidarCampos>(valorInicialValidarCampos);
+  const [validarCampoCpf, setValidarCampoCpf] = useState<IValidarCampos>(valorInicialValidarCampos);
+  const [validarCampoCoordenadorSelecionado, setValidarCampoCoordenadorSelecionado] = useState<IValidarCampos>(valorInicialValidarCampos);
 
-  const [
-    diasSemanaDisponiveisSelecionados,
-    setDiasSemanaDisponiveisSelecionados,
-  ] = useState<IDiaSemanaDisponivel[]>([]);
+  const trocarPagina = (event: React.ChangeEvent<unknown>, page: number) => {
+    setCarregandoInformacoesPagina(true);
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
+    }
 
-  const selecionarDiaSemanaDisponiveis = (
-    diasSemanaDisponiveis: IDiaSemanaDisponivel[]
-  ) => {
-    setDiasSemanaDisponiveisSelecionados(diasSemanaDisponiveis);
+    timeoutId.current = setTimeout(async () => {
+      await carregarProfessor(page);
+    }, 300);
+
+    setPaginaAtual(page);
+  }
+
+  const selecionarDiaSemanaDisponiveis = (diasSemanaDisponiveis: IDiaSemanaDisponivel[]) => {
+    setDiasSemanaDisponiveisSelecionados(diasSemanaDisponiveis)
   };
 
-  const [coordenadorSelecionado, setCoordenadorSelecionado] =
-    useState<ICoordenador>();
-  const [coordenadores, setCoordenadores] = useState<ICoordenador[]>([]);
-
-  const [validarCampoNome, setValidarCampoNome] = useState<IValidarCampos>(
-    valorInicialValidarCampos
-  );
-
-  const [validarCampoTelefone, setValidarCampoTelefone] =
-    useState<IValidarCampos>(valorInicialValidarCampos);
-
-  const [validarCampoEmail, setValidarCampoEmail] = useState<IValidarCampos>(
-    valorInicialValidarCampos
-  );
-
-  const [validarCampoCpf, setValidarCampoCpf] = useState<IValidarCampos>(
-    valorInicialValidarCampos
-  );
+  const selecionarCoordenador = (coordenador: ICoordenador | null) => {
+    if (coordenador) {
+      setCoordenadorSelecionado(coordenador);
+    } else {
+      setCoordenadorSelecionado(null);
+    }
+  };
 
   const exibirErros = (mensagens: string[]) => {
-    //tratamento erro
+
 
     const existeErroEspecifico = mensagens.some(
       (mensagem) =>
@@ -116,7 +129,8 @@ const Professor: FC = () => {
         mensagem.includes("Telefone") ||
         mensagem.includes("Email") ||
         mensagem.includes("CPF") ||
-        mensagem.includes("Semana")
+        mensagem.includes("Semana") ||
+        mensagem.includes("Coordenador")
     );
 
     if (!existeErroEspecifico) {
@@ -139,14 +153,18 @@ const Professor: FC = () => {
       }
       if (mensagem.includes("Cpf")) {
         setValidarCampoCpf({ existeErro: true, mensagem: mensagem });
+        continue;
+      }
+      if (mensagem.includes("Coordenador")) {
+        setValidarCampoCoordenadorSelecionado({ existeErro: true, mensagem: mensagem });
       }
     }
   };
 
   const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
-    //tratamento erro
     setEstadoAlerta(false);
     setEstadoModal(false);
+    setEstadoModalAssociar(false);
 
     setMensagensAlerta(mensagens);
     setCorAlerta(cor);
@@ -154,11 +172,14 @@ const Professor: FC = () => {
   };
 
   const limparErros = () => {
-    //tratamento erro
     setValidarCampoNome(valorInicialValidarCampos);
     setValidarCampoTelefone(valorInicialValidarCampos);
     setValidarCampoEmail(valorInicialValidarCampos);
     setValidarCampoCpf(valorInicialValidarCampos);
+  };
+
+  const limparErrosAssociar = () => {
+    setValidarCampoCoordenadorSelecionado(valorInicialValidarCampos);
   };
 
   const limparModal = () => {
@@ -170,8 +191,12 @@ const Professor: FC = () => {
     setDiasSemanaDisponiveisSelecionados([]);
   };
 
+  const limparModalAssociar = () => {
+    setCoordenadorSelecionado(null);
+  };
+
   const validarCampos = (): boolean => {
-    //tratamento erro
+
     let existeErro = false;
 
     if (!nome) {
@@ -193,15 +218,29 @@ const Professor: FC = () => {
     return existeErro;
   };
 
+  const validarCamposAssociar = (): boolean => {
+    let existeErro = false;
+
+    if (!coordenadorSelecionado) {
+      setValidarCampoCoordenadorSelecionado(campoObrigatorio);
+      existeErro = true;
+    }
+
+    return existeErro;
+  };
+
   const fecharModalVisualizar = () => setEstadoModalVisualizar(false); //exemplo visualizar
 
   const fecharModal = () => setEstadoModal(false);
+
+  const fecharModalAssociar = () => setEstadoModalAssociar(false);
 
   const carregarCoordenador = async () => {
     const response = await apiGet("/coordenador/carregar");
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = "/login";
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -213,37 +252,11 @@ const Professor: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error"); //tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
-    }
-  };
-
-  const associar = async () => {
-
-
-    const response = await apiPost(`professor/associar/coordenador/${coordenadorSelecionado?.id}`);
-
-    if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
-    }
-
-    if (response.status === STATUS_CODE.OK) {
-      setDiasSemanaDisponiveis(response.data);
-    }
-
-    if (
-      response.status === STATUS_CODE.BAD_REQUEST ||
-      response.status === STATUS_CODE.UNAUTHORIZED
-    ) {
-      const mensagens = response.messages;
-      exibirAlerta(mensagens, "error"); //tratamento erro
-    }
-
-    if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   };
 
@@ -251,7 +264,8 @@ const Professor: FC = () => {
     const response = await apiGet("/diasemanadisponivel/carregar");
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = "/login";
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -263,29 +277,34 @@ const Professor: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error"); //tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   };
 
-  const carregarProfessor = async () => {
+  const carregarProfessor = async (page?: number) => {
+    if(!page) {
+      setCarregandoInformacoesPagina(true);
+    }
+
     const paginacao: IPaginacao = {
-      exibir: 10,
-      paginaAtual: 1,
+      exibir: exibir,
+      paginaAtual: page ?? paginaInicial,
     };
 
     const response = await apiGet("/professor/carregar", paginacao);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = "/login";
     }
 
     if (response.status === STATUS_CODE.OK) {
       setProfessores(response.data.data);
-      console.log(response.data.data);
+      setPaginacaoResponse(response.data);
     }
 
     if (
@@ -293,19 +312,22 @@ const Professor: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error"); //tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
+
+    setCarregandoInformacoesPagina(false);
   };
 
   const carregarProfessorPorId = async (id: number) => {
     const response = await apiGet(`/professor/carregar/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = "/login";
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -326,11 +348,11 @@ const Professor: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error"); //tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   };
 
@@ -344,7 +366,8 @@ const Professor: FC = () => {
     );
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = "/login";
     }
 
     if (response.status === STATUS_CODE.NO_CONTENT) {
@@ -360,17 +383,17 @@ const Professor: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirErros(mensagens); //tratamento erro
+      exibirErros(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   };
 
   const salvar = async () => {
-    limparErros(); //tratamento erro
-    if (validarCampos()) return; //tratamento erro
+    limparErros();
+    if (validarCampos()) return;
 
     setCarregando(true);
     const professorRequest: IProfessorRequest = {
@@ -393,7 +416,8 @@ const Professor: FC = () => {
     }
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = "/login";
     }
 
     if (response.status === STATUS_CODE.CREATED) {
@@ -411,35 +435,80 @@ const Professor: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirErros(mensagens); //tratamento erro
+      exibirErros(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
 
     setCarregando(false);
   };
 
-  const abrirModal = async (id?: number) => {
-    limparModal();
-    limparErros(); //tratamento erro
+  const associar = async () => {
+    limparErrosAssociar();
+    if (validarCamposAssociar()) return;
+    setCarregandoAssociar(true);
 
-    carregarCoordenador();
-    carregarDiasSemanaDisponiveis();
+    const response = await apiPost(`professor/associar/coordenador/${coordenadorSelecionado?.id}`);
 
-    if (id) {
-      carregarProfessorPorId(id);
+    if (response.status === STATUS_CODE.FORBIDDEN) {
+      removerUsuario();
+      window.location.href = "/login";
     }
 
+    if (response.status === STATUS_CODE.CREATED) {
+      exibirAlerta(["Coordenador associado com sucesso!"], "success");
+      carregarProfessor();
+    }
+
+    if (
+      response.status === STATUS_CODE.BAD_REQUEST ||
+      response.status === STATUS_CODE.UNAUTHORIZED
+    ) {
+      const mensagens = response.messages;
+      exibirErros(mensagens);
+    }
+
+    if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
+      exibirAlerta(["Erro inesperado!"], "error");
+    }
+
+    setCarregandoAssociar(false);
+  };
+
+  const abrirModal = async (id?: number) => {
+    setCarregandoInformacoesModal(true);
     setEstadoModal(true);
+    limparModal();
+    limparErros();
+
+    await carregarDiasSemanaDisponiveis();
+
+    if (id) {
+      await carregarProfessorPorId(id);
+    }
+
+    setCarregandoInformacoesModal(false);
+  };
+
+  const abrirModalAssociar = async (id?: number) => {
+    setCarregandoInformacoesModal(true);
+    setEstadoModalAssociar(true);
+    limparModalAssociar();
+    limparErrosAssociar();
+
+    await carregarCoordenador();
+
+    setCarregandoInformacoesModal(false);
   };
 
   const visualizar = async (id: number) => {
-    //exemplo visualizar
-    limparModal();
-    carregarProfessorPorId(id);
+    setCarregandoInformacoesModal(true);
     setEstadoModalVisualizar(true);
+    limparModal();
+    await carregarProfessorPorId(id);
+    setCarregandoInformacoesModal(false);
   };
 
   useEffect(() => {
@@ -448,7 +517,6 @@ const Professor: FC = () => {
 
   return (
     <>
-      {/*//exemplo visualizar */}
       <Dialog
         open={estadoModalVisualizar}
         onClose={fecharModalVisualizar}
@@ -458,82 +526,103 @@ const Professor: FC = () => {
         PaperProps={{
           sx: {
             outline: "2px solid var(--dark-blue-senac)",
+            justifyContent: "center",
           },
         }}
       >
-        <DialogTitle sx={{ textAlign: "center", fontWeight: "bold" }}>
+        <LoadingContent
+          carregandoInformacoes={carregandoInformacoesModal}
+          isModal={true}
+          circleOn={true}
+        />
+        <DialogTitle fontSize='1.6rem' sx={{ textAlign: 'center', fontWeight: 'bolder' }}>
           {nome}
         </DialogTitle>
         <Divider />
         <DialogContent>
-          <Stack spacing={2} sx={{ mt: 2, margin: "0px 0px 8px 0px" }}>
-            <Box>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                Nome:
-              </Typography>
-              <Typography variant="body1">{nome}</Typography>
-            </Box>
+          <Stack spacing={2} sx={{ mt: 2, margin: "0px 0px 8px 0px", paddingTop: '2px' }}>
+            <Typography className="info-modal-visualizar-fields" component="div">
+              <Box component={'dl'}>
+                <Typography className="info-modal-visualizar-linha" component="div">
+                  <Typography component="dt">
+                    CPF:
+                  </Typography>
+                  <Typography component="dd">
+                    {aplicarMascaraCpf(cpf)}
+                  </Typography>
+                </Typography>
 
-            <Box>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                Telefone:
-              </Typography>
-              <Typography variant="body1">
-                {aplicarMascaraTelefone(telefone)}
-              </Typography>
-            </Box>
+                <Typography className="info-modal-visualizar-linha" component="div">
+                  <Typography component="dt">
+                    Telefone:
+                  </Typography>
+                  <Typography component="dd">
+                    {aplicarMascaraTelefone(telefone)}
+                  </Typography>
+                </Typography>
 
-            <Box>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                E-mail:
-              </Typography>
-              <Typography variant="body1">{email}</Typography>
-            </Box>
+                <Typography className="info-modal-visualizar-linha" component="div">
+                  <Typography component="dt">
+                    E-mail:
+                  </Typography>
+                  <Typography component="dd">
+                    {email}
+                  </Typography>
+                </Typography>
 
-            <Box>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                CPF:
-              </Typography>
-              <Typography variant="body1">{aplicarMascaraCpf(cpf)}</Typography>
-            </Box>
-
-            <Box>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                Dias da semana disponível(is):
-              </Typography>
-              {/* <Typography variant="body1">{diaSemanaDisponivelSelecionado}</Typography> */}
-            </Box>
+                <Typography className="info-modal-visualizar-linha" component="div">
+                  <Typography component="dt">
+                    Dias da semana disponível(is):
+                  </Typography>
+                  <Typography component="dd">
+                    {diasSemanaDisponiveisSelecionados.map(
+                      (diaSemana) => diaSemanaEnumAbreviado(diaSemana.diaSemanaEnum)
+                    ).join(", ")}
+                  </Typography>
+                </Typography>
+              </Box>
+            </Typography>
           </Stack>
         </DialogContent>
       </Dialog>
 
-      <Modal open={estadoModal} onClose={fecharModal} className="modal">
-        <Box className="modal-box">
+      <Modal open={estadoModalAssociar} onClose={fecharModalAssociar} className="modal">
+        <Box className="modal-box" sx={{ maxWidth: "400px" }}>
+          <LoadingContent
+            carregandoInformacoes={carregandoInformacoesModal}
+            isModal={true}
+            circleOn={true}
+          />
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Associar coordenador
           </Typography>
           <Typography id="modal-modal-description" component="div">
             <div className="modal-content">
               <div className="modal-one-form-group">
-                {/* <FormControl fullWidth>
+                <FormControl fullWidth>
                   <Autocomplete
+                    size="small"
                     options={coordenadores}
                     getOptionLabel={(coordenador: ICoordenador) =>
                       coordenador.nome
                     }
                     value={coordenadorSelecionado}
-                    onChange={(event, value) => setCoordenadorSelecionado(value)}
+                    onChange={(event, value) => selecionarCoordenador(value)}
                     renderInput={(params) => (
-                      <TextField {...params} label="Coordenador" />
+                      <TextField
+                        {...params} label="Coordenador"
+                        error={validarCampoCoordenadorSelecionado.existeErro}
+                        helperText={validarCampoCoordenadorSelecionado.mensagem}
+                      />
                     )}
                   />
-                </FormControl> */}
+                </FormControl>
               </div>
             </div>
             <div className="modal-footer">
               <BotaoPadrao
                 label={"Associar"}
-                carregando={carregando}
+                carregando={carregandoAssociar}
                 onClick={associar}
               />
             </div>
@@ -543,25 +632,16 @@ const Professor: FC = () => {
 
       <Modal open={estadoModal} onClose={fecharModal} className="modal">
         <Box className="modal-box">
+          <LoadingContent
+            carregandoInformacoes={carregandoInformacoesModal}
+            isModal={true}
+            circleOn={true}
+          />
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Professor
           </Typography>
           <Typography id="modal-modal-description" component="div">
             <div className="modal-content">
-              <div className="modal-one-form-group">
-                <InputPadrao
-                  label={"Nome"}
-                  type={"text"}
-                  value={nome}
-                  onChange={(e) => {
-                    if (e) {
-                      setNome(e.target.value);
-                    }
-                  }}
-                  error={validarCampoNome.existeErro} //tratamento erro
-                  helperText={validarCampoNome.mensagem} //tratamento erro
-                />
-              </div>
               <div className="modal-two-form-group">
                 <InputPadrao
                   label={"CPF"}
@@ -572,8 +652,34 @@ const Professor: FC = () => {
                       setCpf(e.target.value);
                     }
                   }}
-                  error={validarCampoCpf.existeErro} //tratamento erro
-                  helperText={validarCampoCpf.mensagem} //tratamento erro
+                  error={validarCampoCpf.existeErro}
+                  helperText={validarCampoCpf.mensagem}
+                />
+                <InputPadrao
+                  label={"Nome"}
+                  type={"text"}
+                  value={nome}
+                  onChange={(e) => {
+                    if (e) {
+                      setNome(e.target.value);
+                    }
+                  }}
+                  error={validarCampoNome.existeErro}
+                  helperText={validarCampoNome.mensagem}
+                />
+              </div>
+              <div className="modal-two-form-group">
+                <InputPadrao
+                  label={"E-mail"}
+                  type={"email"}
+                  value={email}
+                  onChange={(e) => {
+                    if (e) {
+                      setEmail(e.target.value);
+                    }
+                  }}
+                  error={validarCampoEmail.existeErro}
+                  helperText={validarCampoEmail.mensagem}
                 />
                 <InputPadrao
                   label={"Telefone"}
@@ -584,33 +690,16 @@ const Professor: FC = () => {
                       setTelefone(e.target.value);
                     }
                   }}
-                  error={validarCampoTelefone.existeErro} //tratamento erro
-                  helperText={validarCampoTelefone.mensagem} //tratamento erro
+                  error={validarCampoTelefone.existeErro}
+                  helperText={validarCampoTelefone.mensagem}
                 />
               </div>
-              <div className="modal-one-form-group">
-                <InputPadrao
-                  label={"E-mail"}
-                  type={"text"}
-                  value={email}
-                  onChange={(e) => {
-                    if (e) {
-                      setEmail(e.target.value);
-                    }
-                  }}
-                  error={validarCampoEmail.existeErro} //tratamento erro
-                  helperText={validarCampoEmail.mensagem} //tratamento erro
-                />
-              </div>
-
               <div className="modal-one-form-group">
                 <MultiSelect
                   options={diasSemanaDisponiveis}
                   values={diasSemanaDisponiveisSelecionados}
                   label={"Dias da semana disponíveis"}
                   onChange={selecionarDiaSemanaDisponiveis}
-                  // error={validarCampos.existeErro} //tratamento erro
-                  // helperText={validarCampos.mensagem}//tratamento erro
                 />
               </div>
             </div>
@@ -626,7 +715,7 @@ const Professor: FC = () => {
       </Modal>
 
       <AlertPadrao
-        key={estadoAlerta ? "show" : "close"} //componente tratamento erro
+        key={estadoAlerta ? "show" : "close"}
         estado={estadoAlerta}
         cor={corAlerta}
         mensagens={mensagensAlerta}
@@ -636,12 +725,19 @@ const Professor: FC = () => {
       />
 
       <main className="page-main">
-        <div style={{ display: "flex" }}>
-          <h2>Professor</h2>
-          <BotaoPadrao label={"Associar"} onClick={() => abrirModal()} />
-          <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
+        <div className="page-main-title">
+          <h2>Professores</h2>
+          <div className="page-main-title-actions">
+            <BotaoPadrao label={"Associar"} onClick={() => abrirModalAssociar()} />
+            <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
+          </div>
         </div>
         <div className="grid-content">
+          <LoadingContent
+            carregandoInformacoes={carregandoInformacoesPagina}
+            isModal={false}
+            circleOn={true}
+          />
           {professores.map((professor) => (
             <CardPadrao
               key={professor.id}
@@ -679,9 +775,8 @@ const Professor: FC = () => {
                 professor.statusEnum === STATUS_ENUM.INATIVO ? (
                   <CardPadraoActionItem
                     icon={
-                      <ToggleOffOutlined
-                        titleAccess="Inativado"
-                        color="error"
+                      <ToggleOff
+                        className="toggleOff" titleAccess="Inativado"
                       />
                     }
                     onClick={() =>
@@ -690,7 +785,7 @@ const Professor: FC = () => {
                   />
                 ) : (
                   <CardPadraoActionItem
-                    icon={<ToggleOnOutlined titleAccess="Ativado" />}
+                    icon={<ToggleOn className="toggleOn" titleAccess="Ativado" color="primary" />}
                     onClick={() =>
                       alterarStatusProfessor(
                         professor.id,
@@ -704,6 +799,27 @@ const Professor: FC = () => {
             />
           ))}
         </div>
+        {
+          professores.length > 0 &&
+          <div>
+            <Stack spacing={2}>
+              <Pagination
+                count={paginacaoResponse?.totalPaginas}
+                variant="outlined"
+                shape="rounded"
+                page={paginaAtual}
+                onChange={trocarPagina}
+                sx={{
+                  '& .MuiPaginationItem-root': {
+                    fontSize: '1rem',
+                    minWidth: '40px',
+                    minHeight: '38px',
+                  },
+                }}
+              />
+            </Stack>
+          </div>
+        }
       </main>
     </>
   );

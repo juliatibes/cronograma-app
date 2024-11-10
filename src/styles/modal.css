@@ -1,4 +1,6 @@
 .modal-box {
+  position: relative;
+  overflow: hidden;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -22,7 +24,7 @@
 
 .modal-content {
   margin-inline: 16px;
-  padding: 20px;
+  padding: 10px 20px;
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;

@@ -66,7 +66,7 @@ const CursoFaseLista: FC<CursoFaseListaProperties> = ({
         unmountOnExit
         className="curso-fase-collapse"
       >
-        <List component="div" disablePadding>
+        <List component="div" disablePadding style={{minHeight:'42px'}}>
           {curso.fases.map((fase) => (
             <ListItemButton 
             key={fase.id} 

@@ -1,8 +1,8 @@
-import { BOOLEAN_ENUM } from "./booleanEnum"
+import { BOOLEAN_ENUM } from "./enums/booleanEnum"
 import { ICurso } from "./curso"
 import { IFase } from "./fase"
 import { IProfessor } from "./professor"
-import { STATUS_ENUM } from "./statusEnum"
+import { STATUS_ENUM } from "./enums/statusEnum"
 
 export interface IDisciplina {
     id:number,

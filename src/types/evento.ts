@@ -1,4 +1,4 @@
-import { BOOLEAN_ENUM } from "./booleanEnum"
+import { BOOLEAN_ENUM } from "./enums/booleanEnum"
 
 export interface IEvento {
     id:number,

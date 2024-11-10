@@ -1,5 +1,5 @@
 import { IDiaSemanaDisponivel } from "./diaSemanaDisponivel"
-import { STATUS_ENUM } from "./statusEnum"
+import { STATUS_ENUM } from "./enums/statusEnum"
 
 export interface IProfessor{
     id: number,

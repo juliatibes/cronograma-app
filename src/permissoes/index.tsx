@@ -12,6 +12,10 @@ export enum OPERADOR_ENUM {
 export const validarPermissao = (operador:OPERADOR_ENUM ,rankingAcesso:number) => {
     const usuarioSessao:IUsuarioStore = buscaUsuarioSessao();
 
+    if(!usuarioSessao.niveisAcesso){
+        return false;
+    }
+
     return usuarioSessao.niveisAcesso
             .some((nivelAcesso) => compararRakingAcesso(nivelAcesso.rankingAcesso, operador, rankingAcesso))
 }
