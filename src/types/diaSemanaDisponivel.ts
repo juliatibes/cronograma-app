@@ -1,4 +1,4 @@
-import { DIA_SEMANA_ENUM } from "./diaSemanaEnum"
+import { DIA_SEMANA_ENUM } from "./enums/diaSemanaEnum"
 
 export interface IDiaSemanaDisponivel {
     id:number,

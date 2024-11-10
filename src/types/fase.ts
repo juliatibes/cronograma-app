@@ -1,4 +1,4 @@
-import { STATUS_ENUM } from "./statusEnum";
+import { STATUS_ENUM } from "./enums/statusEnum";
 
 export interface IFase {
     id:number,

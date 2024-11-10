@@ -1,5 +1,5 @@
 import { Dayjs } from "dayjs"
-import { STATUS_ENUM } from "./statusEnum"
+import { STATUS_ENUM } from "./enums/statusEnum"
 
 export interface IDataBloqueada {
     id:number,

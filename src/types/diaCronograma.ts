@@ -1,5 +1,5 @@
-import { DATA_STATUS_ENUM } from "./dataStatusEnum";
-import { DIA_SEMANA_ENUM } from "./diaSemanaEnum";
+import { DATA_STATUS_ENUM } from "./enums/dataStatusEnum";
+import { DIA_SEMANA_ENUM } from "./enums/diaSemanaEnum";
 
 export interface IDiaCronograma {
    id:number,

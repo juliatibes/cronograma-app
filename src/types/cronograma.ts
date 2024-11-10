@@ -1,5 +1,5 @@
 import { IDiaCronograma } from "./diaCronograma";
-import { MES_ENUM } from "./mesEnum";
+import { MES_ENUM } from "./enums/mesEnum";
 
 export interface ICronograma {
     id:number

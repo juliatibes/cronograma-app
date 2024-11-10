@@ -1,8 +1,8 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import faseNaoSelecionada from "../../assets/fase-nao-selecionada.gif";
 import "./index.css";
 import { AccountBalance, VisibilityOutlined, EditNote, AutoStories, AlternateEmail, RemoveCircleOutlineOutlined, UploadFile } from "@mui/icons-material";
-import { AlertColor, Divider, Stack, Pagination, Autocomplete, Box, FormControl, Modal, TextField, Typography, Dialog, DialogContent, DialogTitle, Button} from "@mui/material";
+import { AlertColor, Divider, Stack, Pagination, Autocomplete, Box, FormControl, Modal, TextField, Typography, Dialog, DialogContent, DialogTitle, Button } from "@mui/material";
 import { apiDelete, apiGet, apiPost, apiPostImportar, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import CardPadrao from "../../components/CardPadrao";
@@ -19,10 +19,14 @@ import InputPadrao from "../../components/InputPadrao";
 import MultiSelect from "../../components/MultiSelect";
 import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
 import AlertaPadrao from "../../components/AlertaPadrao";
+import LoadingContent from "../../components/LoadingContent";
 
 const Aluno: FC = () => {
   const [carregando, setCarregando] = useState<boolean>(false);
   const [carregandoImportar, setCarregandoImportar] = useState<boolean>(false);
+
+  const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+  const [carregandoInformacoesModal, setCarregandoInformacoesModal] = useState<boolean>(true);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
   const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
@@ -31,15 +35,15 @@ const Aluno: FC = () => {
   const [estadoModal, setEstadoModal] = useState(false);
   const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false);
   const [exibirModalExclusao, setExibirModalExclusao] = useState(false);
-  const [estadoModalImportar, setEstadoModalImportar] = useState(false);//importar
+  const [estadoModalImportar, setEstadoModalImportar] = useState(false);
 
   const [alunoSelecionadoExclusao, setAlunoSelecionadoExclusao] = useState<IAluno>();
 
   const [exibir] = useState<number>(8);
   const [paginaInicial] = useState<number>(1);
   const [paginaAtual, setPaginaAtual] = useState<number>(1);
-  const [variosClicks, setVariosClicks] = useState<boolean>(false);
   const [paginacaoResponse, setPaginacaoResponse] = useState<IPaginacaoResponse>();
+  const timeoutId = useRef<NodeJS.Timeout | null>(null);
 
   const [cursosPorUsuario, setCursosPorUsuario] = useState<ICursoPorUsuario[]>([]);
   const [fasesPorCurso, setFasesPorCurso] = useState<IFase[]>([]);
@@ -77,14 +81,12 @@ const Aluno: FC = () => {
   }
 
   const trocarPagina = (event: React.ChangeEvent<unknown>, page: number) => {
-    if (variosClicks) {
-      return;
+    setCarregandoInformacoesPagina(true);
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
     }
 
-    setVariosClicks(true);
-
-    setTimeout(() => {
-      setVariosClicks(false);
+    timeoutId.current = setTimeout(() => {
       (
         faseIdSelecionada && cursoIdSelecionado &&
         carregarAlunosCursoFase(faseIdSelecionada, cursoIdSelecionado, false, page)
@@ -218,7 +220,10 @@ const Aluno: FC = () => {
   const fecharModalVisualizar = () => setEstadoModalVisualizar(false);
 
   const carregarAlunosCursoFase = async (faseId: number, cursoId: number, editavel: boolean, page?: number) => {
-    page ?? setPaginaAtual(1);
+    if(!page) {
+      setCarregandoInformacoesPagina(true);
+      setPaginaAtual(1);
+    }
 
     const paginacao: IPaginacao = {
       exibir: exibir,
@@ -248,6 +253,8 @@ const Aluno: FC = () => {
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
       exibirAlerta(["Erro inesperado!"], "error");
     }
+
+    setCarregandoInformacoesPagina(false);
   }
 
   const carregarCursoPorUsuario = async () => {
@@ -351,23 +358,29 @@ const Aluno: FC = () => {
   };
 
   const abrirModal = async (id?: number) => {
+    setCarregandoInformacoesModal(true);
+    setEstadoModal(true);
     limparModal();
     limparErros();
 
-    carregarCursoPorUsuario();
+    await carregarCursoPorUsuario();
 
     if (id) {
-      carregarAlunoPorId(id);
+      await carregarAlunoPorId(id);
     }
-
-    setEstadoModal(true);
+    setCarregandoInformacoesModal(false);
   }
 
   const abrirModalImportar = async () => {
+    setCarregandoInformacoesModal(true);
+    setEstadoModalImportar(true);
+
     limparModalImportar();
     limparErrosImportar();
-    carregarCursoPorUsuario();
-    setEstadoModalImportar(true);
+
+    await carregarCursoPorUsuario();
+
+    setCarregandoInformacoesModal(false);
   }
 
   const salvar = async () => {
@@ -441,12 +454,12 @@ const Aluno: FC = () => {
     }
 
     const formData = new FormData();
-    formData.append('cursoId',alunoImportar.cursoId.toString());
-    formData.append('faseId',alunoImportar.faseId.toString());
-    formData.append('arquivo',arquivoSelecionado as File);
+    formData.append('cursoId', alunoImportar.cursoId.toString());
+    formData.append('faseId', alunoImportar.faseId.toString());
+    formData.append('arquivo', arquivoSelecionado as File);
 
     const response = await apiPostImportar(`/aluno/importar`, formData);
-    
+
     if (response.status === STATUS_CODE.FORBIDDEN) {
       removerUsuario();
       window.location.href = '/login';
@@ -464,7 +477,7 @@ const Aluno: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens,'warning');
+      exibirAlerta(mensagens, 'warning');
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
@@ -503,9 +516,11 @@ const Aluno: FC = () => {
   };
 
   const visualizar = async (id: number) => {
-    limparModal();
-    carregarAlunoPorId(id);
+    setCarregandoInformacoesModal(true);
     setEstadoModalVisualizar(true);
+    limparModal();
+    await carregarAlunoPorId(id);
+    setCarregandoInformacoesModal(false);
   }
 
   const fecharModalExclusao = () => setExibirModalExclusao(false);
@@ -545,9 +560,15 @@ const Aluno: FC = () => {
       PaperProps={{
         sx: {
           outline: '2px solid var(--dark-blue-senac)',
+          justifyContent:"center"
         }
       }}
     >
+      <LoadingContent
+        carregandoInformacoes={carregandoInformacoesModal}
+        isModal={true}
+        circleOn={true}
+      />
       <DialogTitle fontSize='1.6rem' sx={{ textAlign: 'center', fontWeight: 'bolder' }}>
         {nome}
       </DialogTitle>
@@ -624,10 +645,10 @@ const Aluno: FC = () => {
         </Typography>
 
         <Box id="modal-excluir-actions">
-          <Button variant="outlined" sx={{ fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder", border: "2px solid currentColor" }} onClick={cancelar}>
+          <Button variant="outlined" sx={{ color: "#464646", fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder", border: "2px solid #464646" }} onClick={cancelar}>
             Cancelar
           </Button>
-          <Button variant="contained" sx={{ fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder" }} onClick={confirmar}>
+          <Button variant="contained" sx={{ backgroundColor: "#c73636", color: "#e7d8d8", fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder" }} onClick={confirmar}>
             Confirmar
           </Button>
         </Box>
@@ -636,8 +657,13 @@ const Aluno: FC = () => {
 
     <Modal open={estadoModal} onClose={fecharModal} className="modal">
       <Box className='modal-box'>
+        <LoadingContent
+          carregandoInformacoes={carregandoInformacoesModal}
+          isModal={true}
+          circleOn={true}
+        />
         <Typography id="modal-modal-title" variant="h6" component="h2">
-          Aluno
+          Alunos
         </Typography>
         <Typography
           id="modal-modal-description"
@@ -645,18 +671,6 @@ const Aluno: FC = () => {
         >
           <div className="modal-content">
             <div className="modal-two-form-group">
-              < InputPadrao
-                label={"Nome"}
-                type={"text"}
-                value={nome}
-                onChange={(e) => {
-                  if (e) {
-                    setNome(e.target.value)
-                  }
-                }}
-                error={validarCampoNome.existeErro}
-                helperText={validarCampoNome.mensagem}
-              />
               < InputPadrao
                 label={"CPF"}
                 type={"text"}
@@ -668,6 +682,18 @@ const Aluno: FC = () => {
                 }}
                 error={validarCampoCpf.existeErro}
                 helperText={validarCampoCpf.mensagem}
+              />
+              < InputPadrao
+                label={"Nome"}
+                type={"text"}
+                value={nome}
+                onChange={(e) => {
+                  if (e) {
+                    setNome(e.target.value)
+                  }
+                }}
+                error={validarCampoNome.existeErro}
+                helperText={validarCampoNome.mensagem}
               />
             </div>
             <div className="modal-two-form-group">
@@ -726,6 +752,11 @@ const Aluno: FC = () => {
 
     <Modal open={estadoModalImportar} onClose={fecharModalImportar} className="modal">
       <Box className='modal-box' sx={{ maxWidth: "380px" }}>
+        <LoadingContent
+          carregandoInformacoes={carregandoInformacoesModal}
+          isModal={true}
+          circleOn={true}
+        />
         <Typography id="modal-modal-title" variant="h6" component="h2">
           Aluno
         </Typography>
@@ -747,12 +778,12 @@ const Aluno: FC = () => {
                     slotProps={{
                       input: {
                         startAdornment: (
-                            <UploadFile color="primary" sx={{marginRight:"10px"}}/>
+                          <UploadFile color="primary" sx={{ marginRight: "10px" }} />
                         ),
                         readOnly: true,
                       },
                       formHelperText: {
-                        onClick: (e: React.MouseEvent<HTMLParagraphElement>) => {e.stopPropagation()} ,
+                        onClick: (e: React.MouseEvent<HTMLParagraphElement>) => { e.stopPropagation() },
                       },
                     }}
                     error={validarCampoArquivoSelecionado.existeErro}
@@ -849,6 +880,11 @@ const Aluno: FC = () => {
       {
         alunosPorCursoFase.length > 0 ?
           <div className="grid-content">
+            <LoadingContent
+              carregandoInformacoes={carregandoInformacoesPagina}
+              isModal={false}
+              circleOn={true}
+            />
             {alunosPorCursoFase.map((aluno) => (
               <CardPadrao
                 key={aluno.id}
@@ -877,7 +913,7 @@ const Aluno: FC = () => {
                     onClick={() => abrirModal(aluno.id)}
                   />,
                   <CardPadraoActionItem
-                    icon={<RemoveCircleOutlineOutlined titleAccess="Excluir" />}
+                    icon={<RemoveCircleOutlineOutlined sx={{ color: "#c73636" }} titleAccess="Excluir" />}
                     onClick={() => {
                       setAlunoSelecionadoExclusao(aluno);
                       abrirModalExclusao();

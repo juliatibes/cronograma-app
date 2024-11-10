@@ -1,14 +1,14 @@
-import { Box, Button, Divider, IconButton, Modal, Snackbar, snackbarClasses, SnackbarOrigin, SxProps, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Divider, IconButton, Modal, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
 import { FC, useState, MouseEvent, useEffect } from "react";
 import { ICronogramaMes } from "../../types/cronograma";
 import { IDiaCronograma } from "../../types/diaCronograma";
 import "./index.css";
-import { DATA_STATUS_ENUM } from "../../types/dataStatusEnum";
+import { DATA_STATUS_ENUM } from "../../types/enums/dataStatusEnum";
 import { hexToRgba } from "../../util/conversorCores";
-import { Close, ScreenRotationAlt, Event, HistoryEdu, School, CompareArrows, MultipleStop, SyncAlt, Check, CloseRounded, CheckRounded } from "@mui/icons-material";
-import { diaSemanaEnumGetLabel } from "../../types/diaSemanaEnum";
+import { Close, Event, HistoryEdu, School, SyncAlt, CloseRounded, CheckRounded } from "@mui/icons-material";
+import { diaSemanaEnumGetLabel } from "../../types/enums/diaSemanaEnum";
 import { IPeriodo } from "../../types/periodo";
-import { STATUS_ENUM } from "../../types/statusEnum";
+import { STATUS_ENUM } from "../../types/enums/statusEnum";
 
 interface CalendarioProperties {
   meses: ICronogramaMes[],
@@ -70,9 +70,9 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado, edita
   const selecionarDiaCronogramaParaTrocar = (diaCronograma: IDiaCronograma) => {
 
     if (
-      diaCronograma.id === diaCronogramaTrocaSelecionadoPrimeiro?.id ||
-      diaCronograma.disciplinaNome === diaCronogramaTrocaSelecionadoPrimeiro?.disciplinaNome &&
-      diaCronograma.professorNome === diaCronogramaTrocaSelecionadoPrimeiro?.professorNome
+      (diaCronograma.id === diaCronogramaTrocaSelecionadoPrimeiro?.id) ||
+      (diaCronograma.disciplinaNome === diaCronogramaTrocaSelecionadoPrimeiro?.disciplinaNome &&
+      diaCronograma.professorNome === diaCronogramaTrocaSelecionadoPrimeiro?.professorNome)
     ) {
       return;
     } else if (diaCronogramaTrocaSelecionadoPrimeiro) {

@@ -1,14 +1,13 @@
 import { FC, useEffect, useState } from "react";
 import BotaoPadrao from "../../components/BotaoPadrao";
-import { useNavigate } from "react-router-dom";
 import CardPadrao from "../../components/CardPadrao";
-import { AccountBalance, People, EditNote, AutoStories, VisibilityOutlined, ToggleOn, ToggleOff } from "@mui/icons-material";
+import { AccountBalance, People, EditNote, AutoStories, ToggleOn, ToggleOff } from "@mui/icons-material";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import { apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
 import { ICurso, ICursoRequest } from "../../types/curso";
-import { STATUS_ENUM } from "../../types/statusEnum";
-import { AlertColor, Autocomplete, Box, Dialog, DialogContent, DialogTitle, Divider, FormControl, Modal, Stack, TextField, Typography } from "@mui/material";
+import { STATUS_ENUM } from "../../types/enums/statusEnum";
+import { AlertColor, Autocomplete, Box, FormControl, Modal, TextField, Typography } from "@mui/material";
 import AlertPadrao from "../../components/AlertaPadrao";
 import InputPadrao from "../../components/InputPadrao";
 import { IFase } from "../../types/fase";
@@ -16,9 +15,13 @@ import { ICoordenador } from "../../types/coordenador";
 import MultiSelect from "../../components/MultiSelect";
 import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
 import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
+import LoadingContent from "../../components/LoadingContent";
 
 const Curso: FC = () => {
   const [carregando, setCarregando] = useState<boolean>(false);
+
+  const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+  const [carregandoInformacoesModal, setCarregandoInformacoesModal] = useState<boolean>(true);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
   const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
@@ -36,11 +39,11 @@ const Curso: FC = () => {
   const [fasesSelecionadas, setFasesSelecionadas] = useState<IFase[]>([]);
   const [coordenadorSelecionado, setCoordenadorSelecionado] = useState<ICoordenador | null>();
 
-  const [validarCampoNome, setValidarCampoNome] = useState<IValidarCampos>(valorInicialValidarCampos);//tratamento erro
-  const [validarCampoSigla, setValidarCampoSigla] = useState<IValidarCampos>(valorInicialValidarCampos);//tratamento erro
-  const [validarCampoFase, setValidarCampoFase] = useState<IValidarCampos>(valorInicialValidarCampos);//tratamento erro
+  const [validarCampoNome, setValidarCampoNome] = useState<IValidarCampos>(valorInicialValidarCampos);
+  const [validarCampoSigla, setValidarCampoSigla] = useState<IValidarCampos>(valorInicialValidarCampos);
+  const [validarCampoFase, setValidarCampoFase] = useState<IValidarCampos>(valorInicialValidarCampos);
 
-  const exibirErros = (mensagens: string[]) => {//tratamento erro
+  const exibirErros = (mensagens: string[]) => {
 
     const existeErroEspecifico = mensagens.some(mensagem =>
       mensagem.includes("Nome") ||
@@ -69,7 +72,7 @@ const Curso: FC = () => {
 
   }
 
-  const exibirAlerta = (mensagens: string[], cor: AlertColor) => {//tratamento erro
+  const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
     setEstadoAlerta(false);
     setEstadoModal(false);
 
@@ -78,7 +81,7 @@ const Curso: FC = () => {
     setEstadoAlerta(true);
   }
 
-  const limparErros = () => {//tratamento erro
+  const limparErros = () => {
     setValidarCampoNome(valorInicialValidarCampos);
     setValidarCampoSigla(valorInicialValidarCampos);
     setValidarCampoFase(valorInicialValidarCampos);
@@ -92,7 +95,7 @@ const Curso: FC = () => {
     setCoordenadorSelecionado(null);
   }
 
-  const validarCampos = (): boolean => {//tratamento erro
+  const validarCampos = (): boolean => {
     let existeErro = false;
 
     if (!nome) {
@@ -119,6 +122,8 @@ const Curso: FC = () => {
   const fecharModal = () => setEstadoModal(false);
 
   const carregarCurso = async () => {
+    setCarregandoInformacoesPagina(true);
+
     const response = await apiGet('/curso/carregar');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
@@ -132,12 +137,14 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error");//tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
+
+    setCarregandoInformacoesPagina(false);
   }
 
   const carregarFase = async () => {
@@ -154,11 +161,11 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error");//tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   }
 
@@ -176,11 +183,11 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error");//tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   }
 
@@ -204,11 +211,11 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error");//tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   }
 
@@ -227,17 +234,17 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirErros(mensagens);//tratamento erro
+      exibirErros(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   }
 
   const salvar = async () => {
-    limparErros();//tratamento erro
-    if (validarCampos()) return;//tratamento erro
+    limparErros();
+    if (validarCampos()) return;
 
     setCarregando(true);
     const cursoRequest: ICursoRequest = {
@@ -273,11 +280,11 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirErros(mensagens);//tratamento erro
+      exibirErros(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
 
     setCarregando(false);
@@ -296,17 +303,18 @@ const Curso: FC = () => {
   };
 
   const abrirModal = async (id?: number) => {
+    setCarregandoInformacoesModal(true);
+    setEstadoModal(true);
     limparModal();
-    limparErros();//tratamento erro
+    limparErros();
 
-    carregarFase();
-    carregarCoordenador();
+    await carregarFase();
+    await carregarCoordenador();
 
     if (id) {
-      carregarCursoPorId(id);
+      await carregarCursoPorId(id);
     }
-
-    setEstadoModal(true);
+    setCarregandoInformacoesModal(false);
   }
 
   useEffect(() => {
@@ -317,8 +325,13 @@ const Curso: FC = () => {
 
     <Modal open={estadoModal} onClose={fecharModal} className="modal">
       <Box className='modal-box'>
+        <LoadingContent
+          carregandoInformacoes={carregandoInformacoesModal}
+          isModal={true}
+          circleOn={true}
+        />
         <Typography id="modal-modal-title" variant="h6" component="h2">
-          Curso
+          Cursos
         </Typography>
         <Typography
           id="modal-modal-description"
@@ -335,8 +348,8 @@ const Curso: FC = () => {
                     setNome(e.target.value)
                   }
                 }}
-                error={validarCampoNome.existeErro}//tratamento erro
-                helperText={validarCampoNome.mensagem}//tratamento erro
+                error={validarCampoNome.existeErro}
+                helperText={validarCampoNome.mensagem}
               />
               < InputPadrao
                 type={"text"}
@@ -348,8 +361,8 @@ const Curso: FC = () => {
                     setSigla(e.target.value)
                   }
                 }}
-                error={validarCampoSigla.existeErro}//tratamento erro
-                helperText={validarCampoSigla.mensagem}//tratamento erro
+                error={validarCampoSigla.existeErro}
+                helperText={validarCampoSigla.mensagem}
               />
             </div>
             <div className="modal-one-form-group">
@@ -358,13 +371,14 @@ const Curso: FC = () => {
                 values={fasesSelecionadas}
                 label={"Fases"}
                 onChange={selecionarFase}
-                error={validarCampoFase.existeErro}//tratamento erro
-                helperText={validarCampoFase.mensagem}//tratamento erro
+                error={validarCampoFase.existeErro}
+                helperText={validarCampoFase.mensagem}
               />
             </div>
             <div className="modal-one-form-group">
               <FormControl fullWidth>
                 <Autocomplete
+                  size="small"
                   options={coordenadores}
                   getOptionLabel={(coordenador: ICoordenador) => coordenador.nome}
                   value={coordenadorSelecionado || null}
@@ -402,6 +416,11 @@ const Curso: FC = () => {
         <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
       </div>
       <div className="grid-content">
+        <LoadingContent
+          carregandoInformacoes={carregandoInformacoesPagina}
+          isModal={false}
+          circleOn={true}
+        />
         {cursos.map((curso) => (
           <CardPadrao
             key={curso.id}
@@ -415,16 +434,16 @@ const Curso: FC = () => {
             actions={[
               (
                 curso.statusEnum === STATUS_ENUM.ATIVO ?
-                (<CardPadraoActionItem icon={<EditNote titleAccess="Editar" />} onClick={() => abrirModal(curso.id)} />) :
-                <></>
+                  (<CardPadraoActionItem icon={<EditNote titleAccess="Editar" />} onClick={() => abrirModal(curso.id)} />) :
+                  <></>
               ),
               (
                 curso.statusEnum === STATUS_ENUM.INATIVO ?
-                (<CardPadraoActionItem 
-                  icon={<ToggleOff titleAccess="Inativado" className="toggleOff"/>} 
-                  onClick={() => alterarStatusCurso(curso.id, curso.nome, true)} />
-                ) :
-                (<CardPadraoActionItem icon={<ToggleOn  className="toggleOn" titleAccess="Ativado" color="primary"/>} onClick={() => alterarStatusCurso(curso.id, curso.nome, false)} />)
+                  (<CardPadraoActionItem
+                    icon={<ToggleOff titleAccess="Inativado" className="toggleOff" />}
+                    onClick={() => alterarStatusCurso(curso.id, curso.nome, true)} />
+                  ) :
+                  (<CardPadraoActionItem icon={<ToggleOn className="toggleOn" titleAccess="Ativado" color="primary" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, false)} />)
               ),
             ]}
           />
