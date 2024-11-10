@@ -232,8 +232,8 @@ export default function IconeLogin() {
       />
 
       <Modal open={estadoModal} onClose={fecharModal} className="modal">
-        <Box sx={{ maxWidth: "400px", backgroundColor: 'var(--dark-blue-senac)' }} className='modal-box'>
-          <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ color: "#fff" }}>
+        <Box sx={{ maxWidth: "400px"}} className='modal-box'>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
             Redefinir Senha
           </Typography>
           <Typography
@@ -244,7 +244,6 @@ export default function IconeLogin() {
               <div className="modal-one-form-group">
                 <InputPadrao
                   label={"Senha Atual"}
-                  backgroundColor="#fff"
                   type={exibirSenhaAtual ? "text" : "password"}
                   icon={
                     exibirSenhaAtual ? (
@@ -259,7 +258,6 @@ export default function IconeLogin() {
                       />
                     )
                   }
-                  variant={"filled"}
                   value={senhaAtual}
                   error={validarCampoSenhaAtual.existeErro}
                   helperText={validarCampoSenhaAtual.mensagem}
@@ -273,7 +271,6 @@ export default function IconeLogin() {
               <div className="modal-one-form-group">
                 <InputPadrao
                   label={"Nova Senha"}
-                  backgroundColor="#fff"
                   type={exibirSenha ? "text" : "password"}
                   icon={
                     exibirSenha ? (
@@ -288,7 +285,6 @@ export default function IconeLogin() {
                       />
                     )
                   }
-                  variant={"filled"}
                   value={senha}
                   error={validarCampoSenha.existeErro}
                   helperText={validarCampoSenha.mensagem}
@@ -303,7 +299,6 @@ export default function IconeLogin() {
               <div className="modal-one-form-group">
                 <InputPadrao
                   label={"Confirmar Nova Senha"}
-                  backgroundColor="#fff"
                   type={exibirConfirmarSenha ? "text" : "password"}
                   icon={
                     exibirConfirmarSenha ? (
@@ -318,7 +313,6 @@ export default function IconeLogin() {
                       />
                     )
                   }
-                  variant={"filled"}
                   value={confirmarSenha}
                   error={validarCampoConfirmarSenha.existeErro}
                   helperText={validarCampoConfirmarSenha.mensagem}

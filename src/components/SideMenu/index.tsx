@@ -12,6 +12,7 @@ import {
 import { FC } from "react";
 import "./index.css";
 import { OPERADOR_ENUM, validarPermissao } from "../../permissoes";
+import Formulario from "../Formulario";
 const SideBar: FC = () => {
   return (
     <div className="side-menu">
@@ -19,17 +20,16 @@ const SideBar: FC = () => {
         {validarPermissao(OPERADOR_ENUM.MENOR, 4) && (
           <a href="/cronogramas">
             <li>
-              <CalendarMonth /> 
+              <CalendarMonth />
               Cronogramas
             </li>
           </a>
         )}
-
         {validarPermissao(OPERADOR_ENUM.MENOR, 3) && (
           <>
             <a href="/alunos">
               <li>
-                <Person /> 
+                <Person />
                 Alunos
               </li>
             </a>
@@ -45,7 +45,7 @@ const SideBar: FC = () => {
         {validarPermissao(OPERADOR_ENUM.MENOR, 2) && (
           <a href="/coordenadores">
             <li>
-              <People /> 
+              <People />
               Coordenadores
             </li>
           </a>
@@ -54,7 +54,7 @@ const SideBar: FC = () => {
         {validarPermissao(OPERADOR_ENUM.MENOR, 3) && (
           <a href="/disciplinas">
             <li>
-              <HistoryEdu /> 
+              <HistoryEdu />
               Disciplinas
             </li>
           </a>
@@ -64,7 +64,7 @@ const SideBar: FC = () => {
           <>
             <a href="/fases">
               <li>
-                <AutoStories /> 
+                <AutoStories />
                 Fases
               </li>
             </a>
@@ -76,7 +76,7 @@ const SideBar: FC = () => {
             </a>
             <a href="/datasbloqueadas">
               <li>
-                <EventBusy /> 
+                <EventBusy />
                 Datas Bloqueadas
               </li>
             </a>
@@ -87,6 +87,9 @@ const SideBar: FC = () => {
               </li>
             </a>
           </>
+        )}
+        {validarPermissao(OPERADOR_ENUM.IGUAL, 3) && (
+           <Formulario/>
         )}
       </ul>
     </div>

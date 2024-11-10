@@ -21,6 +21,7 @@ import { AccountBalance } from "@mui/icons-material";
 import { OPERADOR_ENUM, validarPermissao } from "../../permissoes";
 import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 import LoadingContent from "../../components/LoadingContent";
+import BotaoPadrao from "../../components/BotaoPadrao";
 
 const Cronograma: FC = () => {
     const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
@@ -445,17 +446,16 @@ const Cronograma: FC = () => {
                                     ))}
                                 </Swiper>
                             </Box> :
-                            <p className="cronograma-sem-curso">Nenhum período encontrado com cronograma</p>
+                            <p style={{width:"80%", textAlign:"center", marginBlock:"19px"}} className="cronograma-sem-curso">Nenhum período encontrado com cronograma</p>
                         }
                         {
                             validarPermissao(OPERADOR_ENUM.MENOR, 3) &&
                             <div className="cronograma-botao">
-                                <Button
-                                    className="standard-button"
+                                <BotaoPadrao
+                                    label={"Gerar"}
+                                    carregando={false}
                                     onClick={exibirMenuGerar}
-                                >
-                                    Gerar
-                                </Button>
+                                />
 
                                 <Menu
                                     anchorEl={anchorEl}
