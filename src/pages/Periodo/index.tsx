@@ -1,15 +1,9 @@
 import { FC, useEffect, useState } from "react";
 import "./index.css";
-import { useNavigate } from "react-router-dom";
 import {
   AlertColor,
   Box,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Divider,
   Modal,
-  Stack,
   Typography,
 } from "@mui/material";
 import "dayjs/locale/pt-br";
@@ -33,11 +27,8 @@ import BotaoPadrao from "../../components/BotaoPadrao";
 import CardPadrao from "../../components/CardPadrao";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import {
-  AccountBalance,
   EditNote,
   EventOutlined,
-  People,
-  VisibilityOutlined,
 } from "@mui/icons-material";
 import { STATUS_ENUM } from "../../types/enums/statusEnum";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
@@ -45,17 +36,19 @@ import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { aplicarMascaraDataPtBr } from "../../util/mascaras";
 import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
+import LoadingContent from "../../components/LoadingContent";
 
 const Periodo: FC = () => {
-  const navigate = useNavigate();
   const [carregando, setCarregando] = useState<boolean>(false);
+
+  const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+  const [carregandoInformacoesModal, setCarregandoInformacoesModal] = useState<boolean>(true);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
   const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
   const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
 
   const [estadoModal, setEstadoModal] = useState(false);
-  const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false); //exemplo visualizar
 
   const [periodos, setPeriodos] = useState<IPeriodo[]>([]);
 
@@ -66,10 +59,9 @@ const Periodo: FC = () => {
 
   const [validarCampoNome, setValidarCampoNome] = useState<IValidarCampos>(
     valorInicialValidarCampos
-  ); //tratamento erro
+  );
 
   const exibirErros = (mensagens: string[]) => {
-    //tratamento erro
 
     const existeErroEspecifico = mensagens.some((mensagem) =>
       mensagem.includes("Nome")
@@ -88,7 +80,7 @@ const Periodo: FC = () => {
   };
 
   const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
-    //tratamento erro
+
     setEstadoAlerta(false);
     setEstadoModal(false);
 
@@ -98,7 +90,7 @@ const Periodo: FC = () => {
   };
 
   const limparErros = () => {
-    //tratamento erro
+
     setValidarCampoNome(valorInicialValidarCampos);
   };
 
@@ -110,7 +102,7 @@ const Periodo: FC = () => {
   };
 
   const validarCampos = (): boolean => {
-    //tratamento erro
+
     let existeErro = false;
 
     if (!nome) {
@@ -120,11 +112,10 @@ const Periodo: FC = () => {
     return existeErro;
   };
 
-  const fecharModalVisualizar = () => setEstadoModalVisualizar(false); //exemplo visualizar
-
   const fecharModal = () => setEstadoModal(false);
 
   const carregarPeriodo = async () => {
+    setCarregandoInformacoesPagina(true);
     const response = await apiGet("/periodo/carregar");
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
@@ -141,12 +132,13 @@ const Periodo: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error"); //tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
+    setCarregandoInformacoesPagina(false);
   };
 
   const carregarPeriodoPorId = async (id: number) => {
@@ -171,17 +163,17 @@ const Periodo: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error"); //tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   };
 
   const salvar = async () => {
-    limparErros(); //tratamento erro
-    if (validarCampos()) return; //tratamento erro
+    limparErros();
+    if (validarCampos()) return;
 
     setCarregando(true);
     const periodoRequest: IPeriodoRequest = {
@@ -219,32 +211,27 @@ const Periodo: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirErros(mensagens); //tratamento erro
+      exibirErros(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
 
     setCarregando(false);
   };
 
   const abrirModal = async (id?: number) => {
-    limparModal();
-    limparErros(); //tratamento erro
-
-    if (id) {
-      carregarPeriodoPorId(id);
-    }
-
+    setCarregandoInformacoesModal(true);
     setEstadoModal(true);
-  };
-
-  const visualizar = async (id: number) => {
-    //exemplo visualizar
     limparModal();
-    carregarPeriodoPorId(id);
-    setEstadoModalVisualizar(true);
+    limparErros();
+    
+    if (id) {
+      await carregarPeriodoPorId(id);
+    }
+    
+    setCarregandoInformacoesModal(false);
   };
 
   useEffect(() => {
@@ -253,75 +240,38 @@ const Periodo: FC = () => {
 
   return (
     <>
-        {/*//exemplo visualizar */}
-        <Dialog
-          open={estadoModalVisualizar}
-          onClose={fecharModalVisualizar}
-          fullWidth
-          maxWidth="sm"
-          sx={{ borderRadius: 4, padding: 2 }}
-          PaperProps={{
-            sx: {
-              outline: "2px solid var(--dark-blue-senac)",
-            },
-          }}
-        >
-          <DialogTitle sx={{ textAlign: "center", fontWeight: "bold" }}>
-            {nome}
-          </DialogTitle>
-          <Divider />
-          <DialogContent>
-            <Stack spacing={2} sx={{ mt: 2, margin: "0px 0px 8px 0px" }}>
-              <Box>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Nome:
-            </Typography>
-            <Typography variant="body1">{nome}</Typography>
-          </Box>
-
-              <Box>
-                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                  Data Inicial:
-                </Typography>
-                <Typography variant="body1">{aplicarMascaraDataPtBr(dataInicial)}</Typography>
-              </Box>
-
-              <Box>
-                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                  Data Final:
-                </Typography>
-                <Typography variant="body1">{aplicarMascaraDataPtBr(dataFinal)}</Typography>
-              </Box>
-            </Stack>
-          </DialogContent>
-        </Dialog>
-
-        <Modal open={estadoModal} onClose={fecharModal} className="modal">
-          <Box className="modal-box">
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Período
-            </Typography>
-            <Typography id="modal-modal-description" component="div">
-              <div className="modal-content">
-                <div className="modal-one-form-group">
-                  <InputPadrao
-                    label={"Nome"}
-                    type={"text"}
-                    value={nome}
-                    onChange={(e) => {
-                      if (e) {
-                        setNome(e.target.value);
-                      }
-                    }}
-                    error={validarCampoNome.existeErro} //tratamento erro
-                    helperText={validarCampoNome.mensagem} //tratamento erro
-                  />
-                </div>
-                <div className="modal-two-form-group">
+      <Modal open={estadoModal} onClose={fecharModal} className="modal">
+        <Box className="modal-box">
+          <LoadingContent
+            carregandoInformacoes={carregandoInformacoesModal}
+            isModal={true}
+            circleOn={true}
+          />
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Período
+          </Typography>
+          <Typography id="modal-modal-description" component="div">
+            <div className="modal-content">
+              <div className="modal-one-form-group">
+                <InputPadrao
+                  label={"Nome"}
+                  type={"text"}
+                  value={nome}
+                  onChange={(e) => {
+                    if (e) {
+                      setNome(e.target.value);
+                    }
+                  }}
+                  error={validarCampoNome.existeErro}
+                  helperText={validarCampoNome.mensagem}
+                />
+              </div>
+              <div className="modal-two-form-group">
                 <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
                   <DatePicker
                     label="Data inicial"
                     format="DD/MM/YYYY"
+                    sx={{width:'100%'}}
                     className="date-picker"
                     value={dataInicial}
                     onChange={(date) => {
@@ -332,6 +282,7 @@ const Periodo: FC = () => {
                   />
                   <DatePicker
                     label="Data final"
+                    sx={{width:'100%'}}
                     format="DD/MM/YYYY"
                     className="date-picker"
                     value={dataFinal}
@@ -341,69 +292,71 @@ const Periodo: FC = () => {
                       }
                     }}
                   />
-                  </LocalizationProvider>
-                </div>
+                </LocalizationProvider>
               </div>
-              <div className="modal-footer">
-                <BotaoPadrao
-                  label={"Salvar"}
-                  carregando={carregando}
-                  onClick={salvar}
-                />
-              </div>
-            </Typography>
-          </Box>
-        </Modal>
-        <AlertPadrao
-          key={estadoAlerta ? "show" : "close"} //componente tratamento erro
-          estado={estadoAlerta}
-          cor={corAlerta}
-          mensagens={mensagensAlerta}
-          onClose={() => {
-            setEstadoAlerta(false);
-          }}
-        />
-
-        <main className="page-main">
-          <div style={{ display: "flex" }}>
-            <h2>Período</h2>
-            <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
-          </div>
-          <div className="grid-content">
-            {periodos.map((periodo) => (
-              <CardPadrao
-                key={periodo.id}
-                statusEnum={periodo.statusEnum}
-                titulo={periodo.nome}
-                body={[
-                  <CardPadraoBodyItem
-                    icon={<EventOutlined titleAccess="Data Inicial" />}
-                    label={aplicarMascaraDataPtBr(periodo.dataInicial)}
-                  />,
-                  <CardPadraoBodyItem
-                    icon={<EventOutlined titleAccess="Data Final" />}
-                    label={aplicarMascaraDataPtBr(periodo.dataFinal)}
-                  />,
-                ]}
-                actions={[
-                  <CardPadraoActionItem //exemplo visualizar
-                    icon={<VisibilityOutlined titleAccess="Visualizar" />}
-                    onClick={() => visualizar(periodo.id)}
-                  />,
-                  periodo.statusEnum === STATUS_ENUM.ATIVO ? (
-                    <CardPadraoActionItem
-                      icon={<EditNote titleAccess="Editar" />}
-                      onClick={() => abrirModal(periodo.id)}
-                    />
-                  ) : (
-                    <></>
-                  ),
-                ]}
+            </div>
+            <div className="modal-footer">
+              <BotaoPadrao
+                label={"Salvar"}
+                carregando={carregando}
+                onClick={salvar}
               />
-            ))}
-          </div>
-        </main>
-      
+            </div>
+          </Typography>
+        </Box>
+      </Modal>
+
+      <AlertPadrao
+        key={estadoAlerta ? "show" : "close"}
+        estado={estadoAlerta}
+        cor={corAlerta}
+        mensagens={mensagensAlerta}
+        onClose={() => {
+          setEstadoAlerta(false);
+        }}
+      />
+
+      <main className="page-main">
+        <div className="page-main-title">
+          <h2>Períodos</h2>
+          <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
+        </div>
+        <div className="grid-content">
+          <LoadingContent
+            carregandoInformacoes={carregandoInformacoesPagina}
+            isModal={false}
+            circleOn={true}
+          />
+          {periodos.map((periodo) => (
+            <CardPadrao
+              key={periodo.id}
+              statusEnum={periodo.statusEnum}
+              titulo={periodo.nome}
+              body={[
+                <CardPadraoBodyItem
+                  icon={<EventOutlined titleAccess="Data Inicial" />}
+                  label={aplicarMascaraDataPtBr(periodo.dataInicial)}
+                />,
+                <CardPadraoBodyItem
+                  icon={<EventOutlined titleAccess="Data Final" />}
+                  label={aplicarMascaraDataPtBr(periodo.dataFinal)}
+                />,
+              ]}
+              actions={[
+                periodo.statusEnum === STATUS_ENUM.ATIVO ? (
+                  <CardPadraoActionItem
+                    icon={<EditNote titleAccess="Editar" />}
+                    onClick={() => abrirModal(periodo.id)}
+                  />
+                ) : (
+                  <></>
+                ),
+              ]}
+            />
+          ))}
+        </div>
+      </main>
+
     </>
   );
 };
