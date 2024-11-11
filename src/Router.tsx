@@ -12,7 +12,11 @@ import DataBloqueada from "./pages/DataBloqueada";
 import Disciplina from "./pages/Disciplina";
 import RedefinirSenhaEmail from "./pages/RedefinirSenhaEmail";
 
-const Router: FC = () => {
+interface RouterProperties {
+  buscarContextCarregarNotificao:(carregarNotificacao:boolean) => void
+}
+
+const Router: FC<RouterProperties> = ({buscarContextCarregarNotificao}) => {
   return (
     <BrowserRouter>
       <Routes>
@@ -26,7 +30,7 @@ const Router: FC = () => {
         <Route path="/cursos" element={<Curso />} />
         <Route path="/fases" element={<Fase />} />
         <Route path="/alunos" element={<Aluno />} />
-        <Route path="/cronogramas" element={<Cronograma />} />
+        <Route path="/cronogramas" element={<Cronograma buscarContextCarregarNotificao={buscarContextCarregarNotificao} />} />
         <Route path="/datasbloqueadas" element={<DataBloqueada />} />
       </Routes>
     </BrowserRouter>

@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import "./index.css";
 import DescriptionIcon from '@mui/icons-material/Description';
 import { IProfessor } from "../../types/professor";
 import { AlertColor, Box, Modal, Typography } from "@mui/material";
@@ -177,7 +178,7 @@ const Formulario: FC = () => {
         />
 
         <Modal open={estadoModal} onClose={fecharModal} className="modal">
-            <Box className="modal-box" sx={{maxWidth:"400px"}}>
+            <Box className="modal-box" sx={{ maxWidth: "400px" }}>
                 <LoadingContent
                     carregandoInformacoes={carregandoInformacoesModal}
                     isModal={true}
@@ -187,6 +188,9 @@ const Formulario: FC = () => {
                     Formulário
                 </Typography>
                 <Typography id="modal-modal-description" component="div">
+                    <p className="formulario-info">
+                        Informe o(s) dia(s) da semana que você está disponivel no semestre atual.
+                    </p>
                     <div className="modal-content">
                         <div className="modal-one-form-group">
                             <MultiSelect

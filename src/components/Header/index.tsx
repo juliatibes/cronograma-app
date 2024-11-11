@@ -5,7 +5,11 @@ import Notificacao from "../Notificacao";
 import IconeLogin from "../IconLogin";
 import { buscaUsuarioSessao } from "../../store/UsuarioStore/usuarioStore";
 
-const MenuBar: FC = () => {
+interface MenuBarProperties {
+  carregarNotificacao:boolean
+}
+
+const MenuBar: FC<MenuBarProperties> = ({carregarNotificacao}) => {
   return (
     <>
       <header className="header">
@@ -20,7 +24,7 @@ const MenuBar: FC = () => {
           <div className="menu-header-right">
             {
               buscaUsuarioSessao().niveisAcesso.some((nivelAcesso) => nivelAcesso.rankingAcesso < 3) &&
-              <Notificacao />
+              <Notificacao carregarNotificao={carregarNotificacao} />
             }
             <IconeLogin />
           </div>

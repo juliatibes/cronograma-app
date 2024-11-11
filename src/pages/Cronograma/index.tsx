@@ -23,8 +23,14 @@ import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 import LoadingContent from "../../components/LoadingContent";
 import BotaoPadrao from "../../components/BotaoPadrao";
 
-const Cronograma: FC = () => {
+interface CronogramaProperties {
+    buscarContextCarregarNotificao: (carregarNotificacao:boolean) => void
+}
+
+const Cronograma: FC<CronogramaProperties>= ({buscarContextCarregarNotificao}) => {
     const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+
+    const [carregarNotificao,setCarregarNotificacao] = useState<boolean>();
 
     const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
     const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
@@ -237,6 +243,8 @@ const Cronograma: FC = () => {
         }
 
         if (response.status === STATUS_CODE.CREATED) {
+            buscarContextCarregarNotificao(!carregarNotificao);
+            setCarregarNotificacao(!carregarNotificao);
             periodoSelecionado ?
                 carregarCursoPorPeriodo(periodoSelecionado.id) :
                 exibirAlerta(["Erro inesperado ao carregar cursos!"], "error");

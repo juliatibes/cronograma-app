@@ -14,7 +14,11 @@ import { BOOLEAN_ENUM } from '../../types/enums/booleanEnum';
 import { Close } from '@mui/icons-material';
 import { removerUsuario } from '../../store/UsuarioStore/usuarioStore';
 
-const Notificacao: FC = () => {
+interface NotificacaoProperties {
+  carregarNotificao:boolean
+}
+
+const Notificacao: FC<NotificacaoProperties> = ({carregarNotificao}) => {
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
   const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
@@ -116,10 +120,10 @@ const Notificacao: FC = () => {
 
     const interval = setInterval(() => {
       carregarEventos();
-    }, 20000);
+    }, 300000);
 
     return () => clearInterval(interval);
-  }, [])
+  }, [carregarNotificao]);
 
   return (
     <>
