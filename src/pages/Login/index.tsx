@@ -11,29 +11,21 @@ import {
   adicionaUsuarioSessao,
   removerUsuario,
 } from "../../store/UsuarioStore/usuarioStore";
-import {
-  AlertColor,
-  Box,
-  Button,
-  Modal,
-  Typography,
-} from "@mui/material";
+import { AlertColor, Box, Button, Modal, Typography } from "@mui/material";
 import AlertPadrao from "../../components/AlertaPadrao";
 import {
   campoObrigatorio,
   IValidarCampos,
   valorInicialValidarCampos,
 } from "../../util/validarCampos";
-import {
-  aplicarMascaraCpf,
-  removerMascaraNumeros,
-} from "../../util/mascaras";
+import { aplicarMascaraCpf, removerMascaraNumeros } from "../../util/mascaras";
 import { LoadingButton } from "@mui/lab";
 import BotaoPadrao from "../../components/BotaoPadrao";
 
 const Login: FC = () => {
   const [exibirSenha, setExibirSenha] = useState<boolean>(false);
   const [carregando, setCarregando] = useState<boolean>(false);
+  const [carregandoEsqueciSenha, setCarregandoEsqueciSenha] = useState<boolean>(false);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
   const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
@@ -48,12 +40,20 @@ const Login: FC = () => {
   const [validarCampoCpf, setValidarCampoCpf] = useState<IValidarCampos>(
     valorInicialValidarCampos
   );
-  const [validarCampoCpfEsqueciSenha, setValidarCampoCpfEsqueciSenha] = useState<IValidarCampos>(
-    valorInicialValidarCampos
-  );
+  const [validarCampoCpfEsqueciSenha, setValidarCampoCpfEsqueciSenha] =
+    useState<IValidarCampos>(valorInicialValidarCampos);
   const [validarCampoSenha, setValidarCampoSenha] = useState<IValidarCampos>(
     valorInicialValidarCampos
   );
+
+  const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
+    //tratamento erro
+    setEstadoAlerta(false);
+
+    setMensagensAlerta(mensagens);
+    setCorAlerta(cor);
+    setEstadoAlerta(true);
+  };
 
   const handleClickShowPassword = () => {
     setExibirSenha(!exibirSenha);
@@ -87,6 +87,23 @@ const Login: FC = () => {
     return existeErro;
   };
 
+  const validarCamposEsqueciSenha = (): boolean => {
+    let existeErro = false;
+
+    if (!cpfEsqueciSenha) {
+      setValidarCampoCpfEsqueciSenha(campoObrigatorio);
+      existeErro = true;
+    } else if (cpfEsqueciSenha.length < 14) {
+      setValidarCampoCpfEsqueciSenha({
+        existeErro: true,
+        mensagem: "CPF inválido",
+      });
+      existeErro = true;
+    }
+
+    return existeErro;
+  };
+
   const exibirErros = (mensagens: string[]) => {
     for (const mensagem of mensagens) {
       if (mensagem.includes("Cpf")) {
@@ -95,6 +112,26 @@ const Login: FC = () => {
       }
       if (mensagem.includes("Senha")) {
         setValidarCampoSenha({ existeErro: true, mensagem: mensagem });
+      }
+    }
+  };
+
+  const exibirErrosEsqueciSenha = (mensagens: string[]) => {
+    const existeErroEspecifico = mensagens.some((mensagem) =>
+      mensagem.includes("Cpf")
+    );
+
+    if (!existeErroEspecifico) {
+      exibirAlerta(mensagens, "error");
+      return;
+    }
+
+    for (const mensagem of mensagens) {
+      if (mensagem.includes("Cpf")) {
+        setValidarCampoCpfEsqueciSenha({
+          existeErro: true,
+          mensagem: mensagem,
+        });
       }
     }
   };
@@ -150,37 +187,16 @@ const Login: FC = () => {
   };
 
   const enviar = async () => {
-    limparErros();
-    if (validarCampos()) return;
-    setCarregando(true);
+    limparErrosEsqueciSenha();
+    if (validarCamposEsqueciSenha()) return;
+    setCarregandoEsqueciSenha(true);
 
-    const usuario: ILogin = {
-      cpf: removerMascaraNumeros(cpf),
-      senha: senha,
-    };
+    const response = await apiPost(
+      `/usuario/esqueciminhasenha/${removerMascaraNumeros(cpfEsqueciSenha)}`
+    );
 
-    const response = await apiPost("/usuario/login", usuario);
-
-    if (response.status === STATUS_CODE.OK) {
-      const niveisAcesso: INivelAcesso[] = response.data.niveisAcesso.map(
-        (data: INivelAcesso) => {
-          const nivelAcesso: INivelAcesso = {
-            nome: data.nome,
-            rankingAcesso: data.rankingAcesso,
-          };
-          return nivelAcesso;
-        }
-      );
-
-      const usuario: IUsuarioStore = {
-        nome: response.data.nome,
-        token: response.data.token,
-        niveisAcesso: niveisAcesso,
-      };
-
-      adicionaUsuarioSessao(usuario);
-
-      window.location.href = "/cronograma";
+    if (response.status === STATUS_CODE.NO_CONTENT) {
+      exibirAlerta(["E-mail enviado com sucesso"], "success");
     }
 
     if (
@@ -188,15 +204,14 @@ const Login: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirErros(mensagens);
+      exibirErrosEsqueciSenha(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      setEstadoAlerta(true);
-      setMensagensAlerta(["Erro inesperado!"]);
+      exibirAlerta(["Erro inesperado"], "error");
     }
 
-    setCarregando(false);
+    setCarregandoEsqueciSenha(false);
   };
 
   const fecharModal = () => setEstadoModal(false);
@@ -209,8 +224,8 @@ const Login: FC = () => {
   };
 
   const limparModal = () => {
-    setCpfEsqueciSenha('');
-  }
+    setCpfEsqueciSenha("");
+  };
 
   useEffect(() => {
     removerUsuario();
@@ -229,8 +244,12 @@ const Login: FC = () => {
       <main className="login-content">
         <div className="login-blue-side">
           <div>
-          <img src={logo_senacplan} alt="logo Senac Plan" className="logo-login" />
-          <h2>Entre na sua conta</h2>
+            <img
+              src={logo_senacplan}
+              alt="logo Senac Plan"
+              className="logo-login"
+            />
+            <h2>Entre na sua conta</h2>
           </div>
           <div className="login-email-label">
             <InputPadrao
@@ -296,7 +315,7 @@ const Login: FC = () => {
             Entrar
           </LoadingButton>
           <span className="esqueci-senha-botao" onClick={() => abrirModal()}>
-          Esqueceu a senha?
+            Esqueceu a senha?
           </span>
         </div>
         <div className="login-white-side">
@@ -305,7 +324,7 @@ const Login: FC = () => {
       </main>
 
       <Modal open={estadoModal} onClose={fecharModal} className="modal">
-        <Box className="modal-box" sx={{maxWidth: "500px"}}>
+        <Box className="modal-box" sx={{ maxWidth: "500px" }}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Esqueceu a senha?
           </Typography>
@@ -325,17 +344,20 @@ const Login: FC = () => {
                       setCpfEsqueciSenha(aplicarMascaraCpf(e.target.value));
                     }
                   }}
-                  error={validarCampoCpfEsqueciSenha.existeErro}//tratamento erro
-                  helperText={validarCampoCpfEsqueciSenha.mensagem}//tratamento erro
+                  error={validarCampoCpfEsqueciSenha.existeErro} //tratamento erro
+                  helperText={validarCampoCpfEsqueciSenha.mensagem} //tratamento erro
                 />
               </div>
             </div>
-            <div className="modal-footer" style={{borderTop: "none", marginTop: 0}}>
+            <div
+              className="modal-footer"
+              style={{ borderTop: "none", marginTop: 0 }}
+            >
               <BotaoPadrao
-            label={"Enviar"}
-            carregando={carregando}
-            // onClick={''}
-          />
+                label={"Enviar"}
+                carregando={carregando}
+                onClick={enviar}
+              />
             </div>
           </Typography>
         </Box>
