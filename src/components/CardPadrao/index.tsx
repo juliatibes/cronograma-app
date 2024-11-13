@@ -4,24 +4,32 @@ import "./index.css";
 import React from "react";
 import { CardPadraoBodyItemProperties } from "../CardPadraoBodyItem";
 import { CardPadraoActionItemProperties } from "../CardPadraoActionItem";
-import { STATUS_ENUM } from "../../types/statusEnum";
+import { STATUS_ENUM } from "../../types/enums/statusEnum";
 
 interface CardPadraoProperties {
   titulo: string,
   body: React.ReactElement<CardPadraoBodyItemProperties>[],
   actions: React.ReactElement<CardPadraoActionItemProperties>[],
-  statusEnum?:STATUS_ENUM
+  statusEnum?:STATUS_ENUM,
+  disciplinaCorHexadecimal?:string
 }
 
 const CardPadrao: FC<CardPadraoProperties> = ({
   titulo,
   body,
   actions,
-  statusEnum
+  statusEnum,
+  disciplinaCorHexadecimal
 }) => {
 
   return <>
     <Card className={`card-padrao`}>
+       {
+        disciplinaCorHexadecimal && 
+        <div title="Cor" className={`card-padrao-disciplina-cor ${statusEnum === STATUS_ENUM.INATIVO && "inativo" }`}>
+          <span style={{backgroundColor:disciplinaCorHexadecimal}} className="card-padrao-disciplina-cor-tag"></span>
+        </div>
+       }
       <CardHeader className={`card-padrao-title ${statusEnum === STATUS_ENUM.INATIVO && "inativo"}`} title={<h3 title={titulo}>{titulo}</h3>}/>
       <CardContent sx={{padding:'0px'}}>
         <Typography className={`card-padrao-body ${statusEnum === STATUS_ENUM.INATIVO && "inativo"}`} component="div" sx={{ color: 'text.secondary' }}>

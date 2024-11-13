@@ -13,6 +13,16 @@ const BotaoPadrao: FC<ButtonPadraoProperty> = ({ label, variant, onClick,carrega
     return (
         <LoadingButton
         className="standard-button"
+        sx={{
+            backgroundColor: 'var(--dark-orange-senac)',
+            color: 'var(--dark-blue-senac)',
+            fontWeight: 'bold',
+            padding: '6px 12px',
+            '&:hover': {
+              backgroundColor: '#fca63d',
+              color: 'var(--dark-blue-senac)'
+            },
+          }}
         loading={carregando}
         loadingPosition="center"
         variant={variant}

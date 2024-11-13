@@ -130,7 +130,7 @@ const Login: FC = () => {
 
       adicionaUsuarioSessao(usuario);
 
-      window.location.href = "/cronograma";
+      window.location.href = "/cronogramas";
     }
 
     if (

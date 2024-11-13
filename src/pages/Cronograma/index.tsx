@@ -19,8 +19,13 @@ import semCronograma from "../../assets/sem_cronograma.gif";
 import dayjs from "dayjs";
 import { AccountBalance } from "@mui/icons-material";
 import { OPERADOR_ENUM, validarPermissao } from "../../permissoes";
+import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
+import LoadingContent from "../../components/LoadingContent";
+import BotaoPadrao from "../../components/BotaoPadrao";
 
 const Cronograma: FC = () => {
+    const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+
     const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
     const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
     const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
@@ -88,7 +93,8 @@ const Cronograma: FC = () => {
         const response = await apiGet(urlPeriodo);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
-            window.location.href = "/login";
+            removerUsuario();
+            window.location.href = '/login';
         }
 
         if (response.status === STATUS_CODE.OK) {
@@ -110,7 +116,8 @@ const Cronograma: FC = () => {
         const response = await apiGet(`/curso/carregar/periodo/${id}`);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
-            window.location.href = "/login";
+            removerUsuario();
+            window.location.href = '/login';
         }
 
         if (response.status === STATUS_CODE.OK) {
@@ -124,7 +131,7 @@ const Cronograma: FC = () => {
         }
 
         if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-            exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+            exibirAlerta(["Erro inesperado!"], "error");
         }
     }
 
@@ -132,7 +139,8 @@ const Cronograma: FC = () => {
         const response = await apiGet(`/curso/carregar/usuario`);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
-            window.location.href = "/login";
+            removerUsuario();
+            window.location.href = '/login';
         }
 
         if (response.status === STATUS_CODE.OK) {
@@ -156,13 +164,15 @@ const Cronograma: FC = () => {
     }
 
     const carregarCrogramaPorPeriodoCursoFase = async (faseId: number, cursoId: number, editavel: boolean, periodoIdEncontrado?: number) => {
+        setCarregandoInformacoesPagina(true);
 
         const periodoIdParam = periodoSelecionado?.id ? periodoSelecionado?.id : periodoIdEncontrado;
         const response = await
             apiGet(`/cronograma/carregar/periodo/${periodoIdParam}/curso/${cursoId}/fase/${faseId}`);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
-            window.location.href = "/login";
+            removerUsuario();
+            window.location.href = '/login';
         }
 
         if (response.status === STATUS_CODE.OK) {
@@ -180,6 +190,8 @@ const Cronograma: FC = () => {
         if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
             exibirAlerta(["Erro inesperado!"], "error");
         }
+
+        setCarregandoInformacoesPagina(false);
     }
 
     const editarCronograma = async (idPrimeiroDiaCronograma: number | undefined, idSegundoDiaCronograma: number | undefined) => {
@@ -187,7 +199,8 @@ const Cronograma: FC = () => {
         const response = await apiPut(`/diacronograma/editar/${idPrimeiroDiaCronograma}/${idSegundoDiaCronograma}`);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
-            window.location.href = "/login";
+            removerUsuario();
+            window.location.href = '/login';
         }
 
         if (response.status === STATUS_CODE.NO_CONTENT) {
@@ -204,7 +217,7 @@ const Cronograma: FC = () => {
         }
 
         if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-            exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+            exibirAlerta(["Erro inesperado!"], "error");
         }
     }
 
@@ -219,7 +232,8 @@ const Cronograma: FC = () => {
         const response = await apiPost(`/evento/criar/cronograma`, cronogramaRequest);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
-            window.location.href = "/login";
+            removerUsuario();
+            window.location.href = '/login';
         }
 
         if (response.status === STATUS_CODE.CREATED) {
@@ -239,25 +253,33 @@ const Cronograma: FC = () => {
     }
 
     const primeiroCarregamento = async () => {
+        setCarregandoInformacoesPagina(true);
+        setCronogramaPorPeriodoCursoFase(undefined);
+
         const periodosEncontrados: IPeriodo[] = await carregarPeriodo();
-        const ultimoPeriodo: IPeriodo | undefined = periodosEncontrados
-            .sort((a, b) => dayjs(b.dataInicial).valueOf() - dayjs(a.dataInicial).valueOf())[0];
+        if (periodosEncontrados) {
+            const ultimoPeriodo: IPeriodo | undefined = periodosEncontrados
+                .sort((a, b) => dayjs(b.dataInicial).valueOf() - dayjs(a.dataInicial).valueOf())[0];
 
-        if (ultimoPeriodo) {
-            setPeriodoSelecionado(ultimoPeriodo);
-            const cursosPorPeriodoEncontrados: ICursoPorPeriodo[] = await carregarCursoPorPeriodo(ultimoPeriodo.id);
-            const primeiroCurso: ICursoPorPeriodo | undefined = cursosPorPeriodoEncontrados.find((curso: ICursoPorPeriodo) => curso);
-            const primeiraFase: IFase | undefined = primeiroCurso?.fases.find(fase => fase);
 
-            if (primeiroCurso && primeiraFase) {
-                await carregarCrogramaPorPeriodoCursoFase(
-                    primeiraFase?.id,
-                    primeiroCurso?.id,
-                    primeiroCurso?.editavel,
-                    ultimoPeriodo.id
-                );
+            if (ultimoPeriodo) {
+                setPeriodoSelecionado(ultimoPeriodo);
+                const cursosPorPeriodoEncontrados: ICursoPorPeriodo[] = await carregarCursoPorPeriodo(ultimoPeriodo.id);
+                const primeiroCurso: ICursoPorPeriodo | undefined = cursosPorPeriodoEncontrados.find((curso: ICursoPorPeriodo) => curso);
+                const primeiraFase: IFase | undefined = primeiroCurso?.fases.find(fase => fase);
+
+                if (primeiroCurso && primeiraFase) {
+                    await carregarCrogramaPorPeriodoCursoFase(
+                        primeiraFase?.id,
+                        primeiroCurso?.id,
+                        primeiroCurso?.editavel,
+                        ultimoPeriodo.id
+                    );
+                }
             }
         }
+
+        setCarregandoInformacoesPagina(false);
     }
 
     const excluirCronograma = async () => {
@@ -343,10 +365,10 @@ const Cronograma: FC = () => {
                 </Typography>
 
                 <Box id="modal-excluir-actions">
-                    <Button variant="outlined" sx={{ fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder", border: "2px solid currentColor" }} onClick={cancelar}>
+                    <Button variant="outlined" sx={{ color: "#464646", fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder", border: "2px solid #464646" }} onClick={cancelar}>
                         Cancelar
                     </Button>
-                    <Button variant="contained" sx={{ fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder" }} onClick={confirmar}>
+                    <Button variant="contained" sx={{ backgroundColor: "#c73636", color: "#e7d8d8", fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder" }} onClick={confirmar}>
                         Confirmar
                     </Button>
                 </Box>
@@ -358,81 +380,82 @@ const Cronograma: FC = () => {
                 validarPermissao(OPERADOR_ENUM.MENOR, 4) &&
                 <>
                     <div className="cronograma-periodo">
-                        <Box id="cronograma-periodo-carousel"
-                            sx={{
-                                maxWidth: `${validarPermissao(OPERADOR_ENUM.MAIOR, 2) ? "90%" : "80%"}`,
-                                minWidth: `${validarPermissao(OPERADOR_ENUM.MAIOR, 2) ? "90%" : "80%"}`
-                            }}
-                        >
-                            <IconButton
-                                className="swiper-button-prev"
+                        {periodos.length > 0 ?
+                            <Box id="cronograma-periodo-carousel"
                                 sx={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '-30px',
-                                    zIndex: 10,
-                                    transform: 'translateY(-50%)',
-                                    color: 'var(--light-orange-senac)',
-                                    '&:hover': { color: 'var(--dark-orange-senac)', backgroundColor: "transparent" },
+                                    maxWidth: `${validarPermissao(OPERADOR_ENUM.MENOR, 3) ? "80%" : "90%"}`,
+                                    minWidth: `${validarPermissao(OPERADOR_ENUM.MENOR, 3) ? "80%" : "90%"}`
                                 }}
                             >
-                            </IconButton>
-                            <IconButton
-                                className="swiper-button-next"
-                                sx={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    right: '-30px',
-                                    zIndex: 10,
-                                    transform: 'translateY(-50%)',
-                                    color: 'var(--light-orange-senac)',
-                                    '&:hover': { color: 'var(--dark-orange-senac)', backgroundColor: "transparent" },
-                                }}
-                            >
-                            </IconButton>
-                            <Swiper
-                                modules={[Navigation]}
-                                slidesPerView={4}
-                                slidesPerGroup={1}
-                                loop={false}
-                                className="cronograma-carousel"
-                                navigation={{
-                                    prevEl: '.swiper-button-prev',
-                                    nextEl: '.swiper-button-next',
-                                }}
-                                breakpoints={{
-                                    360: { slidesPerView: 1 },
-                                    640: { slidesPerView: 2 },
-                                    900: { slidesPerView: 3 },
-                                    1200: { slidesPerView: 4 },
-                                }}
-                            >
-                                {periodos.map((periodo) => (
-                                    <SwiperSlide key={periodo.id} style={{ display: 'flex', justifyContent: 'center' }}>
-                                        <Button
-                                            key={periodo.id}
-                                            onClick={() => selecionarPeriodo(periodo)}
-                                            className={`cronograma-periodo-btn ${periodoSelecionado?.id === periodo.id ? 'selecionado' : ''}`}
-                                            size="large"
-                                            variant="contained"
-                                        >
-                                            <span>{dayjs(periodo.dataInicial).year()}</span>
-                                            {periodo.nome}
-                                        </Button>
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-                        </Box>
-
+                                <IconButton
+                                    className="swiper-button-prev"
+                                    sx={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '-30px',
+                                        zIndex: 10,
+                                        transform: 'translateY(-50%)',
+                                        color: 'var(--light-orange-senac)',
+                                        '&:hover': { color: 'var(--dark-orange-senac)', backgroundColor: "transparent" },
+                                    }}
+                                >
+                                </IconButton>
+                                <IconButton
+                                    className="swiper-button-next"
+                                    sx={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        right: '-30px',
+                                        zIndex: 10,
+                                        transform: 'translateY(-50%)',
+                                        color: 'var(--light-orange-senac)',
+                                        '&:hover': { color: 'var(--dark-orange-senac)', backgroundColor: "transparent" },
+                                    }}
+                                >
+                                </IconButton>
+                                <Swiper
+                                    modules={[Navigation]}
+                                    slidesPerView={4}
+                                    slidesPerGroup={1}
+                                    loop={false}
+                                    className="cronograma-carousel"
+                                    navigation={{
+                                        prevEl: '.swiper-button-prev',
+                                        nextEl: '.swiper-button-next',
+                                    }}
+                                    breakpoints={{
+                                        360: { slidesPerView: 1 },
+                                        640: { slidesPerView: 2 },
+                                        900: { slidesPerView: 3 },
+                                        1200: { slidesPerView: 4 },
+                                    }}
+                                >
+                                    {periodos.map((periodo) => (
+                                        <SwiperSlide key={periodo.id} style={{ display: 'flex', justifyContent: 'center' }}>
+                                            <Button
+                                                key={periodo.id}
+                                                onClick={() => selecionarPeriodo(periodo)}
+                                                className={`cronograma-periodo-btn ${periodoSelecionado?.id === periodo.id ? 'selecionado' : ''}`}
+                                                size="large"
+                                                variant="contained"
+                                            >
+                                                <span>{dayjs(periodo.dataInicial).year()}</span>
+                                                {periodo.nome}
+                                            </Button>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            </Box> :
+                            <p style={{width:"80%", textAlign:"center", marginBlock:"19px"}} className="cronograma-sem-curso">Nenhum período encontrado com cronograma</p>
+                        }
                         {
                             validarPermissao(OPERADOR_ENUM.MENOR, 3) &&
                             <div className="cronograma-botao">
-                                <Button
-                                    className="standard-button"
+                                <BotaoPadrao
+                                    label={"Gerar"}
+                                    carregando={false}
                                     onClick={exibirMenuGerar}
-                                >
-                                    Gerar
-                                </Button>
+                                />
 
                                 <Menu
                                     anchorEl={anchorEl}
@@ -517,13 +540,18 @@ const Cronograma: FC = () => {
                                 }}
                             />
                         )) :
-                        <p className="cronograma-sem-curso">Não existem cronogramas para o periodo selecionado</p>
+                        <p className="cronograma-sem-curso">Não existem cronogramas para o período selecionado</p>
                 }
 
 
             </div>
             <Divider className="divider" />
             <div className="cronograma-container">
+                <LoadingContent
+                    carregandoInformacoes={carregandoInformacoesPagina}
+                    isModal={false}
+                    circleOn={true}
+                />
                 {cronogramaPorPeriodoCursoFase ? <>
                     <div className="cronograma-header">
                         <h2 className="cronograma-titulo">{`${cronogramaPorPeriodoCursoFase.faseNumero}ª Fase - ${cronogramaPorPeriodoCursoFase.cursoNome} - ${cronogramaPorPeriodoCursoFase.ano}`}</h2>

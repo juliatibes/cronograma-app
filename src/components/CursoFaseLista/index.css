@@ -35,12 +35,6 @@
     color: rgb(226, 38, 38);
 }
 
-
-.curso-fase-hide {
-    visibility: hidden;
-    pointer-events: none;
-}
-
 .curso-fase-rotate {
     transform: rotate(180deg);
 }

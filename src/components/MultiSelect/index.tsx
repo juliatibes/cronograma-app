@@ -1,6 +1,6 @@
 import { Stack, Autocomplete, TextField } from "@mui/material";
 import { FC } from "react";
-import { diaSemanaEnumGetLabel } from "../../types/diaSemanaEnum";
+import { diaSemanaEnumGetLabel } from "../../types/enums/diaSemanaEnum";
 
 interface MultiSelectProperties {
   options:any[]

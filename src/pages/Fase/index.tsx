@@ -1,41 +1,44 @@
 import { FC, useEffect, useState } from "react";
 import "./index.css"; 
 import { apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
-import { AlertColor, Autocomplete, Box, Dialog, DialogContent, DialogTitle, Divider, FormControl, Modal, Stack, TextField, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { AlertColor, Box,  Modal, Typography } from "@mui/material";
 import { IFase, IFasesRequest } from "../../types/fase";
-import { AccountBalance, People, AutoStories, VisibilityOutlined, EditNote, ToggleOffOutlined, ToggleOnOutlined } from "@mui/icons-material";
+import { AutoStories,  EditNote, ToggleOff, ToggleOn } from "@mui/icons-material";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import CardPadrao from "../../components/CardPadrao";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import InputPadrao from "../../components/InputPadrao";
-import { STATUS_ENUM } from "../../types/statusEnum";
+import { STATUS_ENUM } from "../../types/enums/statusEnum";
 import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
 import AlertaPadrao from "../../components/AlertaPadrao";
+import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
+import { removerMascaraNumeros } from "../../util/mascaras";
+import LoadingContent from "../../components/LoadingContent";
 
 const Fase: FC = () => {
-  const navigate = useNavigate();
   const [carregando, setCarregando] = useState<boolean>(false);
+
+  const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+  const [carregandoInformacoesModal, setCarregandoInformacoesModal] = useState<boolean>(true);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
   const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
   const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
 
   const [estadoModal, setEstadoModal] = useState(false);
-  const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false);//exemplo visualizar
 
   const [fases, setFases] = useState<IFase[]>([]);
 
   const [id, setId] = useState<number>();
-  const [numero, setNumero] = useState<number>();
+  const [numero, setNumero] = useState<string>('');
 
-  const [validarCampoNumero, setValidarCampoNumero] = useState<IValidarCampos>(valorInicialValidarCampos);//tratamento erro
+  const [validarCampoNumero, setValidarCampoNumero] = useState<IValidarCampos>(valorInicialValidarCampos);
 
-  const exibirErros = (mensagens: string[]) => {//tratamento erro
+  const exibirErros = (mensagens: string[]) => {
 
     const existeErroEspecifico = mensagens.some(mensagem =>
-      mensagem.includes("Numero")
+      mensagem.includes("Número")
     );
 
     if (!existeErroEspecifico) {
@@ -44,7 +47,7 @@ const Fase: FC = () => {
     }
 
     for (const mensagem of mensagens) {
-      if (mensagem.includes("Numero")) {
+      if (mensagem.includes("Número")) {
         setValidarCampoNumero({ existeErro: true, mensagem: mensagem });
         continue;
       }
@@ -52,7 +55,7 @@ const Fase: FC = () => {
 
   }
 
-  const exibirAlerta = (mensagens: string[], cor: AlertColor) => {//tratamento erro
+  const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
     setEstadoAlerta(false);
     setEstadoModal(false);
 
@@ -61,16 +64,16 @@ const Fase: FC = () => {
     setEstadoAlerta(true);
   }
 
-  const limparErros = () => {//tratamento erro
+  const limparErros = () => {
     setValidarCampoNumero(valorInicialValidarCampos);
   }
 
   const limparModal = () => {
     setId(undefined);
-    setNumero(undefined);
+    setNumero('');
   }
 
-  const validarCampos = (): boolean => {//tratamento erro
+  const validarCampos = (): boolean => {
     let existeErro = false;
 
     if (!numero) {
@@ -81,15 +84,15 @@ const Fase: FC = () => {
     return existeErro;
   }
 
-  const fecharModalVisualizar = () => setEstadoModalVisualizar(false);//exemplo visualizar
-
   const fecharModal = () => setEstadoModal(false);
 
   const carregarFase = async () => {
+    setCarregandoInformacoesPagina(true);
     const response = await apiGet('/fase/carregar');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -98,35 +101,37 @@ const Fase: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error");//tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
+    setCarregandoInformacoesPagina(false);
   }
 
   const carregarFasePorId = async (id: number) => {
     const response = await apiGet(`/fase/carregar/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
       const faseEncontrada: IFase = response.data;
 
       setId(id);
-      setNumero(faseEncontrada.numero);
+      setNumero(faseEncontrada.numero.toString());
     }
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error");//tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   }
 
@@ -134,32 +139,33 @@ const Fase: FC = () => {
     const response = await apiPut(`/fase/${ativar ? "ativar" : "inativar"}/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';;
     }
 
     if (response.status === STATUS_CODE.NO_CONTENT) {
-      exibirAlerta([`${numero} ${ativar ? "ativado" : "inativado"} com sucesso!`], "success");
+      exibirAlerta([`${numero} ${ativar ? "ativada" : "inativada"} com sucesso!`], "success");
       carregarFase();
     }
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirErros(mensagens);//tratamento erro
+      exibirErros(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   }
 
   const salvar = async () => {
-    limparErros();//tratamento erro
-    if (validarCampos()) return;//tratamento erro
+    limparErros();
+    if (validarCampos()) return;
 
     setCarregando(true);
     const faseRequest: IFasesRequest = {
       id: id,
-      numero: numero,
+      numero: +numero,
     }
 
     let response: IDataResponse | undefined = undefined;
@@ -171,40 +177,43 @@ const Fase: FC = () => {
     }
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.CREATED) {
-      exibirAlerta([`Fase criado com sucesso!`], "success");
+      exibirAlerta([`Fase criada com sucesso!`], "success");
       carregarFase();
     }
 
     if (response.status === STATUS_CODE.NO_CONTENT) {
-      exibirAlerta([`Fase editado com sucesso!`], "success");
+      exibirAlerta([`Fase editada com sucesso!`], "success");
       carregarFase();
     }
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirErros(mensagens);//tratamento erro
+      exibirErros(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
 
     setCarregando(false);
   }
 
   const abrirModal = async (id?: number) => {
+    setCarregandoInformacoesModal(true);
+    setEstadoModal(true);
     limparModal();
-    limparErros();//tratamento erro
+    limparErros();
 
     if (id) {
-      carregarFasePorId(id);
+      await carregarFasePorId(id);
     }
 
-    setEstadoModal(true);
+    setCarregandoInformacoesModal(false);
   }
 
   useEffect(() => {
@@ -212,38 +221,14 @@ const Fase: FC = () => {
   }, []);
 
   return <>
-  {/*//exemplo visualizar */}
-  <Dialog
-    open={estadoModalVisualizar}
-    onClose={fecharModalVisualizar}
-    fullWidth
-    maxWidth="sm"
-    sx={{ borderRadius: 4, padding: 2}}
-    PaperProps={{
-      sx: {
-        outline: '2px solid var(--dark-blue-senac)',
-      }
-    }}
-  >
-    <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-      {numero + 'ª Fase'}
-    </DialogTitle>
-    <Divider />
-    <DialogContent>
-      <Stack spacing={2} sx={{ mt: 2 , margin:"0px 0px 8px 0px"}}>
-        <Box>
-          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-            Fase:
-          </Typography>
-          <Typography variant="body1">{numero + 'ª'}</Typography>
-        </Box>
-
-      </Stack>
-    </DialogContent>
-  </Dialog>
 
   <Modal open={estadoModal} onClose={fecharModal} className="modal">
-    <Box className='modal-box'>
+    <Box className='modal-box' sx={{maxWidth:'350px'}}>
+    <LoadingContent
+          carregandoInformacoes={carregandoInformacoesModal}
+          isModal={true}
+          circleOn={true}
+        />
       <Typography id="modal-modal-title" variant="h6" component="h2">
         Fase
       </Typography>
@@ -254,16 +239,16 @@ const Fase: FC = () => {
         <div className="modal-content">
           <div className="modal-two-form-group">
             < InputPadrao
-              label={"Numero"}
-              type={"number"}
-              value={undefined}
+              label={"Número"}
+              type={"text"}
+              value={removerMascaraNumeros(numero)}
               onChange={(e) => {
                 if (e) {
-                  setNumero(e.target.value)
+                  setNumero(removerMascaraNumeros(e.target.value))
                 }
               }}
-              error={validarCampoNumero.existeErro}//tratamento erro
-              helperText={validarCampoNumero.mensagem}//tratamento erro
+              error={validarCampoNumero.existeErro}
+              helperText={validarCampoNumero.mensagem}
             />
           </div>
         </div>
@@ -280,7 +265,7 @@ const Fase: FC = () => {
   </Modal>
 
   <AlertaPadrao
-    key={estadoAlerta ? "show" : "close"} //componente tratamento erro
+    key={estadoAlerta ? "show" : "close"}
     estado={estadoAlerta}
     cor={corAlerta}
     mensagens={mensagensAlerta}
@@ -290,11 +275,16 @@ const Fase: FC = () => {
   />
 
   <main className="page-main">
-    <div style={{ display: 'flex' }}>
-      <h2>Fase</h2>
+    <div className="page-main-title">
+      <h2>Fases</h2>
       <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
     </div>
     <div className="grid-content">
+    <LoadingContent
+          carregandoInformacoes={carregandoInformacoesPagina}
+          isModal={false}
+          circleOn={true}
+        />
       {fases.map((fase) => (
         <CardPadrao
           key={fase.id}
@@ -313,13 +303,13 @@ const Fase: FC = () => {
               fase.statusEnum === STATUS_ENUM.INATIVO ?
               (
               <CardPadraoActionItem 
-                icon={<ToggleOffOutlined titleAccess="Inativado" color="error" />} 
+                icon={<ToggleOff className="toggleOff" titleAccess="Inativado" />} 
                 onClick={() => alterarStatusFase(fase.id, fase.numero, true)} 
                 />
               ) :
               (
               <CardPadraoActionItem 
-              icon={<ToggleOnOutlined titleAccess="Ativado" />} 
+              icon={<ToggleOn className="toggleOn" titleAccess="Ativado" color="primary"/>} 
               onClick={() => alterarStatusFase(fase.id, fase.numero, false)} 
               />
             )
@@ -333,7 +323,4 @@ const Fase: FC = () => {
 };
 
 export default Fase;
-function limparErros() {
-  throw new Error("Function not implemented.");
-}
 

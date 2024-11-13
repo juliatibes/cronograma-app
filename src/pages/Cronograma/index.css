@@ -28,12 +28,12 @@
     text-transform: none !important;
     font-size: 1rem !important;
     padding-block: 10px !important;
-    opacity: 0.8;
+    opacity: 0.4;
     transition: 0.2s !important;
 }
 
 .cronograma-periodo-btn:hover {
-    opacity: 0.9;
+    opacity: 0.8;
 }
 
 .selecionado {
@@ -56,6 +56,11 @@
 }
 
 .cronograma-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     width: 100%;
 }
 

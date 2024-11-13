@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import {
   Badge, IconButton, Popover, List, ListItem, ListItemText,
-  Typography, Dialog, DialogTitle, DialogContent, Button, Fade,
+  Typography, Dialog, DialogTitle, DialogContent, Fade,
   AlertColor,
   Divider
 } from '@mui/material';
@@ -10,8 +10,9 @@ import "./index.css";
 import { eventoStatusEnumGetLabel, IEvento } from '../../types/evento';
 import AlertaPadrao from '../AlertaPadrao';
 import { apiGet, apiPut, STATUS_CODE } from '../../api/RestClient';
-import { BOOLEAN_ENUM } from '../../types/booleanEnum';
+import { BOOLEAN_ENUM } from '../../types/enums/booleanEnum';
 import { Close } from '@mui/icons-material';
+import { removerUsuario } from '../../store/UsuarioStore/usuarioStore';
 
 const Notificacao: FC = () => {
 
@@ -64,6 +65,7 @@ const Notificacao: FC = () => {
     const response = await apiPut(`/evento/visualizar/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
+      removerUsuario();
       window.location.href = "/login";
     }
 
@@ -90,6 +92,7 @@ const Notificacao: FC = () => {
     const response = await apiGet('/evento/carregar');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
+      removerUsuario();
       window.location.href = "/login";
     }
 
@@ -171,7 +174,7 @@ const Notificacao: FC = () => {
                 onClick={() => selecionarNotificacao(evento)}
                 sx={{
                   cursor: 'pointer',
-                  backgroundColor: evento.visualizadoBooleanEnum == BOOLEAN_ENUM.SIM ? '' : '#ffefde',
+                  backgroundColor: evento.visualizadoBooleanEnum === BOOLEAN_ENUM.SIM ? '' : '#ffefde',
                   '&:hover': { backgroundColor: '#ffe8ce' },
                 }}
               >

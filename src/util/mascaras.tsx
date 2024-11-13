@@ -9,7 +9,7 @@ export const aplicarMascaraTelefone = (value: String | undefined) => {
         .replace(/(-\d{4})(\d+?)/, '$1')
 }
 
-export const aplicarMascaraCpf = (value: String | undefined) => {
+export const aplicarMascaraCpf = (value: string | undefined) => {
     if (!value) return "";
 
     return value

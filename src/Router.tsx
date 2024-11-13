@@ -1,19 +1,16 @@
 import { FC } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
-import CadastroProfessor from "./pages/CadastroProfessor";
-import CadastroPeriodo from "./pages/CadastroPeriodo";
-import CadastroCoordenador from "./pages/CadastroCoordenador";
 import Professor from "./pages/Professor";
 import Coordenador from "./pages/Coordenador";
 import Curso from "./pages/Curso";
 import Periodo from "./pages/Periodo";
 import Fase from "./pages/Fase";
-import CadastroFase from "./pages/CadastroFase";
 import Aluno from "./pages/Aluno";
 import Cronograma from "./pages/Cronograma";
-import CadastroDisciplina from "./pages/CadastroDisciplina";
 import DataBloqueada from "./pages/DataBloqueada";
+import Disciplina from "./pages/Disciplina";
+import RedefinirSenhaEmail from "./pages/RedefinirSenhaEmail";
 
 const Router: FC = () => {
   return (
@@ -21,19 +18,16 @@ const Router: FC = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/cadastroprofessor" element={<CadastroProfessor />} />
-        <Route path="/cadastroperiodo" element={<CadastroPeriodo/>} />
-        <Route path="/cadastrocoordenador" element={<CadastroCoordenador />} />
-        <Route path="/cadastrofase" element={<CadastroFase />} />
-        <Route path="/cadastrodisciplina" element={<CadastroDisciplina />} />
-        <Route path="/professor" element={<Professor />} />
-        <Route path="/periodo" element={<Periodo />} />
-        <Route path="/coordenador" element={<Coordenador />} />
-        <Route path="/curso" element={<Curso />} />
-        <Route path="/fase" element={<Fase />} />
-        <Route path="/aluno" element={<Aluno />} />
-        <Route path="/cronograma" element={<Cronograma />} />
-        <Route path="/databloqueada" element={<DataBloqueada />} />
+        <Route path="/redefinirsenha" element={<RedefinirSenhaEmail />} />
+        <Route path="/disciplinas" element={<Disciplina />} />
+        <Route path="/professores" element={<Professor />} />
+        <Route path="/periodos" element={<Periodo />} />
+        <Route path="/coordenadores" element={<Coordenador />} />
+        <Route path="/cursos" element={<Curso />} />
+        <Route path="/fases" element={<Fase />} />
+        <Route path="/alunos" element={<Aluno />} />
+        <Route path="/cronogramas" element={<Cronograma />} />
+        <Route path="/datasbloqueadas" element={<DataBloqueada />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,23 +1,24 @@
-import { Box, Button, Divider, IconButton, Modal, Snackbar, snackbarClasses, SnackbarOrigin, SxProps, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Divider, IconButton, Modal, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
 import { FC, useState, MouseEvent, useEffect } from "react";
 import { ICronogramaMes } from "../../types/cronograma";
 import { IDiaCronograma } from "../../types/diaCronograma";
 import "./index.css";
-import { DATA_STATUS_ENUM } from "../../types/dataStatusEnum";
+import { DATA_STATUS_ENUM } from "../../types/enums/dataStatusEnum";
 import { hexToRgba } from "../../util/conversorCores";
-import { Close, ScreenRotationAlt, Event, HistoryEdu, School } from "@mui/icons-material";
-import { diaSemanaEnumGetLabel } from "../../types/diaSemanaEnum";
+import { Close, Event, HistoryEdu, School, SyncAlt, CloseRounded, CheckRounded } from "@mui/icons-material";
+import { diaSemanaEnumGetLabel } from "../../types/enums/diaSemanaEnum";
 import { IPeriodo } from "../../types/periodo";
-import { STATUS_ENUM } from "../../types/statusEnum";
+import { STATUS_ENUM } from "../../types/enums/statusEnum";
+import BotaoPadrao from "../BotaoPadrao";
 
 interface CalendarioProperties {
   meses: ICronogramaMes[],
-  periodoSelecionado:IPeriodo | undefined,
+  periodoSelecionado: IPeriodo | undefined,
   editavel: boolean,
   onClickConfirmar: (idPrimeiroDiaCronograma: number | undefined, idSegundoDiaCronograma: number | undefined) => void,
 }
 
-const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado ,editavel, onClickConfirmar }) => {
+const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado, editavel, onClickConfirmar }) => {
   const [exibirModal, setExibirModal] = useState(false);
   const [exibirToolTip, setExibirToolTip] = useState<boolean>(false);
   const [exibirSnackBar, setExibirSnackBar] = useState<boolean>(false);
@@ -70,9 +71,9 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado ,edita
   const selecionarDiaCronogramaParaTrocar = (diaCronograma: IDiaCronograma) => {
 
     if (
-      diaCronograma.id === diaCronogramaTrocaSelecionadoPrimeiro?.id ||
-      diaCronograma.disciplinaNome === diaCronogramaTrocaSelecionadoPrimeiro?.disciplinaNome &&
-      diaCronograma.professorNome === diaCronogramaTrocaSelecionadoPrimeiro?.professorNome
+      (diaCronograma.id === diaCronogramaTrocaSelecionadoPrimeiro?.id) ||
+      (diaCronograma.disciplinaNome === diaCronogramaTrocaSelecionadoPrimeiro?.disciplinaNome &&
+        diaCronograma.professorNome === diaCronogramaTrocaSelecionadoPrimeiro?.professorNome)
     ) {
       return;
     } else if (diaCronogramaTrocaSelecionadoPrimeiro) {
@@ -166,83 +167,110 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado ,edita
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            bgcolor: "#9cc5eb",
+            bgcolor: "#e2f0fd",
             outline: "0.2px solid var(--dark)",
+            margin: '2rem 0',
             p: 3,
             borderRadius: 2,
-            maxWidth: "350px"
           }}
         >
           <Typography id="calendario-modal-title" variant="h5" component="h2">
-            Deseja confirmar a troca ?
+            Deseja confirmar a troca?
           </Typography>
 
           <Typography id="calendario-modal-description" sx={{ mt: 2 }} component="div" >
-            <Typography className="calendario-modal-group" component="div" >
-              <Event fontSize="large" />
-              <Typography variant="h6" component="p" >
-                {
-                  diaCronogramaTrocaSelecionadoPrimeiro &&
-                  `${new Date(diaCronogramaTrocaSelecionadoPrimeiro.data).toLocaleDateString('pt-BR')} - 
+            <Typography className="calendario-modal-container" component="div"
+              sx={{
+                backgroundColor: diaCronogramaTrocaSelecionadoPrimeiro &&
+                  definirBackgorundColor(diaCronogramaTrocaSelecionadoPrimeiro)
+              }}>
+              <Typography className="calendario-modal-group" component="div" >
+                <Event fontSize="large" />
+                <Typography variant="h6" component="p" >
+                  {
+                    diaCronogramaTrocaSelecionadoPrimeiro &&
+                    `${new Date(diaCronogramaTrocaSelecionadoPrimeiro.data).toLocaleDateString('pt-BR')} - 
                    ${diaSemanaEnumGetLabel(diaCronogramaTrocaSelecionadoPrimeiro?.diaSemanaEnum)}`
-                }
+                  }
+                </Typography>
               </Typography>
-            </Typography>
-            <Typography className="calendario-modal-group" component="div" >
-              <School fontSize="large" />
-              <Typography variant="h6" component="p" >
-                {diaCronogramaTrocaSelecionadoPrimeiro?.professorNome}
+              <Typography className="calendario-modal-group" component="div" >
+                <School fontSize="large" />
+                <Typography variant="h6" component="p" >
+                  {diaCronogramaTrocaSelecionadoPrimeiro?.professorNome}
+                </Typography>
               </Typography>
-            </Typography>
-            <Typography className="calendario-modal-group" component="div" >
-              <HistoryEdu fontSize="large" />
-              <Typography variant="h6" component="p" >
-                {diaCronogramaTrocaSelecionadoPrimeiro?.disciplinaNome}
+              <Typography className="calendario-modal-group" component="div" >
+                <HistoryEdu fontSize="large" />
+                <Typography variant="h6" title={diaCronogramaTrocaSelecionadoPrimeiro?.disciplinaNome} component="p" >
+                  {diaCronogramaTrocaSelecionadoPrimeiro?.disciplinaNome}
+                </Typography>
               </Typography>
             </Typography>
 
-            <Divider className="calendario-modal-divider"
-              sx={{ position: "relative", marginBottom: "5px", marginTop: "10px" }}
-            >
-              <ScreenRotationAlt className="calendario-modal-divider-icon" sx={{ rotate: "134deg" }} />
-            </Divider>
+            <SyncAlt className="calendario-modal-divider-icon" />
 
-            <Divider sx={{ marginBottom: "10px" }} className="calendario-modal-divider"></Divider>
-
-            <Typography className="calendario-modal-group" component="div" >
-              <Event fontSize="large" />
-              <Typography variant="h6" component="p" >
-                {
-                  diaCronogramaTrocaSelecionadoSegundo &&
-                  `${new Date(diaCronogramaTrocaSelecionadoSegundo.data).toLocaleDateString('pt-BR')} - 
+            <Typography className="calendario-modal-container" component="div"
+              sx={{
+                backgroundColor: diaCronogramaTrocaSelecionadoSegundo &&
+                  definirBackgorundColor(diaCronogramaTrocaSelecionadoSegundo)
+              }}>
+              <Typography className="calendario-modal-group" component="div" >
+                <Event fontSize="large" />
+                <Typography variant="h6" component="p" >
+                  {
+                    diaCronogramaTrocaSelecionadoSegundo &&
+                    `${new Date(diaCronogramaTrocaSelecionadoSegundo.data).toLocaleDateString('pt-BR')} - 
                    ${diaSemanaEnumGetLabel(diaCronogramaTrocaSelecionadoSegundo?.diaSemanaEnum)}`
-                }
+                  }
+                </Typography>
               </Typography>
-            </Typography>
-            <Typography className="calendario-modal-group" component="div" >
-              <School fontSize="large" />
-              <Typography variant="h6" component="p" >
-                {diaCronogramaTrocaSelecionadoSegundo?.professorNome}
+              <Typography className="calendario-modal-group" component="div" >
+                <School fontSize="large" />
+                <Typography variant="h6" component="p" >
+                  {diaCronogramaTrocaSelecionadoSegundo?.professorNome}
+                </Typography>
               </Typography>
-            </Typography>
-            <Typography className="calendario-modal-group" component="div" >
-              <HistoryEdu fontSize="large" />
-              <Typography variant="h6" component="p" >
-                {diaCronogramaTrocaSelecionadoSegundo?.disciplinaNome}
+              <Typography className="calendario-modal-group" component="div" >
+                <HistoryEdu fontSize="large" />
+                <Typography variant="h6" title={diaCronogramaTrocaSelecionadoSegundo?.disciplinaNome} component="p" >
+                  {diaCronogramaTrocaSelecionadoSegundo?.disciplinaNome}
+                </Typography>
               </Typography>
             </Typography>
           </Typography>
 
-          <Divider sx={{ marginBlock: "1.1rem" }} className="calendario-modal-divider"></Divider>
-
-          <Box id="calendario-modal-actions">
-            <Button sx={{ color: "var(--dark-blue-senac)", borderColor: "var(--dark-blue-senac)", fontWeight: "bolder" }} variant="outlined" onClick={cancelar}>
+          <Typography component="div" id="calendario-modal-actions">
+            <Button
+              onClick={cancelar}
+              sx={{
+                color: '#4c89bf',
+                borderColor: 'var(--light-blue-senac)',
+                fontWeight: 'bold',
+                padding: '5px 12px',
+                transition:"0.2s",
+                '&:hover': {
+                  backgroundColor: '#d1e4f5',
+                },
+              }}
+              variant="outlined">
               Cancelar
             </Button>
-            <Button variant="contained" sx={{ backgroundColor: "var(--dark-blue-senac)", color: "var(--gray)", fontWeight: "bolder" }} onClick={confirmar}>
+            <Button
+              onClick={confirmar}
+              sx={{
+                backgroundColor: 'var(--light-blue-senac)',
+                color: 'var(--light)',
+                fontWeight: 'bold',
+                padding: '6px 12px',
+                transition:"0.2s",
+                '&:hover': {
+                  opacity:"0.9"
+                },
+              }}>
               Confirmar
             </Button>
-          </Box>
+          </Typography>
         </Box>
       </Modal>
 
@@ -320,14 +348,14 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado ,edita
 
               {
                 (editavel &&
-                periodoSelecionado?.statusEnum === STATUS_ENUM.ATIVO && 
-                toolTipDiaCronograma.dataStatusEnum !== DATA_STATUS_ENUM.BLOQUEADA) &&
+                  periodoSelecionado?.statusEnum === STATUS_ENUM.ATIVO &&
+                  toolTipDiaCronograma.dataStatusEnum !== DATA_STATUS_ENUM.BLOQUEADA) &&
                 <>
                   <div className="calendario-tooltip-actions">
                     <Button
                       onClick={() => selecionarDiaCronogramaParaTrocar(toolTipDiaCronograma)} className="calendario-tooltip-button"
                     >
-                      <ScreenRotationAlt sx={{ rotate: "134deg" }} />
+                      <SyncAlt />
                     </Button>
                   </div>
                   <Divider sx={{ backgroundColor: "var(--dark)" }} orientation="vertical" flexItem />
@@ -357,7 +385,7 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado ,edita
           )
         }
       >
-        <Box sx={{ display: 'inline-block', width: 0, height: 0 }} />
+        <Box sx={{ display: 'none', width: 0, height: 0 }} />
       </Tooltip>
 
       {

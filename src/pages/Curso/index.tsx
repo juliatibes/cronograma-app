@@ -1,31 +1,33 @@
 import { FC, useEffect, useState } from "react";
 import BotaoPadrao from "../../components/BotaoPadrao";
-import { useNavigate } from "react-router-dom";
 import CardPadrao from "../../components/CardPadrao";
-import { AccountBalance, People, EditNote, ToggleOffOutlined, ToggleOnOutlined, AutoStories, VisibilityOutlined } from "@mui/icons-material";
+import { AccountBalance, People, EditNote, AutoStories, ToggleOn, ToggleOff } from "@mui/icons-material";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import { apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
 import { ICurso, ICursoRequest } from "../../types/curso";
-import { STATUS_ENUM } from "../../types/statusEnum";
-import { AlertColor, Autocomplete, Box, Dialog, DialogContent, DialogTitle, Divider, FormControl, Modal, Stack, TextField, Typography } from "@mui/material";
+import { STATUS_ENUM } from "../../types/enums/statusEnum";
+import { AlertColor, Autocomplete, Box, FormControl, Modal, TextField, Typography } from "@mui/material";
 import AlertPadrao from "../../components/AlertaPadrao";
 import InputPadrao from "../../components/InputPadrao";
 import { IFase } from "../../types/fase";
 import { ICoordenador } from "../../types/coordenador";
 import MultiSelect from "../../components/MultiSelect";
 import { campoObrigatorio, IValidarCampos, valorInicialValidarCampos } from "../../util/validarCampos";
+import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
+import LoadingContent from "../../components/LoadingContent";
 
 const Curso: FC = () => {
-  const navigate = useNavigate();
   const [carregando, setCarregando] = useState<boolean>(false);
+
+  const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+  const [carregandoInformacoesModal, setCarregandoInformacoesModal] = useState<boolean>(true);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
   const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
   const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
 
   const [estadoModal, setEstadoModal] = useState(false);
-  const [estadoModalVisualizar, setEstadoModalVisualizar] = useState(false);//exemplo visualizar
 
   const [cursos, setCursos] = useState<ICurso[]>([]);
   const [fases, setFases] = useState<IFase[]>([]);
@@ -37,11 +39,11 @@ const Curso: FC = () => {
   const [fasesSelecionadas, setFasesSelecionadas] = useState<IFase[]>([]);
   const [coordenadorSelecionado, setCoordenadorSelecionado] = useState<ICoordenador | null>();
 
-  const [validarCampoNome, setValidarCampoNome] = useState<IValidarCampos>(valorInicialValidarCampos);//tratamento erro
-  const [validarCampoSigla, setValidarCampoSigla] = useState<IValidarCampos>(valorInicialValidarCampos);//tratamento erro
-  const [validarCampoFase, setValidarCampoFase] = useState<IValidarCampos>(valorInicialValidarCampos);//tratamento erro
+  const [validarCampoNome, setValidarCampoNome] = useState<IValidarCampos>(valorInicialValidarCampos);
+  const [validarCampoSigla, setValidarCampoSigla] = useState<IValidarCampos>(valorInicialValidarCampos);
+  const [validarCampoFase, setValidarCampoFase] = useState<IValidarCampos>(valorInicialValidarCampos);
 
-  const exibirErros = (mensagens: string[]) => {//tratamento erro
+  const exibirErros = (mensagens: string[]) => {
 
     const existeErroEspecifico = mensagens.some(mensagem =>
       mensagem.includes("Nome") ||
@@ -70,7 +72,7 @@ const Curso: FC = () => {
 
   }
 
-  const exibirAlerta = (mensagens: string[], cor: AlertColor) => {//tratamento erro
+  const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
     setEstadoAlerta(false);
     setEstadoModal(false);
 
@@ -79,7 +81,7 @@ const Curso: FC = () => {
     setEstadoAlerta(true);
   }
 
-  const limparErros = () => {//tratamento erro
+  const limparErros = () => {
     setValidarCampoNome(valorInicialValidarCampos);
     setValidarCampoSigla(valorInicialValidarCampos);
     setValidarCampoFase(valorInicialValidarCampos);
@@ -93,7 +95,7 @@ const Curso: FC = () => {
     setCoordenadorSelecionado(null);
   }
 
-  const validarCampos = (): boolean => {//tratamento erro
+  const validarCampos = (): boolean => {
     let existeErro = false;
 
     if (!nome) {
@@ -117,15 +119,16 @@ const Curso: FC = () => {
     return existeErro;
   }
 
-  const fecharModalVisualizar = () => setEstadoModalVisualizar(false);//exemplo visualizar
-
   const fecharModal = () => setEstadoModal(false);
 
   const carregarCurso = async () => {
+    setCarregandoInformacoesPagina(true);
+
     const response = await apiGet('/curso/carregar');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -134,19 +137,22 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error");//tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
+
+    setCarregandoInformacoesPagina(false);
   }
 
   const carregarFase = async () => {
     const response = await apiGet('/fase/carregar/ativo');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -155,11 +161,11 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error");//tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   }
 
@@ -167,7 +173,8 @@ const Curso: FC = () => {
     const response = await apiGet('/coordenador/carregar');
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -176,11 +183,11 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error");//tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   }
 
@@ -188,7 +195,8 @@ const Curso: FC = () => {
     const response = await apiGet(`/curso/carregar/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -203,11 +211,11 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error");//tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   }
 
@@ -215,7 +223,8 @@ const Curso: FC = () => {
     const response = await apiPut(`/curso/${ativar ? "ativar" : "inativar"}/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.NO_CONTENT) {
@@ -225,17 +234,17 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirErros(mensagens);//tratamento erro
+      exibirErros(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   }
 
   const salvar = async () => {
-    limparErros();//tratamento erro
-    if (validarCampos()) return;//tratamento erro
+    limparErros();
+    if (validarCampos()) return;
 
     setCarregando(true);
     const cursoRequest: ICursoRequest = {
@@ -255,7 +264,8 @@ const Curso: FC = () => {
     }
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login")
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.CREATED) {
@@ -270,11 +280,11 @@ const Curso: FC = () => {
 
     if (response.status === STATUS_CODE.BAD_REQUEST || response.status === STATUS_CODE.UNAUTHORIZED) {
       const mensagens = response.messages;
-      exibirErros(mensagens);//tratamento erro
+      exibirErros(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error");//tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
 
     setCarregando(false);
@@ -293,23 +303,18 @@ const Curso: FC = () => {
   };
 
   const abrirModal = async (id?: number) => {
+    setCarregandoInformacoesModal(true);
+    setEstadoModal(true);
     limparModal();
-    limparErros();//tratamento erro
+    limparErros();
 
-    carregarFase();
-    carregarCoordenador();
+    await carregarFase();
+    await carregarCoordenador();
 
     if (id) {
-      carregarCursoPorId(id);
+      await carregarCursoPorId(id);
     }
-
-    setEstadoModal(true);
-  }
-
-  const visualizar = async (id: number) => {//exemplo visualizar
-    limparModal();
-    carregarCursoPorId(id);
-    setEstadoModalVisualizar(true);
+    setCarregandoInformacoesModal(false);
   }
 
   useEffect(() => {
@@ -317,55 +322,16 @@ const Curso: FC = () => {
   }, []);
 
   return <>
-    {/*//exemplo visualizar */}
-    <Dialog
-      open={estadoModalVisualizar}
-      onClose={fecharModalVisualizar}
-      fullWidth
-      maxWidth="sm"
-      sx={{ borderRadius: 4, padding: 2}}
-      PaperProps={{
-        sx: {
-          outline: '2px solid var(--dark-blue-senac)',
-        }
-      }}
-    >
-      <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-        {sigla}
-      </DialogTitle>
-      <Divider />
-      <DialogContent>
-        <Stack spacing={2} sx={{ mt: 2 , margin:"0px 0px 8px 0px"}}>
-          <Box>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Nome:
-            </Typography>
-            <Typography variant="body1">{nome}</Typography>
-          </Box>
-
-          <Box>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Coordenador:
-            </Typography>
-            <Typography variant="body1">{coordenadorSelecionado?.nome ? coordenadorSelecionado.nome : "Contratando..."}</Typography>
-          </Box>
-
-          <Box>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Fases:
-            </Typography>
-            <Typography variant="body1">
-              {fasesSelecionadas.map((fase) => (fase.numero + "ª Fase")).join(', ')}
-            </Typography>
-          </Box>
-        </Stack>
-      </DialogContent>
-    </Dialog>
 
     <Modal open={estadoModal} onClose={fecharModal} className="modal">
       <Box className='modal-box'>
+        <LoadingContent
+          carregandoInformacoes={carregandoInformacoesModal}
+          isModal={true}
+          circleOn={true}
+        />
         <Typography id="modal-modal-title" variant="h6" component="h2">
-          Curso
+          Cursos
         </Typography>
         <Typography
           id="modal-modal-description"
@@ -382,8 +348,8 @@ const Curso: FC = () => {
                     setNome(e.target.value)
                   }
                 }}
-                error={validarCampoNome.existeErro}//tratamento erro
-                helperText={validarCampoNome.mensagem}//tratamento erro
+                error={validarCampoNome.existeErro}
+                helperText={validarCampoNome.mensagem}
               />
               < InputPadrao
                 type={"text"}
@@ -395,8 +361,8 @@ const Curso: FC = () => {
                     setSigla(e.target.value)
                   }
                 }}
-                error={validarCampoSigla.existeErro}//tratamento erro
-                helperText={validarCampoSigla.mensagem}//tratamento erro
+                error={validarCampoSigla.existeErro}
+                helperText={validarCampoSigla.mensagem}
               />
             </div>
             <div className="modal-one-form-group">
@@ -405,13 +371,14 @@ const Curso: FC = () => {
                 values={fasesSelecionadas}
                 label={"Fases"}
                 onChange={selecionarFase}
-                error={validarCampoFase.existeErro}//tratamento erro
-                helperText={validarCampoFase.mensagem}//tratamento erro
+                error={validarCampoFase.existeErro}
+                helperText={validarCampoFase.mensagem}
               />
             </div>
             <div className="modal-one-form-group">
               <FormControl fullWidth>
                 <Autocomplete
+                  size="small"
                   options={coordenadores}
                   getOptionLabel={(coordenador: ICoordenador) => coordenador.nome}
                   value={coordenadorSelecionado || null}
@@ -444,11 +411,16 @@ const Curso: FC = () => {
     />
 
     <main className="page-main">
-      <div style={{ display: 'flex' }}>
-        <h2>Curso</h2>
+      <div className="page-main-title">
+        <h2>Cursos</h2>
         <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
       </div>
       <div className="grid-content">
+        <LoadingContent
+          carregandoInformacoes={carregandoInformacoesPagina}
+          isModal={false}
+          circleOn={true}
+        />
         {cursos.map((curso) => (
           <CardPadrao
             key={curso.id}
@@ -460,19 +432,18 @@ const Curso: FC = () => {
               <CardPadraoBodyItem icon={<AutoStories titleAccess="Fases" />} label={curso.fases.map((fase) => (fase.numero + "ª Fase")).join(', ')} />,
             ]}
             actions={[
-              <CardPadraoActionItem //exemplo visualizar
-                icon={<VisibilityOutlined titleAccess="Visualizar" />} 
-                onClick={() => visualizar(curso.id)} 
-              />,
               (
                 curso.statusEnum === STATUS_ENUM.ATIVO ?
-                (<CardPadraoActionItem icon={<EditNote titleAccess="Editar" />} onClick={() => abrirModal(curso.id)} />) :
-                <></>
+                  (<CardPadraoActionItem icon={<EditNote titleAccess="Editar" />} onClick={() => abrirModal(curso.id)} />) :
+                  <></>
               ),
               (
                 curso.statusEnum === STATUS_ENUM.INATIVO ?
-                (<CardPadraoActionItem icon={<ToggleOffOutlined titleAccess="Inativado" color="error" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, true)} />) :
-                (<CardPadraoActionItem icon={<ToggleOnOutlined titleAccess="Ativado" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, false)} />)
+                  (<CardPadraoActionItem
+                    icon={<ToggleOff titleAccess="Inativado" className="toggleOff" />}
+                    onClick={() => alterarStatusCurso(curso.id, curso.nome, true)} />
+                  ) :
+                  (<CardPadraoActionItem icon={<ToggleOn className="toggleOn" titleAccess="Ativado" color="primary" />} onClick={() => alterarStatusCurso(curso.id, curso.nome, false)} />)
               ),
             ]}
           />

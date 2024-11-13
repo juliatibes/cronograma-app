@@ -1,6 +1,5 @@
 import { FC, useEffect, useState } from "react";
 import "./index.css";
-import { useNavigate } from "react-router-dom";
 import {
   AlertColor,
   Box,
@@ -41,10 +40,14 @@ import {
   IDataBloqueada,
   IDataBloqueadaRequest,
 } from "../../types/dataBloqueada";
+import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
+import LoadingContent from "../../components/LoadingContent";
 
 const DataBloqueada: FC = () => {
-  const navigate = useNavigate();
   const [carregando, setCarregando] = useState<boolean>(false);
+
+  const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+  const [carregandoInformacoesModal, setCarregandoInformacoesModal] = useState<boolean>(true);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
   const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
@@ -59,14 +62,14 @@ const DataBloqueada: FC = () => {
   const [motivo, setMotivo] = useState<string>("");
   const [data, setData] = useState<Dayjs>();
 
-  const [dataBloqueadaSelecionadaExclusao, setDataBloqueadaSelecionadaExclusao] = useState<IDataBloqueada>();//excluir
+  const [dataBloqueadaSelecionadaExclusao, setDataBloqueadaSelecionadaExclusao] = useState<IDataBloqueada>();
 
   const [validarCampoMotivo, setValidarCampoMotivo] = useState<IValidarCampos>(
     valorInicialValidarCampos
-  ); //tratamento erro
+  );
 
   const exibirErros = (mensagens: string[]) => {
-    //tratamento erro
+
 
     const existeErroEspecifico = mensagens.some((mensagem) =>
       mensagem.includes("Motivo")
@@ -85,7 +88,6 @@ const DataBloqueada: FC = () => {
   };
 
   const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
-    //tratamento erro
     setEstadoAlerta(false);
     setEstadoModal(false);
 
@@ -95,7 +97,6 @@ const DataBloqueada: FC = () => {
   };
 
   const limparErros = () => {
-    //tratamento erro
     setValidarCampoMotivo(valorInicialValidarCampos);
   };
 
@@ -106,7 +107,7 @@ const DataBloqueada: FC = () => {
   };
 
   const validarCampos = (): boolean => {
-    //tratamento erro
+
     let existeErro = false;
 
     if (!motivo) {
@@ -119,10 +120,12 @@ const DataBloqueada: FC = () => {
   const fecharModal = () => setEstadoModal(false);
 
   const carregarDataBloqueada = async () => {
+    setCarregandoInformacoesPagina(true);
     const response = await apiGet("/databloqueada/carregar");
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -134,19 +137,21 @@ const DataBloqueada: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error"); //tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
+    setCarregandoInformacoesPagina(false);
   };
 
   const carregarDataBloqueadaPorId = async (id: number) => {
     const response = await apiGet(`/databloqueada/carregar/${id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.OK) {
@@ -162,11 +167,11 @@ const DataBloqueada: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirAlerta(mensagens, "error"); //tratamento erro
+      exibirAlerta(mensagens, "error");
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   };
 
@@ -174,7 +179,8 @@ const DataBloqueada: FC = () => {
     const response = await apiDelete(`/databloqueada/excluir/${dataBloqueadaSelecionadaExclusao?.id}`);
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.NO_CONTENT) {
@@ -187,17 +193,17 @@ const DataBloqueada: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirErros(mensagens); //tratamento erro
+      exibirErros(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
   };
 
   const salvar = async () => {
-    limparErros(); //tratamento erro
-    if (validarCampos()) return; //tratamento erro
+    limparErros();
+    if (validarCampos()) return;
 
     setCarregando(true);
     const dataBloqueadaRequest: IDataBloqueadaRequest = {
@@ -218,7 +224,8 @@ const DataBloqueada: FC = () => {
     }
 
     if (response.status === STATUS_CODE.FORBIDDEN) {
-      navigate("/login");
+      removerUsuario();
+      window.location.href = '/login';
     }
 
     if (response.status === STATUS_CODE.CREATED) {
@@ -236,37 +243,39 @@ const DataBloqueada: FC = () => {
       response.status === STATUS_CODE.UNAUTHORIZED
     ) {
       const mensagens = response.messages;
-      exibirErros(mensagens); //tratamento erro
+      exibirErros(mensagens);
     }
 
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-      exibirAlerta(["Erro inesperado!"], "error"); //tratamento erro
+      exibirAlerta(["Erro inesperado!"], "error");
     }
 
     setCarregando(false);
   };
 
   const abrirModal = async (id?: number) => {
+    setCarregandoInformacoesModal(true);
+    setEstadoModal(true);
     limparModal();
-    limparErros(); //tratamento erro
+    limparErros();
 
     if (id) {
-      carregarDataBloqueadaPorId(id);
+     await carregarDataBloqueadaPorId(id);
     }
-
-    setEstadoModal(true);
+    setCarregandoInformacoesModal(false);
+    
   };
 
-  const fecharModalExclusao = () => setExibirModalExclusao(false);//excluir
+  const fecharModalExclusao = () => setExibirModalExclusao(false);
 
-  const abrirModalExclusao = () =>  setExibirModalExclusao(true);//excluir
+  const abrirModalExclusao = () => setExibirModalExclusao(true);
 
-  const confirmar = () => {//excluir
+  const confirmar = () => {
     excluirDataBloqueada();
     fecharModalExclusao();
   };
 
-  const cancelar = () => {//excluir
+  const cancelar = () => {
     fecharModalExclusao();
   };
 
@@ -277,7 +286,16 @@ const DataBloqueada: FC = () => {
   return (
     <>
 
-      {/* excluir */}
+      <AlertPadrao
+        key={estadoAlerta ? "show" : "close"} //componente tratamento erro
+        estado={estadoAlerta}
+        cor={corAlerta}
+        mensagens={mensagensAlerta}
+        onClose={() => {
+          setEstadoAlerta(false);
+        }}
+      />
+
       <Modal
         open={exibirModalExclusao}
         onClose={(_, reason) => {
@@ -304,14 +322,14 @@ const DataBloqueada: FC = () => {
           }}
         >
           <Typography id="modal-excluir-title" component="h2">
-            Deseja confirmar a exclusão do {dataBloqueadaSelecionadaExclusao?.motivo}?
+            Deseja confirmar a exclusão de {dataBloqueadaSelecionadaExclusao?.motivo}?
           </Typography>
 
           <Box id="modal-excluir-actions">
-            <Button variant="outlined" sx={{ fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder", border: "2px solid currentColor" }} onClick={cancelar}>
+            <Button variant="outlined" sx={{ color:"#464646", fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder", border: "2px solid #464646" }} onClick={cancelar}>
               Cancelar
             </Button>
-            <Button variant="contained" sx={{ fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder" }} onClick={confirmar}>
+            <Button variant="contained" sx={{ backgroundColor:"#c73636", color:"#e7d8d8" ,fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder" }} onClick={confirmar}>
               Confirmar
             </Button>
           </Box>
@@ -319,7 +337,12 @@ const DataBloqueada: FC = () => {
       </Modal>
 
       <Modal open={estadoModal} onClose={fecharModal} className="modal">
-        <Box className="modal-box">
+        <Box className="modal-box" sx={{maxWidth:"450px"}}>
+        <LoadingContent
+          carregandoInformacoes={carregandoInformacoesModal}
+          isModal={true}
+          circleOn={true}
+        />
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Data Bloqueada
           </Typography>
@@ -335,16 +358,18 @@ const DataBloqueada: FC = () => {
                       setMotivo(e.target.value);
                     }
                   }}
-                  error={validarCampoMotivo.existeErro} //tratamento erro
-                  helperText={validarCampoMotivo.mensagem} //tratamento erro
+                  error={validarCampoMotivo.existeErro}
+                  helperText={validarCampoMotivo.mensagem}
                 />
               </div>
-              <div className="modal-two-form-group">
+              <div className="modal-one-form-group">
                 <LocalizationProvider
                   dateAdapter={AdapterDayjs}
                   adapterLocale="pt-br"
+                  
                 >
                   <DatePicker
+                    sx={{width:'100%'}}
                     label="Data"
                     format="DD/MM/YYYY"
                     className="date-picker"
@@ -369,22 +394,17 @@ const DataBloqueada: FC = () => {
         </Box>
       </Modal>
 
-      <AlertPadrao
-        key={estadoAlerta ? "show" : "close"} //componente tratamento erro
-        estado={estadoAlerta}
-        cor={corAlerta}
-        mensagens={mensagensAlerta}
-        onClose={() => {
-          setEstadoAlerta(false);
-        }}
-      />
-
       <main className="page-main">
-        <div style={{ display: "flex" }}>
-          <h2>Data bloqueada</h2>
+        <div className="page-main-title">
+          <h2>Datas Bloqueadas</h2>
           <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
         </div>
         <div className="grid-content">
+        <LoadingContent
+          carregandoInformacoes={carregandoInformacoesPagina}
+          isModal={false}
+          circleOn={true}
+        />
           {datasBloqueadas.map((dataBloqueada) => (
             <CardPadrao
               key={dataBloqueada.id}
@@ -402,7 +422,7 @@ const DataBloqueada: FC = () => {
                   onClick={() => abrirModal(dataBloqueada.id)}
                 />,
                 <CardPadraoActionItem
-                  icon={<RemoveCircleOutlineOutlined titleAccess="Excluir" />}
+                  icon={<RemoveCircleOutlineOutlined sx={{color:"#c73636"}} titleAccess="Excluir" />}
                   onClick={() => {
                     setDataBloqueadaSelecionadaExclusao(dataBloqueada);
                     abrirModalExclusao();

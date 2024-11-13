@@ -2,10 +2,11 @@ import { Collapse, List, ListItemButton, ListItemText } from "@mui/material";
 import Rotate90DegreesCwIcon from '@mui/icons-material/Rotate90DegreesCw';
 import "./index.css";
 import { FC, useState } from "react"
-import { ICursoPorPeriodo } from "../../types/curso";
+import { ICursoPorPeriodo, ICursoPorUsuario } from "../../types/curso";
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
+import { AccountBalance } from "@mui/icons-material";
 interface CursoFaseListaProperties {
-  curso: ICursoPorPeriodo,
+  curso: ICursoPorPeriodo | ICursoPorUsuario,
   editavel: boolean,
   onClickListItemText: (faseId: number, cursoId: number, editavel:boolean) => void,
   onClickRemoveCircleOutlineIcon: (cursoId: number) => void,
@@ -44,10 +45,15 @@ const CursoFaseLista: FC<CursoFaseListaProperties> = ({
       aria-labelledby="nested-list-subheader"
     >
       <ListItemButton sx={{ display: 'flex', gap: '10px' }} >
-        <PlaylistRemoveIcon
-          className={`curso-fase-icon-delete ${!editavel && "curso-fase-hide"}`}
+        {
+          editavel ?
+          <PlaylistRemoveIcon
+          className={`curso-fase-icon-delete`}
           onClick={() => { onClickRemoveCircleOutlineIcon(curso.id)}}
-        />
+          /> :
+          <AccountBalance/>
+        }
+        
         <ListItemText sx={{textAlign:'center'}} primary={curso.sigla} />
         <Rotate90DegreesCwIcon
           className={`curso-fase-icon-drop ${open && "curso-fase-rotate"}`}
@@ -60,7 +66,7 @@ const CursoFaseLista: FC<CursoFaseListaProperties> = ({
         unmountOnExit
         className="curso-fase-collapse"
       >
-        <List component="div" disablePadding>
+        <List component="div" disablePadding style={{minHeight:'42px'}}>
           {curso.fases.map((fase) => (
             <ListItemButton 
             key={fase.id} 

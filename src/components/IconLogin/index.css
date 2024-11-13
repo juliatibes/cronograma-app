@@ -1,18 +1,21 @@
-/* .container-login {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    min-width: 200px;
+.redefinirsenha-regras {
+    text-align: center;
+    font-style: italic;
+    color: #464545;
+    font-size: 0.9rem;
+    margin: 0;
 }
 
-.container-login svg {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
+.redefinirsenha-regra {
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    transition: 0.2s;
 }
 
-.texto-login{
-    font-size: 13px;
-    font-weight: 500;
-} */
+.redefinirsenha-valida {
+    color: rgb(24, 139, 24);
+}
+
+.redefinirsenha-invalida {
+    color: rgb(206, 39, 39);
+}
