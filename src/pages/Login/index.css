@@ -40,3 +40,22 @@
 .login-white-side .img-login{
     width: 50%;
 }
+.esqueci-senha-info {
+    width: 75%;
+    margin: 5px auto 5px auto;
+    text-align: center;
+    font-size: 0.98rem;
+    font-style: italic;
+    color: rgb(56, 56, 56);
+}
+
+.logo-login{
+    width: 150px;
+    display: block;
+    margin: 0 auto;
+}
+
+.esqueci-senha-botao{
+    color: var(--light);
+    cursor: pointer;
+}
