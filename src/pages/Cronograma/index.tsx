@@ -22,15 +22,24 @@ import { OPERADOR_ENUM, validarPermissao } from "../../permissoes";
 import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 import LoadingContent from "../../components/LoadingContent";
 import BotaoPadrao from "../../components/BotaoPadrao";
+import { IEvento } from "../../types/evento";
+import { STATUS_ENUM } from "../../types/enums/statusEnum";
+import { buscarNotificacaoSucessoSelecionada, removerNotificacaoSucessoSelecionada } from "../../store/SessionStore/notificacaoSessionStore";
 
 interface CronogramaProperties {
-    buscarContextCarregarNotificao: (carregarNotificacao:boolean) => void
+    buscarContextCarregarNotificao: (carregarNotificacao: boolean) => void,
+    notificacao?: IEvento
+    estadoUnicoNotificacao?: number,
 }
 
-const Cronograma: FC<CronogramaProperties>= ({buscarContextCarregarNotificao}) => {
+const Cronograma: FC<CronogramaProperties> = ({
+    buscarContextCarregarNotificao,
+    notificacao,
+    estadoUnicoNotificacao
+}) => {
     const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
 
-    const [carregarNotificao,setCarregarNotificacao] = useState<boolean>();
+    const [carregarNotificao, setCarregarNotificacao] = useState<boolean>();
 
     const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
     const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
@@ -245,6 +254,7 @@ const Cronograma: FC<CronogramaProperties>= ({buscarContextCarregarNotificao}) =
         if (response.status === STATUS_CODE.CREATED) {
             buscarContextCarregarNotificao(!carregarNotificao);
             setCarregarNotificacao(!carregarNotificao);
+
             periodoSelecionado ?
                 carregarCursoPorPeriodo(periodoSelecionado.id) :
                 exibirAlerta(["Erro inesperado ao carregar cursos!"], "error");
@@ -290,6 +300,42 @@ const Cronograma: FC<CronogramaProperties>= ({buscarContextCarregarNotificao}) =
         setCarregandoInformacoesPagina(false);
     }
 
+    const carregarCronogramaPorNotificaoSucessoSelecionada = async (notificacao: IEvento) => {
+        setCarregandoInformacoesPagina(true);
+        setCronogramaPorPeriodoCursoFase(undefined);
+
+        const periodosEncontrados: IPeriodo[] = await carregarPeriodo();
+        if (periodosEncontrados) {
+            const periodoNotificacaoEncontrado: IPeriodo | undefined = periodosEncontrados
+                .find((periodo: IPeriodo) => periodo.statusEnum === STATUS_ENUM.ATIVO);
+
+
+            if (periodoNotificacaoEncontrado) {
+                setPeriodoSelecionado(periodoNotificacaoEncontrado);
+
+                const cursosPorPeriodoEncontrados: ICursoPorPeriodo[] =
+                    await carregarCursoPorPeriodo(periodoNotificacaoEncontrado.id);
+
+                const cursoNotificacaoEncontrado: ICursoPorPeriodo | undefined =
+                    cursosPorPeriodoEncontrados.find((curso: ICursoPorPeriodo) => curso.id === notificacao.cursoId);
+
+                const primeiraFase: IFase | undefined = cursoNotificacaoEncontrado?.fases.find(fase => fase);
+
+                if (cursoNotificacaoEncontrado && primeiraFase) {
+                    await carregarCrogramaPorPeriodoCursoFase(
+                        primeiraFase?.id,
+                        cursoNotificacaoEncontrado?.id,
+                        cursoNotificacaoEncontrado?.editavel,
+                        periodoNotificacaoEncontrado.id
+                    );
+                }
+            }
+        }
+
+        setCarregandoInformacoesPagina(false);
+        removerNotificacaoSucessoSelecionada();
+    }
+
     const excluirCronograma = async () => {
 
         const response = await apiDelete(`/cronograma/excluir/periodo/${periodoSelecionado?.id}/curso/${cursoPorPeriodoSelecionadoExclusao?.id}`);
@@ -329,8 +375,19 @@ const Cronograma: FC<CronogramaProperties>= ({buscarContextCarregarNotificao}) =
     };
 
     useEffect(() => {
-        primeiroCarregamento();
+        const notificacaoSucessoSelecionada = buscarNotificacaoSucessoSelecionada();
+        if (notificacaoSucessoSelecionada.cursoId) {
+            carregarCronogramaPorNotificaoSucessoSelecionada(notificacaoSucessoSelecionada);
+        } else {
+            primeiroCarregamento();
+        }
     }, []);
+
+    useEffect(() => {
+        if (notificacao) {
+            carregarCronogramaPorNotificaoSucessoSelecionada(notificacao);
+        }
+    }, [estadoUnicoNotificacao]);
 
     return <>
         <AlertaPadrao
@@ -454,7 +511,7 @@ const Cronograma: FC<CronogramaProperties>= ({buscarContextCarregarNotificao}) =
                                     ))}
                                 </Swiper>
                             </Box> :
-                            <p style={{width:"80%", textAlign:"center", marginBlock:"19px"}} className="cronograma-sem-curso">Nenhum período encontrado com cronograma</p>
+                            <p style={{ width: "80%", textAlign: "center", marginBlock: "19px" }} className="cronograma-sem-curso">Nenhum período encontrado com cronograma</p>
                         }
                         {
                             validarPermissao(OPERADOR_ENUM.MENOR, 3) &&
