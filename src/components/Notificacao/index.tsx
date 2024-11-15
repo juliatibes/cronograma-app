@@ -7,15 +7,21 @@ import {
 } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import "./index.css";
-import { eventoStatusEnumGetLabel, IEvento } from '../../types/evento';
+import { IEvento } from '../../types/evento';
 import AlertaPadrao from '../AlertaPadrao';
 import { apiGet, apiPut, STATUS_CODE } from '../../api/RestClient';
 import { BOOLEAN_ENUM } from '../../types/enums/booleanEnum';
 import { Close } from '@mui/icons-material';
 import { removerUsuario } from '../../store/UsuarioStore/usuarioStore';
+import { EVENTO_STATUS_ENUM, eventoStatusEnumGetLabel } from '../../types/enums/eventoStatusEnum';
+import { adicionarNotificacaoSucessoSelecionada } from '../../store/SessionStore/notificacaoSessionStore';
 
-const Notificacao: FC = () => {
+interface NotificacaoProperties {
+  carregarNotificao: boolean,
+  buscarNotificacaoSucessoSelecionada: (notificacao: IEvento, estadoUnicoNotificacao: number) => void
+}
 
+const Notificacao: FC<NotificacaoProperties> = ({ carregarNotificao, buscarNotificacaoSucessoSelecionada }) => {
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
   const [mensagensAlerta, setMensagensAlerta] = useState<string[]>([]);
   const [corAlerta, setCorAlerta] = useState<AlertColor>("success");
@@ -50,6 +56,17 @@ const Notificacao: FC = () => {
   const selecionarNotificacao = (notificacao: IEvento) => {
     if (notificacao.visualizadoBooleanEnum === BOOLEAN_ENUM.NAO) {
       atualizarEvento(notificacao.id)
+    }
+
+    if (notificacao.eventoStatusEnum === EVENTO_STATUS_ENUM.SUCESSO) {
+      buscarNotificacaoSucessoSelecionada(notificacao, Date.now());
+      fecharNotificacoes();
+
+      if(window.location.pathname !== "/cronogramas") {
+        adicionarNotificacaoSucessoSelecionada(notificacao);
+        window.location.href = "/cronogramas";
+      }
+      return;
     }
 
     setNotificacaoSelecionada(notificacao);
@@ -116,10 +133,10 @@ const Notificacao: FC = () => {
 
     const interval = setInterval(() => {
       carregarEventos();
-    }, 20000);
+    }, 300000);
 
     return () => clearInterval(interval);
-  }, [])
+  }, [carregarNotificao]);
 
   return (
     <>

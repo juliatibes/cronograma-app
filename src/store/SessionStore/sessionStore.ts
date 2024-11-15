@@ -15,3 +15,6 @@ export const adicionaTokenRedefinirSenhaSessao = (tokenRedefinirSenha:ITokenRede
 }
 
 export const removerTokenRedefinirSenhaSessao = () => (sessionStorage.removeItem(TOKEN_REDEFINIR_SENHA_STORE));
+
+
+
