@@ -1,0 +1,29 @@
+.periodo-aviso{
+    width: 100%;
+    color: rgb(102, 60, 0);
+    background-color: rgb(255, 244, 229);
+    border-radius: 10px;
+}
+
+.periodo-aviso-header {
+    margin: 10px 0px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.periodo-aviso-header h4 {
+    margin: 0;
+    font-size: 17px;
+}
+
+.periodo-aviso-lista {
+    margin: 0px 0px 10px 30px;
+    padding: 0px 10px;
+}
+
+.periodo-aviso-lista li {
+    margin-bottom: 2px;
+    font-size: 15px;
+}

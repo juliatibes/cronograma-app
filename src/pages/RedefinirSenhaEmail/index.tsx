@@ -4,7 +4,8 @@ import { removerUsuario } from "../../store/UsuarioStore/usuarioStore";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import { AlertColor } from "@mui/material";
-import { apiPost, apiPostValidarToken, apiPutRedefinirSenhaEmail, STATUS_CODE } from "../../api/RestClient";
+import { apiPostValidarToken, apiPutRedefinirSenhaEmail, STATUS_CODE } from "../../api/RestClient";
+import logo_senacplan from "../../assets/logo-senacplan.png";
 import InputPadrao from "../../components/InputPadrao";
 import { IValidarCampos, valorInicialValidarCampos, campoObrigatorio } from "../../util/validarCampos";
 import AlertaPadrao from "../../components/AlertaPadrao";
@@ -97,11 +98,11 @@ const RedefinirSenhaEmail: FC = () => {
         if (
             (confirmarSenha && senha) &&
             (!possuiCaracterEspecial ||
-            !possuiOitoCaracteres ||
-            !possuiLetraMinuscula ||
-            !possuiLetraMaiuscula ||
-            !possuiNumero ||
-            !senhasIguais)
+                !possuiOitoCaracteres ||
+                !possuiLetraMinuscula ||
+                !possuiLetraMaiuscula ||
+                !possuiNumero ||
+                !senhasIguais)
         ) {
             setValidarCampoConfirmarSenha({ existeErro: true, mensagem: "Senha inválida" });
             setValidarCampoSenha({ existeErro: true, mensagem: "Senha inválida" });
@@ -212,7 +213,14 @@ const RedefinirSenhaEmail: FC = () => {
 
         <main className="redefinirsenhaemail-content">
             <div className="redefinirsenhaemail-blue-side">
-                <h2>Redefinir senha</h2>
+                <div>
+                    <img
+                        src={logo_senacplan}
+                        alt="logo Senac Plan"
+                        className="redefinirsenhaemail-logo"
+                    />
+                    <h2>Redefinir senha</h2>
+                </div>
                 <div className="redefinirsenhaemail-senha-label">
                     <InputPadrao
                         label={"Nova Senha"}

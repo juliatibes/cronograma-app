@@ -379,6 +379,14 @@ const DataBloqueada: FC = () => {
                         setData(date);
                       }
                     }}
+                    slotProps={{
+                      textField: {
+                        size: 'small',
+                      },
+                      popper: {
+                        placement: 'auto',
+                      },
+                    }}
                   />
                 </LocalizationProvider>
               </div>

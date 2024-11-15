@@ -1,8 +1,13 @@
 import { FC, useEffect, useState } from "react";
 import "./index.css";
 import {
+  Alert,
   AlertColor,
+  AlertTitle,
   Box,
+  List,
+  ListItem,
+  ListItemText,
   Modal,
   Typography,
 } from "@mui/material";
@@ -29,6 +34,7 @@ import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import {
   EditNote,
   EventOutlined,
+  WarningAmber,
 } from "@mui/icons-material";
 import { STATUS_ENUM } from "../../types/enums/statusEnum";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
@@ -226,11 +232,11 @@ const Periodo: FC = () => {
     setEstadoModal(true);
     limparModal();
     limparErros();
-    
+
     if (id) {
       await carregarPeriodoPorId(id);
     }
-    
+
     setCarregandoInformacoesModal(false);
   };
 
@@ -252,6 +258,21 @@ const Periodo: FC = () => {
           </Typography>
           <Typography id="modal-modal-description" component="div">
             <div className="modal-content">
+              {
+                !id &&
+                <div className="periodo-aviso">
+                  <div className="periodo-aviso-header">
+                    <WarningAmber sx={{ fontSize: "22px" }} color="warning" />
+                    <h4>Aviso</h4>
+                  </div>
+                  <ul className="periodo-aviso-lista">
+                    <li>Todas as Notificações serão limpas.</li>
+                    <li>Todas as Datas Bloqueadas serão excluidas.</li>
+                    <li>Todos os Alunos de todos os cursos serão excluidos.</li>
+                    <li>Todos os dias da semana disponíveis relacionados aos Professores serão excluidos.</li>
+                  </ul>
+                </div>
+              }
               <div className="modal-one-form-group">
                 <InputPadrao
                   label={"Nome"}
@@ -271,7 +292,7 @@ const Periodo: FC = () => {
                   <DatePicker
                     label="Data inicial"
                     format="DD/MM/YYYY"
-                    sx={{width:'100%'}}
+                    sx={{ width: '100%' }}
                     className="date-picker"
                     value={dataInicial}
                     onChange={(date) => {
@@ -279,10 +300,18 @@ const Periodo: FC = () => {
                         setDataInicial(date);
                       }
                     }}
+                    slotProps={{
+                      textField: {
+                        size: 'small',
+                      },
+                      popper: {
+                        placement: 'auto',
+                      },
+                    }}
                   />
                   <DatePicker
                     label="Data final"
-                    sx={{width:'100%'}}
+                    sx={{ width: '100%' }}
                     format="DD/MM/YYYY"
                     className="date-picker"
                     value={dataFinal}
@@ -290,6 +319,14 @@ const Periodo: FC = () => {
                       if (date) {
                         setDataFinal(date);
                       }
+                    }}
+                    slotProps={{
+                      textField: {
+                        size: 'small',
+                      },
+                      popper: {
+                        placement: 'auto',
+                      },
                     }}
                   />
                 </LocalizationProvider>

@@ -11,7 +11,7 @@ import {
   adicionaUsuarioSessao,
   removerUsuario,
 } from "../../store/UsuarioStore/usuarioStore";
-import { AlertColor, Box, Button, Modal, Typography } from "@mui/material";
+import { AlertColor, Box, Modal, Typography } from "@mui/material";
 import AlertPadrao from "../../components/AlertaPadrao";
 import {
   campoObrigatorio,
@@ -47,7 +47,7 @@ const Login: FC = () => {
   );
 
   const exibirAlerta = (mensagens: string[], cor: AlertColor) => {
-    //tratamento erro
+    setEstadoModal(false);
     setEstadoAlerta(false);
 
     setMensagensAlerta(mensagens);
@@ -149,6 +149,14 @@ const Login: FC = () => {
     const response = await apiPost("/usuario/login", usuario);
 
     if (response.status === STATUS_CODE.OK) {
+
+      if(!response.data){
+        exibirAlerta(["Primeiro acesso ao sistema, redefina sua senha!"],"warning");
+        abrirModal();
+        setCarregando(false);
+        return;
+      }
+
       const niveisAcesso: INivelAcesso[] = response.data.niveisAcesso.map(
         (data: INivelAcesso) => {
           const nivelAcesso: INivelAcesso = {
@@ -216,8 +224,8 @@ const Login: FC = () => {
 
   const fecharModal = () => setEstadoModal(false);
 
-  const abrirModal = async (id?: number) => {
-    limparErrosEsqueciSenha(); //tratamento erro
+  const abrirModal = async () => {
+    limparErrosEsqueciSenha();
     limparModal();
 
     setEstadoModal(true);
@@ -344,8 +352,8 @@ const Login: FC = () => {
                       setCpfEsqueciSenha(aplicarMascaraCpf(e.target.value));
                     }
                   }}
-                  error={validarCampoCpfEsqueciSenha.existeErro} //tratamento erro
-                  helperText={validarCampoCpfEsqueciSenha.mensagem} //tratamento erro
+                  error={validarCampoCpfEsqueciSenha.existeErro}
+                  helperText={validarCampoCpfEsqueciSenha.mensagem} 
                 />
               </div>
             </div>
@@ -355,7 +363,7 @@ const Login: FC = () => {
             >
               <BotaoPadrao
                 label={"Enviar"}
-                carregando={carregando}
+                carregando={carregandoEsqueciSenha}
                 onClick={enviar}
               />
             </div>

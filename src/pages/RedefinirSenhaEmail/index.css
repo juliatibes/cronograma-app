@@ -63,3 +63,9 @@
 .redefinirsenhaemail-invalida {
     color: rgb(255, 110, 110);
 }
+
+.redefinirsenhaemail-logo {
+    width: 150px;
+    display: block;
+    margin: 0 auto;
+}
