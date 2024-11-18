@@ -189,8 +189,7 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado, edita
                 <Typography variant="h6" component="p" >
                   {
                     diaCronogramaTrocaSelecionadoPrimeiro &&
-                    `${new Date(diaCronogramaTrocaSelecionadoPrimeiro.data).toLocaleDateString('pt-BR')} - 
-                   ${diaSemanaEnumGetLabel(diaCronogramaTrocaSelecionadoPrimeiro?.diaSemanaEnum)}`
+                    `${new Date(`${diaCronogramaTrocaSelecionadoPrimeiro?.data}T00:00:00`).toLocaleDateString('pt-BR')} - ${diaSemanaEnumGetLabel(diaCronogramaTrocaSelecionadoPrimeiro?.diaSemanaEnum)}`
                   }
                 </Typography>
               </Typography>
@@ -220,8 +219,7 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado, edita
                 <Typography variant="h6" component="p" >
                   {
                     diaCronogramaTrocaSelecionadoSegundo &&
-                    `${new Date(diaCronogramaTrocaSelecionadoSegundo.data).toLocaleDateString('pt-BR')} - 
-                   ${diaSemanaEnumGetLabel(diaCronogramaTrocaSelecionadoSegundo?.diaSemanaEnum)}`
+                    `${new Date(`${diaCronogramaTrocaSelecionadoSegundo?.data}T00:00:00`).toLocaleDateString('pt-BR')} - ${diaSemanaEnumGetLabel(diaCronogramaTrocaSelecionadoSegundo?.diaSemanaEnum)}`
                   }
                 </Typography>
               </Typography>
@@ -248,7 +246,7 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado, edita
                 borderColor: 'var(--light-blue-senac)',
                 fontWeight: 'bold',
                 padding: '5px 12px',
-                transition:"0.2s",
+                transition: "0.2s",
                 '&:hover': {
                   backgroundColor: '#d1e4f5',
                 },
@@ -263,9 +261,9 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado, edita
                 color: 'var(--light)',
                 fontWeight: 'bold',
                 padding: '6px 12px',
-                transition:"0.2s",
+                transition: "0.2s",
                 '&:hover': {
-                  opacity:"0.9"
+                  opacity: "0.9"
                 },
               }}>
               Confirmar
@@ -299,7 +297,7 @@ const Calendario: FC<CalendarioProperties> = ({ meses, periodoSelecionado, edita
             <Typography variant="body1">
               {
                 diaCronogramaTrocaSelecionadoPrimeiro?.data &&
-                new Date(diaCronogramaTrocaSelecionadoPrimeiro?.data).toLocaleDateString('pt-BR')
+                new Date(`${diaCronogramaTrocaSelecionadoPrimeiro?.data}T00:00:00`).toLocaleDateString('pt-BR')
               }
             </Typography>
           </Box>
