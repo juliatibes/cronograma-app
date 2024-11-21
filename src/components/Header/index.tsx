@@ -18,7 +18,7 @@ const MenuBar: FC<MenuBarProperties> = ({carregarNotificacao,buscarNotificacaoSu
         <div className="menu-header">
           <ul>
             <li>
-              <a href="/cronograma">
+              <a href="/cronogramas">
                 <img src={logoEmpresa} alt="logo" className="logo" />
               </a>
             </li>

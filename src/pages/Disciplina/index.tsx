@@ -5,7 +5,7 @@ import CardPadrao from "../../components/CardPadrao";
 import CardPadraoActionItem from "../../components/CardPadraoActionItem";
 import CardPadraoBodyItem from "../../components/CardPadraoBodyItem";
 import { STATUS_ENUM } from "../../types/enums/statusEnum";
-import { AlertColor, Autocomplete, Box, Dialog, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, FormLabel, Modal, Pagination, Radio, RadioGroup, Stack, TextField, Typography } from "@mui/material";
+import { AlertColor, Autocomplete, Box, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, FormLabel, Modal, Pagination, Radio, RadioGroup, Stack, TextField, Typography } from "@mui/material";
 import { apiGet, apiPost, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
 import AlertaPadrao from "../../components/AlertaPadrao";
 import CursoFaseLista from "../../components/CursoFaseLista";
@@ -27,7 +27,8 @@ import LoadingContent from "../../components/LoadingContent";
 const Disciplina: FC = () => {
     const [carregando, setCarregando] = useState<boolean>(false);
 
-    const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+    const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(false);
+    const [carregandoInformacoesCurso, setCarregandoInformacoesCurso] = useState<boolean>(true);
     const [carregandoInformacoesModal, setCarregandoInformacoesModal] = useState<boolean>(true);
 
     const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
@@ -182,7 +183,7 @@ const Disciplina: FC = () => {
     }
 
     const carregarCursoPorUsuario = async () => {
-        setCarregandoInformacoesPagina(true);
+        setCarregandoInformacoesCurso(true);
 
         const response = await apiGet('/curso/carregar/usuario');
 
@@ -206,7 +207,7 @@ const Disciplina: FC = () => {
             exibirAlerta(["Erro inesperado!"], "error");
         }
 
-        setCarregandoInformacoesPagina(false);
+        setCarregandoInformacoesCurso(false);
     }
 
     const carregarProfessor = async () => {
@@ -232,8 +233,8 @@ const Disciplina: FC = () => {
     }
 
     const carregarDisciplinasCursoFase = async (faseId: number, cursoId: number, editavel: boolean, page?: number) => {
+        setCarregandoInformacoesPagina(true);
         if (!page) {
-            setCarregandoInformacoesPagina(true);
             setPaginaAtual(1);
         }
 
@@ -242,8 +243,7 @@ const Disciplina: FC = () => {
             paginaAtual: page ?? paginaInicial
         }
 
-        const response = await
-            apiGet(`/disciplina/carregar/curso/${cursoId}/fase/${faseId}`, paginacao);
+        const response = await apiGet(`/disciplina/carregar/curso/${cursoId}/fase/${faseId}`, paginacao);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
             removerUsuario();
@@ -744,13 +744,23 @@ const Disciplina: FC = () => {
                                 onClickListItemText={carregarDisciplinasCursoFase}
                                 onClickRemoveCircleOutlineIcon={() => { }}
                             />
-                        )) :
-                        <p className="cronograma-sem-curso">Não existe cursos cadastrados</p>
+                        )) : (
+                            carregandoInformacoesCurso ?
+                            <p className="carregando-curso">
+                                <CircularProgress size="2.8rem" sx={{
+                                    position: 'absolute',
+                                    zIndex: 50,
+                                    right: `50%`,
+                                    color: "var(--dark-blue-senac)"
+                                }} />
+                            </p> :
+                            <p className="cronograma-sem-curso">Não existe cursos cadastrados</p>
+                        )
                 }
             </div>
             <Divider className="divider" />
             {
-                disciplinasPorCursoFase.length > 0 ?
+                disciplinasPorCursoFase.length > 0 || carregandoInformacoesPagina ?
                     <div className="grid-content">
                         <LoadingContent
                             carregandoInformacoes={carregandoInformacoesPagina}
@@ -806,7 +816,7 @@ const Disciplina: FC = () => {
                             <p className="disciplina-sem-fase-message" >
                                 {(!cursoIdSelecionado && !faseIdSelecionada) ?
                                     "Nenhuma fase Selecionada" :
-                                    "Nenhuma Disciplina cadastrado até o momento"}
+                                    "Nenhuma Disciplina cadastrada até o momento"}
                             </p>
                             <img src={faseNaoSelecionada} alt="sem fase selecionada" className="disciplina-sem-fase-gif" />
                         </div>

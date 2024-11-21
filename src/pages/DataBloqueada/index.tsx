@@ -67,6 +67,9 @@ const DataBloqueada: FC = () => {
   const [validarCampoMotivo, setValidarCampoMotivo] = useState<IValidarCampos>(
     valorInicialValidarCampos
   );
+  const [validarCampoData, setValidarCampoData] = useState<IValidarCampos>(
+    valorInicialValidarCampos
+  );
 
   const exibirErros = (mensagens: string[]) => {
 
@@ -98,6 +101,7 @@ const DataBloqueada: FC = () => {
 
   const limparErros = () => {
     setValidarCampoMotivo(valorInicialValidarCampos);
+    setValidarCampoData(valorInicialValidarCampos);
   };
 
   const limparModal = () => {
@@ -112,6 +116,16 @@ const DataBloqueada: FC = () => {
 
     if (!motivo) {
       setValidarCampoMotivo(campoObrigatorio);
+      existeErro = true;
+    }
+    if (!data) {
+      setValidarCampoData(campoObrigatorio);
+      existeErro = true;
+    } else if (!dayjs(data).isValid()) {
+      setValidarCampoData({ existeErro: true, mensagem: "Data inválida" });
+      existeErro = true;
+    } else if(dayjs(data).isBefore(dayjs('2020-01-01')) || dayjs(data).isAfter(dayjs('2070-12-31'))){
+      setValidarCampoData({ existeErro: true, mensagem: "Data inválida" });
       existeErro = true;
     }
     return existeErro;
@@ -260,10 +274,10 @@ const DataBloqueada: FC = () => {
     limparErros();
 
     if (id) {
-     await carregarDataBloqueadaPorId(id);
+      await carregarDataBloqueadaPorId(id);
     }
     setCarregandoInformacoesModal(false);
-    
+
   };
 
   const fecharModalExclusao = () => setExibirModalExclusao(false);
@@ -309,7 +323,7 @@ const DataBloqueada: FC = () => {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            bgcolor: "var(--gray)",
+            bgcolor: "var(--light)",
             boxShadow: 3,
             padding: "24px 16px",
             borderRadius: 2,
@@ -326,10 +340,10 @@ const DataBloqueada: FC = () => {
           </Typography>
 
           <Box id="modal-excluir-actions">
-            <Button variant="outlined" sx={{ color:"#464646", fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder", border: "2px solid #464646" }} onClick={cancelar}>
+            <Button variant="outlined" sx={{ color: "#464646", fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder", border: "2px solid #464646" }} onClick={cancelar}>
               Cancelar
             </Button>
-            <Button variant="contained" sx={{ backgroundColor:"#c73636", color:"#e7d8d8" ,fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder" }} onClick={confirmar}>
+            <Button variant="contained" sx={{ backgroundColor: "#c73636", color: "#e7d8d8", fontSize: "0.8rem", letterSpacing: "1px", fontWeight: "bolder" }} onClick={confirmar}>
               Confirmar
             </Button>
           </Box>
@@ -337,12 +351,12 @@ const DataBloqueada: FC = () => {
       </Modal>
 
       <Modal open={estadoModal} onClose={fecharModal} className="modal">
-        <Box className="modal-box" sx={{maxWidth:"450px"}}>
-        <LoadingContent
-          carregandoInformacoes={carregandoInformacoesModal}
-          isModal={true}
-          circleOn={true}
-        />
+        <Box className="modal-box" sx={{ maxWidth: "450px" }}>
+          <LoadingContent
+            carregandoInformacoes={carregandoInformacoesModal}
+            isModal={true}
+            circleOn={true}
+          />
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Data Bloqueada
           </Typography>
@@ -366,10 +380,10 @@ const DataBloqueada: FC = () => {
                 <LocalizationProvider
                   dateAdapter={AdapterDayjs}
                   adapterLocale="pt-br"
-                  
+
                 >
                   <DatePicker
-                    sx={{width:'100%'}}
+                    sx={{ width: '100%' }}
                     label="Data"
                     format="DD/MM/YYYY"
                     className="date-picker"
@@ -382,6 +396,8 @@ const DataBloqueada: FC = () => {
                     slotProps={{
                       textField: {
                         size: 'small',
+                        error: validarCampoData.existeErro,
+                        helperText: validarCampoData.mensagem,
                       },
                       popper: {
                         placement: 'auto',
@@ -408,11 +424,11 @@ const DataBloqueada: FC = () => {
           <BotaoPadrao label={"Adicionar"} onClick={() => abrirModal()} />
         </div>
         <div className="grid-content">
-        <LoadingContent
-          carregandoInformacoes={carregandoInformacoesPagina}
-          isModal={false}
-          circleOn={true}
-        />
+          <LoadingContent
+            carregandoInformacoes={carregandoInformacoesPagina}
+            isModal={false}
+            circleOn={true}
+          />
           {datasBloqueadas.map((dataBloqueada) => (
             <CardPadrao
               key={dataBloqueada.id}
@@ -430,7 +446,7 @@ const DataBloqueada: FC = () => {
                   onClick={() => abrirModal(dataBloqueada.id)}
                 />,
                 <CardPadraoActionItem
-                  icon={<RemoveCircleOutlineOutlined sx={{color:"#c73636"}} titleAccess="Excluir" />}
+                  icon={<RemoveCircleOutlineOutlined sx={{ color: "#c73636" }} titleAccess="Excluir" />}
                   onClick={() => {
                     setDataBloqueadaSelecionadaExclusao(dataBloqueada);
                     abrirModalExclusao();

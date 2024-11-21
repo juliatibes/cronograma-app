@@ -32,6 +32,7 @@ const MultiSelect: FC<MultiSelectProperties> = ({
             option.nome ? option.nome : 
                 (option.numero ? `${option.numero}ª Fase` : diaSemanaEnumGetLabel(option.diaSemanaEnum))
         }
+        isOptionEqualToValue={(option, value) => option.id === value.id}
         value={values} 
         filterSelectedOptions
         onChange={(event, value) => onChange(value)}

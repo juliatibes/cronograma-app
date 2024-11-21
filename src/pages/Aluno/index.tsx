@@ -2,7 +2,7 @@ import { FC, useEffect, useRef, useState } from "react";
 import faseNaoSelecionada from "../../assets/fase-nao-selecionada.gif";
 import "./index.css";
 import { AccountBalance, VisibilityOutlined, EditNote, AutoStories, AlternateEmail, RemoveCircleOutlineOutlined, UploadFile } from "@mui/icons-material";
-import { AlertColor, Divider, Stack, Pagination, Autocomplete, Box, FormControl, Modal, TextField, Typography, Dialog, DialogContent, DialogTitle, Button } from "@mui/material";
+import { AlertColor, Divider, Stack, Pagination, Autocomplete, Box, FormControl, Modal, TextField, Typography, Dialog, DialogContent, DialogTitle, Button, CircularProgress } from "@mui/material";
 import { apiDelete, apiGet, apiPost, apiPostImportar, apiPut, IDataResponse, STATUS_CODE } from "../../api/RestClient";
 import BotaoPadrao from "../../components/BotaoPadrao";
 import CardPadrao from "../../components/CardPadrao";
@@ -25,7 +25,8 @@ const Aluno: FC = () => {
   const [carregando, setCarregando] = useState<boolean>(false);
   const [carregandoImportar, setCarregandoImportar] = useState<boolean>(false);
 
-  const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+  const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(false);
+  const [carregandoInformacoesCurso, setCarregandoInformacoesCurso] = useState<boolean>(true);
   const [carregandoInformacoesModal, setCarregandoInformacoesModal] = useState<boolean>(true);
 
   const [estadoAlerta, setEstadoAlerta] = useState<boolean>(false);
@@ -220,8 +221,9 @@ const Aluno: FC = () => {
   const fecharModalVisualizar = () => setEstadoModalVisualizar(false);
 
   const carregarAlunosCursoFase = async (faseId: number, cursoId: number, editavel: boolean, page?: number) => {
+    setCarregandoInformacoesPagina(true);
+    
     if(!page) {
-      setCarregandoInformacoesPagina(true);
       setPaginaAtual(1);
     }
 
@@ -258,6 +260,7 @@ const Aluno: FC = () => {
   }
 
   const carregarCursoPorUsuario = async () => {
+    setCarregandoInformacoesCurso(true);
 
     const response = await apiGet('/curso/carregar/usuario');
 
@@ -280,6 +283,8 @@ const Aluno: FC = () => {
     if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
       exibirAlerta(["Erro inesperado!"], "error");
     }
+
+    setCarregandoInformacoesCurso(false);
   }
 
   const carregarFasePorCurso = async (cursoId: number) => {
@@ -412,8 +417,8 @@ const Aluno: FC = () => {
     if (response.status === STATUS_CODE.CREATED) {
       exibirAlerta([`Aluno criado com sucesso!`], "success");
       carregarAlunosCursoFase(
-        alunoRequest.faseIds[0],
-        alunoRequest.cursoId,
+        faseIdSelecionada ? faseIdSelecionada : alunoRequest.faseIds[0],
+        cursoIdSelecionado ? cursoIdSelecionado : alunoRequest.cursoId,
         false,
         paginaAtual
       )
@@ -422,8 +427,8 @@ const Aluno: FC = () => {
     if (response.status === STATUS_CODE.NO_CONTENT) {
       exibirAlerta([`Aluno editado com sucesso!`], "success");
       carregarAlunosCursoFase(
-        alunoRequest.faseIds[0],
-        alunoRequest.cursoId,
+        faseIdSelecionada ? faseIdSelecionada : alunoRequest.faseIds[0],
+        cursoIdSelecionado ? cursoIdSelecionado : alunoRequest.cursoId,
         false,
         paginaAtual
       )
@@ -628,7 +633,7 @@ const Aluno: FC = () => {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          bgcolor: "var(--gray)",
+          bgcolor: "var(--light)",
           boxShadow: 3,
           padding: "24px 16px",
           borderRadius: 2,
@@ -872,13 +877,23 @@ const Aluno: FC = () => {
                 onClickListItemText={carregarAlunosCursoFase}
                 onClickRemoveCircleOutlineIcon={() => { }}
               />
-            )) :
-            <p className="cronograma-sem-curso">Não existe cursos cadastrados</p>
+            )) : (
+              carregandoInformacoesCurso ?
+              <p className="carregando-curso">
+                  <CircularProgress size="2.8rem" sx={{
+                      position: 'absolute',
+                      zIndex: 50,
+                      right: `50%`,
+                      color: "var(--dark-blue-senac)"
+                  }} />
+              </p> :
+              <p className="cronograma-sem-curso">Não existe cursos cadastrados</p>
+          )
         }
       </div>
       <Divider className="divider" />
       {
-        alunosPorCursoFase.length > 0 ?
+        alunosPorCursoFase.length > 0  || carregandoInformacoesPagina?
           <div className="grid-content">
             <LoadingContent
               carregandoInformacoes={carregandoInformacoesPagina}

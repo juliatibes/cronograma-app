@@ -467,7 +467,7 @@ const Coordenador: FC = () => {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          bgcolor: "var(--gray)",
+          bgcolor: "var(--light)",
           boxShadow: 3,
           padding: "24px 16px",
           borderRadius: 2,

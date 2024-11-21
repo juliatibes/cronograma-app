@@ -182,6 +182,14 @@
     width: 400px;
 }
 
+.carregando-periodo {
+    width:80%; 
+    position: relative;
+    text-align: center;
+    margin: 0 auto;
+    min-height: 60px;
+}
+
 @media(max-width:1200px) {
     .cronograma-periodo {
         flex-direction: column-reverse;

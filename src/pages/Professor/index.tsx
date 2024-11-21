@@ -128,7 +128,7 @@ const Professor: FC = () => {
         mensagem.includes("Nome") ||
         mensagem.includes("Telefone") ||
         mensagem.includes("Email") ||
-        mensagem.includes("CPF") ||
+        mensagem.includes("Cpf") ||
         mensagem.includes("Semana") ||
         mensagem.includes("Coordenador")
     );
@@ -286,9 +286,7 @@ const Professor: FC = () => {
   };
 
   const carregarProfessor = async (page?: number) => {
-    if(!page) {
-      setCarregandoInformacoesPagina(true);
-    }
+    setCarregandoInformacoesPagina(true);
 
     const paginacao: IPaginacao = {
       exibir: exibir,
@@ -572,7 +570,7 @@ const Professor: FC = () => {
 
                 <Typography className="info-modal-visualizar-linha" component="div">
                   <Typography component="dt">
-                    Dias da semana disponível(is):
+                    Dias da semana disponíveis:
                   </Typography>
                   <Typography component="dd">
                     {diasSemanaDisponiveisSelecionados.map(

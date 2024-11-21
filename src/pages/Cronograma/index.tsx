@@ -37,7 +37,9 @@ const Cronograma: FC<CronogramaProperties> = ({
     notificacao,
     estadoUnicoNotificacao
 }) => {
-    const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(true);
+    const [carregandoInformacoesPagina, setCarregandoInformacoesPagina] = useState<boolean>(false);
+    const [carregandoInformacoesCurso, setCarregandoInformacoesCurso] = useState<boolean>(true);
+    const [carregandoInformacoesPeriodo, setCarregandoInformacoesPeriodo] = useState<boolean>(true);
 
     const [carregarNotificao, setCarregarNotificacao] = useState<boolean>();
 
@@ -97,6 +99,7 @@ const Cronograma: FC<CronogramaProperties> = ({
     };
 
     const carregarPeriodo = async () => {
+        setCarregandoInformacoesPeriodo(true);
 
         let urlPeriodo;
         if (validarPermissao(OPERADOR_ENUM.MENOR, 3)) {
@@ -114,6 +117,7 @@ const Cronograma: FC<CronogramaProperties> = ({
 
         if (response.status === STATUS_CODE.OK) {
             setPeriodos(response.data);
+            setCarregandoInformacoesPeriodo(false);
             return response.data;
         }
 
@@ -125,9 +129,13 @@ const Cronograma: FC<CronogramaProperties> = ({
         if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
             exibirAlerta(["Erro inesperado!"], "error");
         }
+
+        setCarregandoInformacoesPeriodo(false);
     }
 
     const carregarCursoPorPeriodo = async (id: number) => {
+        setCarregandoInformacoesCurso(true);
+
         const response = await apiGet(`/curso/carregar/periodo/${id}`);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
@@ -137,6 +145,7 @@ const Cronograma: FC<CronogramaProperties> = ({
 
         if (response.status === STATUS_CODE.OK) {
             setCursosPorPeriodo(response.data);
+            setCarregandoInformacoesCurso(false);
             return response.data;
         }
 
@@ -148,9 +157,12 @@ const Cronograma: FC<CronogramaProperties> = ({
         if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
             exibirAlerta(["Erro inesperado!"], "error");
         }
+
+        setCarregandoInformacoesCurso(false);
     }
 
     const carregarCursoPorUsuario = async () => {
+        setCarregandoInformacoesCurso(true);
         const response = await apiGet(`/curso/carregar/usuario`);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
@@ -170,6 +182,7 @@ const Cronograma: FC<CronogramaProperties> = ({
         if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
             exibirAlerta(["Erro inesperado!"], "error");
         }
+        setCarregandoInformacoesCurso(false);
     }
 
     const selecionarPeriodo = async (periodo: IPeriodo) => {
@@ -413,7 +426,7 @@ const Cronograma: FC<CronogramaProperties> = ({
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    bgcolor: "var(--gray)",
+                    bgcolor: "var(--light)",
                     boxShadow: 3,
                     padding: "24px 16px",
                     borderRadius: 2,
@@ -510,8 +523,19 @@ const Cronograma: FC<CronogramaProperties> = ({
                                         </SwiperSlide>
                                     ))}
                                 </Swiper>
-                            </Box> :
-                            <p style={{ width: "80%", textAlign: "center", marginBlock: "19px" }} className="cronograma-sem-curso">Nenhum período encontrado com cronograma</p>
+                            </Box> : (
+                                carregandoInformacoesPeriodo ?
+                                    <p className="carregando-periodo">
+                                        <CircularProgress size="2.8rem" sx={{
+                                            position: 'absolute',
+                                            zIndex: 50,
+                                            right: `50%`,
+                                            color: "var(--dark-blue-senac)"
+                                        }} />
+                                    </p> :
+                                    <p style={{ width: "80%", textAlign: "center", marginBlock: "19px" }}className="cronograma-sem-curso">Nenhum período encontrado com cronograma</p>
+                            )
+
                         }
                         {
                             validarPermissao(OPERADOR_ENUM.MENOR, 3) &&
@@ -604,8 +628,18 @@ const Cronograma: FC<CronogramaProperties> = ({
                                     setCursoPorPeriodoSelecionadoExclusao(curso);
                                 }}
                             />
-                        )) :
-                        <p className="cronograma-sem-curso">Não existem cronogramas para o período selecionado</p>
+                        )) : (
+                            carregandoInformacoesCurso ?
+                                <p className="carregando-curso">
+                                    <CircularProgress size="2.8rem" sx={{
+                                        position: 'absolute',
+                                        zIndex: 50,
+                                        right: `50%`,
+                                        color: "var(--dark-blue-senac)"
+                                    }} />
+                                </p> :
+                                <p className="cronograma-sem-curso">Não existe cronogramas para o período selecionado</p>
+                        )
                 }
 
 

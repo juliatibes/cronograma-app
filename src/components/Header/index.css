@@ -3,6 +3,7 @@
 }
 
 .menu-header{
+  min-height: 74px;
   width: 100%;
   display: flex;
   align-items: center;

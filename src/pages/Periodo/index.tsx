@@ -66,6 +66,12 @@ const Periodo: FC = () => {
   const [validarCampoNome, setValidarCampoNome] = useState<IValidarCampos>(
     valorInicialValidarCampos
   );
+  const [validarCampoDataInicial, setValidarCampoDataInicial] = useState<IValidarCampos>(
+    valorInicialValidarCampos
+  );
+  const [validarCampoDataFinal, setValidarCampoDataFinal] = useState<IValidarCampos>(
+    valorInicialValidarCampos
+  );
 
   const exibirErros = (mensagens: string[]) => {
 
@@ -96,8 +102,9 @@ const Periodo: FC = () => {
   };
 
   const limparErros = () => {
-
     setValidarCampoNome(valorInicialValidarCampos);
+    setValidarCampoDataInicial(valorInicialValidarCampos);
+    setValidarCampoDataFinal(valorInicialValidarCampos);
   };
 
   const limparModal = () => {
@@ -115,6 +122,41 @@ const Periodo: FC = () => {
       setValidarCampoNome(campoObrigatorio);
       existeErro = true;
     }
+
+    if (!dataInicial) {
+      setValidarCampoDataInicial(campoObrigatorio);
+      existeErro = true;
+    } else if (!dayjs(dataInicial).isValid()) {
+      setValidarCampoDataInicial({ existeErro: true, mensagem: "Data inválida" });
+      existeErro = true;
+    } else if(dayjs(dataInicial).isBefore(dayjs('2020-01-01')) || dayjs(dataInicial).isAfter(dayjs('2070-12-31'))){
+      setValidarCampoDataInicial({ existeErro: true, mensagem: "Data inválida" });
+      existeErro = true;
+    }
+
+    if (!dataFinal) {
+      setValidarCampoDataFinal(campoObrigatorio);
+      existeErro = true;
+    } else if (!dayjs(dataFinal).isValid()) {
+      setValidarCampoDataFinal({ existeErro: true, mensagem: "Data inválida" });
+      existeErro = true;
+    } else if(dayjs(dataFinal).isBefore(dayjs('2020-01-01')) || dayjs(dataFinal).isAfter(dayjs('2070-12-31'))){
+      setValidarCampoDataFinal({ existeErro: true, mensagem: "Data inválida" });
+      existeErro = true;
+    }
+
+    if (dataFinal && dataInicial) {
+      if(dayjs(dataInicial).isAfter(dayjs(dataFinal))){
+        setValidarCampoDataInicial({ existeErro: true, mensagem: "Data inválida" });
+        existeErro = true;
+      }
+      if(dayjs(dataInicial).isSame(dayjs(dataFinal))){
+        setValidarCampoDataInicial({ existeErro: true, mensagem: "Data inválida" });
+        setValidarCampoDataFinal({ existeErro: true, mensagem: "Data inválida" });
+        existeErro = true;
+      }
+    }
+
     return existeErro;
   };
 
@@ -303,6 +345,8 @@ const Periodo: FC = () => {
                     slotProps={{
                       textField: {
                         size: 'small',
+                        error: validarCampoDataInicial.existeErro,
+                        helperText: validarCampoDataInicial.mensagem,
                       },
                       popper: {
                         placement: 'auto',
@@ -323,6 +367,8 @@ const Periodo: FC = () => {
                     slotProps={{
                       textField: {
                         size: 'small',
+                        error: validarCampoDataFinal.existeErro,
+                        helperText: validarCampoDataFinal.mensagem,
                       },
                       popper: {
                         placement: 'auto',

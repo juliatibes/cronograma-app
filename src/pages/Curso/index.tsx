@@ -355,10 +355,10 @@ const Curso: FC = () => {
                 type={"text"}
                 width={"30%"}
                 label={"Sigla"}
-                value={sigla}
+                value={sigla.toUpperCase()}
                 onChange={(e) => {
                   if (e) {
-                    setSigla(e.target.value)
+                    setSigla(e.target.value.toUpperCase())
                   }
                 }}
                 error={validarCampoSigla.existeErro}
