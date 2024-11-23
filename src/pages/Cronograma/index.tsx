@@ -162,7 +162,6 @@ const Cronograma: FC<CronogramaProperties> = ({
     }
 
     const carregarCursoPorUsuario = async () => {
-        setCarregandoInformacoesCurso(true);
         const response = await apiGet(`/curso/carregar/usuario`);
 
         if (response.status === STATUS_CODE.FORBIDDEN) {
@@ -182,7 +181,6 @@ const Cronograma: FC<CronogramaProperties> = ({
         if (response.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
             exibirAlerta(["Erro inesperado!"], "error");
         }
-        setCarregandoInformacoesCurso(false);
     }
 
     const selecionarPeriodo = async (periodo: IPeriodo) => {
@@ -309,7 +307,9 @@ const Cronograma: FC<CronogramaProperties> = ({
                 }
             }
         }
-
+        
+        setCarregandoInformacoesPeriodo(false);
+        setCarregandoInformacoesCurso(false);
         setCarregandoInformacoesPagina(false);
     }
 
