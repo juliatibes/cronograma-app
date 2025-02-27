@@ -1,46 +1,47 @@
-# Getting Started with Create React App
+# cronograma-app
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Front-End do TCS de Analise e Desenvolvimento de Sistemas**<br>
+**SenacPlan -  Gerador de cronogramas de aulas**
 
-## Available Scripts
+**Equipe:**
+Barbara [linkedin](https://www.linkedin.com/in/barbara-s-b052b1140/), 
+Gustavo [linkedin](https://www.linkedin.com/in/gustavo-albonico-goncalves/), 
+Julia  [linkedin](https://www.linkedin.com/in/juliatibes/), 
+Maria Eduarda [linkedin](https://www.linkedin.com/in/maria-eduarda-rebelo-961306193/).
 
-In the project directory, you can run:
+**Resumo:**
+  O Senacplan é um sistema desenvolvido para organizar cronogramas de aulas na Faculdade Senac Criciúma. O objetivo principal é oferecer uma plataforma prática e intuitiva que facilite o planejamento acadêmico. Para isso, o projeto focou em aprimorar a versão anterior, que apresentava limitações quanto à usabilidade e funcionalidade. Com uma nova interface, identidade visual alinhada à instituição, e níveis de acesso hierárquicos, o sistema permite que coordenadores gerenciem horários com eficiência, professores ajustem suas disponibilidades e alunos acessem cronogramas de forma prática. Os métodos envolveram pesquisa, análise de requisitos, modelagem do sistema e desenvolvimento de testes para garantir a eficácia das funções implementadas. Como resultado, a aplicação promoveu maior agilidade e organização no planejamento acadêmico. Concluiu-se que, embora o sistema atual apresente melhorias significativas, novas funcionalidades ainda podem ser adicionadas para atender plenamente às necessidades de todos os cursos
+  
+**Tecnologias Utilizadas/Ferramentas:**
+- Frontend: Reactjs + Typescript + Material-UI
+- Backend: Java + Spring Boot 
+- Banco de dados: Postgresql
+- Figma
+- Postman
+- GitHub
 
-### `npm start`
+**Videos e Imagens:**
+- [Post com video de demonstração do sistema](https://www.linkedin.com/feed/update/urn:li:activity:7282042694523064320/).
+- [Post explicando as tecnologias](https://www.linkedin.com/feed/update/urn:li:activity:7284558012415942656/).
+- [Login](https://www.linkedin.com/feed/update/urn:li:activity:7282042694523064320/)
+    <a href="https://www.linkedin.com/feed/update/urn:li:activity:7282042694523064320/"><p><img src="./img/login.png" width="600"/></p></a>
+- [Disciplinas](https://www.linkedin.com/feed/update/urn:li:activity:7282042694523064320/)
+    <a href="https://www.linkedin.com/feed/update/urn:li:activity:7282042694523064320/"><p><img src="./img/disciplinas.png" width="600"/></p></a>
+- [Cronograma](https://www.linkedin.com/feed/update/urn:li:activity:7282042694523064320/)
+    <a href="https://www.linkedin.com/feed/update/urn:li:activity:7282042694523064320/"><p><img src="./img/cronograma.png" width="600"/></p></a>
+- [Cronograma](https://www.linkedin.com/feed/update/urn:li:activity:7282042694523064320/)
+    <a href="https://www.linkedin.com/feed/update/urn:li:activity:7282042694523064320/"><p><img src="./img/cronograma-trocar-dia.png" width="600"/></p></a>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+**Tutorial para rodar a aplicação completa:**
+   - Back [API](https://github.com/GustavoAlbonico/cronograma-api)
+     - Clone o projeto
+     - Abra o projeto com a sua IDEA para Java
+     - Configure o arquivo .yml com as informações do seu banco
+     - Crie o banco de dados com o nome informado no arquivo .yml
+     - Iniciei o projeto (Vai ser inseridos alguns dados automaticamente quando iniciar o projeto).
+   - Front [APP](https://github.com/juliatibes/cronograma-app).
+     - Clone o projeto.
+     - Abra o projeto com a IDEA.
+     - npm i para instalar as dependências.
+     - Verifique se em cronograma-app/src/api "const api = new Axios({ baseURL: "http://localhost:8080" });" está na mesma **porta** que seu back está rodando
+     - npm start para iniciar o projeto.
